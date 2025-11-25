@@ -1,0 +1,232 @@
+/* Recommendations.css */
+.recommendations-container {
+  max-width: 900px;
+  margin: 2rem auto;
+  padding: 0 1rem;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  color: #333;
+}
+
+.recommendations-header {
+  text-align: center;
+  margin-bottom: 2.5rem;
+}
+
+.recommendations-header h2 {
+  color: #0066ff;
+  font-size: 2rem;
+  margin-bottom: 0.75rem;
+  position: relative;
+  display: inline-block;
+  font-weight: 600;
+}
+
+.recommendations-header h2::after {
+  content: '';
+  position: absolute;
+  bottom: -10px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 80px;
+  height: 3px;
+  background: linear-gradient(90deg, #0066ff, #00ccff);
+  border-radius: 3px;
+}
+
+/* Loading State */
+.recommendations-loading {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 300px;
+  gap: 1.5rem;
+}
+
+.loading-spinner {
+  width: 60px;
+  height: 60px;
+  border: 5px solid rgba(0, 102, 255, 0.1);
+  border-top: 5px solid #0066ff;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+.loading-text {
+  color: #666;
+  font-size: 1.1rem;
+}
+
+/* Error State */
+.recommendations-error {
+  background: #fff0f0;
+  color: #d32f2f;
+  padding: 1.5rem;
+  border-radius: 8px;
+  border-left: 4px solid #d32f2f;
+  margin: 2rem 0;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+}
+
+.error-icon {
+  font-size: 1.5rem;
+  margin-right: 0.5rem;
+  vertical-align: middle;
+}
+
+/* Recommendations Content */
+.recommendations-content {
+  display: grid;
+  gap: 2rem;
+}
+
+.recommendation-section {
+  background: #fff;
+  border-radius: 12px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+  padding: 2rem;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.recommendation-section:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 25px rgba(0, 0, 0, 0.1);
+}
+
+.section-title {
+  color: #000000;
+  font-size: 1.5rem;
+  text-align: justify;
+  margin-bottom: 1.25rem;
+  font-weight: 600;
+  padding-bottom: 0.75rem;
+  border-bottom: 2px solid rgba(0, 102, 255, 0.1);
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+
+
+.recommendation-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.recommendation-item {
+  padding: 0.85rem 0;
+  display: flex;
+  align-items: flex-start;
+  line-height: 1.6;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+}
+
+.recommendation-item:last-child {
+  border-bottom: none;
+}
+
+.recommendation-item::before {
+  content: '•';
+  color: #333;
+  font-weight: bold;
+  font-size: 1.5rem;
+  margin-right: 0.75rem;
+  line-height: 1;
+}
+
+.item-text {
+  color: #444;
+  flex: 1;
+  text-align: justify;
+}
+
+.bold-part {
+  font-weight: 600;
+  color: #000000;
+}
+
+/* Empty/Waiting State */
+.waiting-message {
+  text-align: center;
+  padding: 3rem 2rem;
+  background: #f8faff;
+  border-radius: 12px;
+  color: #555;
+  font-size: 1.1rem;
+  border: 1px dashed rgba(0, 102, 255, 0.3);
+}
+
+.waiting-icon {
+  font-size: 2rem;
+  color: #0066ff;
+  margin-bottom: 1rem;
+  opacity: 0.7;
+}
+
+/* Animations */
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateX(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .recommendations-container {
+    padding: 0 1rem;
+  }
+  
+  .recommendations-header h2 {
+    font-size: 1.75rem;
+  }
+  
+  .recommendation-section {
+    padding: 1.5rem;
+  }
+  
+  .section-title {
+    font-size: 1.3rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .recommendation-section {
+    padding: 1.25rem;
+  }
+  
+  .recommendation-item {
+    padding: 0.75rem 0;
+  }
+  
+  .recommendation-item::before {
+    font-size: 1.3rem;
+    margin-right: 0.5rem;
+  }
+}

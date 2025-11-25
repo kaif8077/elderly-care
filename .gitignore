@@ -1,0 +1,65 @@
+# Node.js dependencies
+node_modules/
+backend/node_modules/
+frontend/node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Environment variables
+.env
+.env.local
+.env.production
+backend/.env
+frontend/.env
+
+# Uploads and generated files
+backend/uploads/
+backend/public/profiles/
+
+# Logs
+logs
+*.log
+backend/logs/
+frontend/logs/
+
+# Runtime data
+*.pid
+*.seed
+*.pid.lock
+
+# Coverage directory
+coverage/
+*.lcov
+
+# IDE files
+.vscode/
+.idea/
+*.swp
+*.swo
+*.sublime-project
+*.sublime-workspace
+
+# OS generated files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Cache
+.npm
+.eslintcache
+
+# Build files
+dist/
+build/
+backend/dist/
+frontend/build/
+frontend/dist/
+
+# Temporary files
+*.tmp
+*.temp

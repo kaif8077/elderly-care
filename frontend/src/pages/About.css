@@ -1,0 +1,252 @@
+/* ===== Base Styles ===== */
+.about-page {
+  font-family: 'Poppins', sans-serif;
+  color: #333;
+  line-height: 1.6;
+}
+
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 20px;
+}
+
+/* ===== Hero Section ===== */
+.about-hero {
+  height: 300px;
+  background-size: cover;
+  background-position: center;
+  display: flex;
+  align-items: center;
+  position: relative;
+  
+}
+
+
+
+.hero-overlay h1 {
+  font-size: 2.8rem;
+  margin-bottom: 15px;
+  text-align: center ;
+}
+
+.hero-overlay p {
+  font-size: 1.3rem;
+}
+
+/* ===== About Us Section ===== */
+.section-about {
+  padding: 60px 0 0;
+  
+}
+
+.section-about .container {
+  display: flex;
+  gap: 50px;
+  align-items: center;
+}
+
+.about-content {
+  flex: 1;
+  padding-right: 30px;
+}
+
+.about-content h2 {
+  font-size: 2.2rem;
+  color: #0066ff;
+  margin-bottom: 20px;
+}
+
+.about-content p {
+  font-size: 1.1rem;
+  margin-bottom: 18px;
+  color: #555;
+}
+
+.about-image {
+  flex: 1;
+  border-radius: 10px;
+  overflow: hidden;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+}
+
+.about-image img {
+  width: 100%;
+  height: auto;
+  display: block;
+  transition: transform 0.5s ease;
+}
+
+.about-image img:hover {
+  transform: scale(1.03);
+}
+
+/* ===== Detailed About Section ===== */
+.section-details {
+  padding: 60px 0 30px;
+}
+
+.details-content {
+  
+  margin: 0 auto;
+}
+
+.details-content h3 {
+  font-size: 1.5rem;
+  color: #0066ff;
+  margin: 30px 0 15px;
+}
+
+.details-content p {
+  font-size: 1.1rem;
+  color: #555;
+  margin-bottom: 20px;
+}
+
+/* ===== Compact Team Section ===== */
+.section-team {
+  padding: 0 0 60px;
+  background-color: #f5f7fa;
+}
+
+.section-team h2 {
+  text-align: center;
+  font-size: 2.2rem;
+  color: #0066ff;
+  margin-bottom: 40px;
+}
+
+.team-grid-compact {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 20px;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.team-card-compact {
+  background: white;
+  border-radius: 8px;
+  padding: 20px;
+  box-shadow: 0 3px 10px rgba(0,0,0,0.08);
+  transition: transform 0.3s ease;
+  text-align: center;
+}
+
+.team-card-compact:hover {
+  transform: translateY(-5px);
+}
+
+.member-avatar {
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  margin: 0 auto 15px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-weight: bold;
+  font-size: 1.2rem;
+}
+
+.member-info h4 {
+  font-size: 1rem;
+  margin-bottom: 5px;
+  color: #333;
+}
+
+.member-info .role {
+  font-size: 0.85rem;
+  color: #ff6b00;
+  font-weight: 500;
+}
+.team-description {
+  text-align: center;
+  color: #666;
+  font-size: 1.1rem;
+  margin-bottom: 30px;
+  font-weight: 500;
+}
+
+.member-info {
+  text-align: center;
+}
+
+.member-description {
+  font-size: 0.85rem;
+  color: #666;
+  margin-top: 8px;
+  line-height: 1.4;
+  font-style: italic;
+}
+
+/* Adjust card height to accommodate new text */
+.team-card-compact {
+  min-height: 180px;
+}
+
+/* Responsive adjustments */
+@media (max-width: 1200px) {
+  .team-grid-compact {
+    grid-template-columns: repeat(3, 1fr);
+    gap: 15px;
+  }
+}
+
+@media (max-width: 768px) {
+  .team-grid-compact {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 480px) {
+  .team-grid-compact {
+    grid-template-columns: 1fr;
+    max-width: 300px;
+  }
+}
+
+/* ===== Responsive Design ===== */
+@media (max-width: 992px) {
+  .section-about .container {
+    flex-direction: column;
+  }
+  
+  .about-content {
+    padding-right: 0;
+    margin-bottom: 40px;
+  }
+  
+  .team-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 768px) {
+  .about-hero {
+    height: 300px;
+  }
+  
+  .hero-overlay {
+    margin-left: 5%;
+    padding: 30px;
+  }
+  
+  .hero-overlay h1 {
+    font-size: 2.2rem;
+  }
+}
+
+@media (max-width: 576px) {
+  .team-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .hero-overlay {
+    margin: 0 auto;
+    text-align: center;
+    
+  }
+}
+
