@@ -16,11 +16,7 @@ connectDB();
 
 // CORS setup - EK HI BAAR USE KAREIN
 app.use(cors({
-    origin: [
-        'http://localhost:3000',
-        'https://elderly-care-xi.vercel.app',
-        'https://elderlycare-khaki.vercel.app'
-    ],
+    origin: "*",
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
     allowedHeaders: ['Content-Type', 'Authorization', 'Accept'],
     credentials: true
