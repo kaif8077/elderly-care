@@ -17,13 +17,13 @@ const MedicalForm = ({ onSubmissionSuccess }) => {
         weight: '',
         customWeight: '',
         dietPreference: '',
-        
+
         // Contact Information
         phone: '+91 ',
         emergencyContact: '',
         emergencyPhone: '+91 ',
         address: '',
-        
+
         // Medical Information
         medicalHistory: [],
         medicalHistoryOther: '',
@@ -33,7 +33,7 @@ const MedicalForm = ({ onSubmissionSuccess }) => {
         medicationsOther: '',
         currentSymptoms: [],
         currentSymptomsOther: '',
-        
+
         // Insurance Information
         hasInsurance: false,
         insuranceProvider: '',
@@ -47,7 +47,7 @@ const MedicalForm = ({ onSubmissionSuccess }) => {
     // Options for form fields
     const bloodGroups = ['A+', 'A-', 'B+', 'B-', 'AB+', 'AB-', 'O+', 'O-'];
     const dietPreferences = ['Vegetarian', 'Non-Vegetarian', 'Vegan', 'Eggetarian'];
-    
+
     // Height options (4ft to 7ft in inches)
     const heightOptions = [];
     for (let feet = 4; feet <= 6; feet++) {
@@ -59,7 +59,7 @@ const MedicalForm = ({ onSubmissionSuccess }) => {
             });
         }
     }
-    
+
     // Weight options (30kg to 150kg in 5kg increments)
     const weightOptions = [];
     for (let i = 45; i <= 100; i += 5) {
@@ -68,29 +68,29 @@ const MedicalForm = ({ onSubmissionSuccess }) => {
 
     // Medical options
     const medicalHistoryOptions = [
-        'Diabetes', 'Hypertension', 'Asthma', 'Heart Disease', 
+        'Diabetes', 'Hypertension', 'Asthma', 'Heart Disease',
         'Cancer', 'Stroke', 'Kidney Disease', 'Liver Disease', 'Thyroid Disorders',
         'Cholesterol', 'Obesity', 'Anemia', 'Epilepsy', 'Parkinson\'s Disease', 'None', 'Other'
     ];
-    
+
     const allergiesOptions = [
-        'Dust', 'Pollen', 'Food', 'Medication', 
+        'Dust', 'Pollen', 'Food', 'Medication',
         'Animal Dander', 'Mold', 'Shellfish', 'Nuts', 'Latex',
         'Penicillin', 'Aspirin', 'Milk', 'Eggs', 'Wheat', 'None', 'Other'
     ];
-    
+
     const medicationsOptions = [
-        'Metformin', 'Amlodipine', 'Inhalers', 'Statins', 
+        'Metformin', 'Amlodipine', 'Inhalers', 'Statins',
         'Aspirin', 'Paracetamol', 'Ibuprofen', 'Insulin', 'Losartan',
         'Lisinopril', 'Omeprazole', 'Hydrochlorothiazide', 'Warfarin', 'Gabapentin', 'None', 'Other'
     ];
-    
+
     const symptomsOptions = [
-        'Fever', 'Cough', 'Headache', 'Fatigue', 
+        'Fever', 'Cough', 'Headache', 'Fatigue',
         'Nausea', 'Dizziness', 'Shortness of Breath', 'Chest Pain', 'Swelling',
         'Joint Pain', 'Sore Throat', 'Rash', 'Vomiting', 'Diarrhea', 'None', 'Other'
     ];
-    
+
     const insuranceProviders = [
         'Star Health and Allied Insurance',
         'Niva Bupa Health Insurance',
@@ -128,7 +128,7 @@ const MedicalForm = ({ onSubmissionSuccess }) => {
 
     const handlePhoneChange = (e) => {
         const { name, value } = e.target;
-        if ((name === 'phone' || name === 'emergencyPhone') && 
+        if ((name === 'phone' || name === 'emergencyPhone') &&
             (value.startsWith('+91') && value.length <= 13 || value === '+91 ')) {
             setFormData(prev => ({
                 ...prev,
@@ -140,11 +140,11 @@ const MedicalForm = ({ onSubmissionSuccess }) => {
     const handleCheckboxChange = (field, option) => {
         setFormData(prev => {
             const currentValues = [...prev[field]];
-            
+
             if (option === 'None') {
                 return { ...prev, [field]: ['None'] };
             }
-            
+
             if (currentValues.includes(option)) {
                 const newValues = currentValues.filter(item => item !== option && item !== 'None');
                 return { ...prev, [field]: newValues };
@@ -194,31 +194,30 @@ const MedicalForm = ({ onSubmissionSuccess }) => {
             height: formData.height === 'other' ? formData.customHeight : formData.height,
             heightUnit: 'cm',
             weight: formData.weight === 'other' ? formData.customWeight : formData.weight,
-            medicalHistory: formData.medicalHistory.includes('Other') ? 
-                [...formData.medicalHistory.filter(item => item !== 'Other'), formData.medicalHistoryOther] : 
+            medicalHistory: formData.medicalHistory.includes('Other') ?
+                [...formData.medicalHistory.filter(item => item !== 'Other'), formData.medicalHistoryOther] :
                 formData.medicalHistory,
-            allergies: formData.allergies.includes('Other') ? 
-                [...formData.allergies.filter(item => item !== 'Other'), formData.allergiesOther] : 
+            allergies: formData.allergies.includes('Other') ?
+                [...formData.allergies.filter(item => item !== 'Other'), formData.allergiesOther] :
                 formData.allergies,
-            medications: formData.medications.includes('Other') ? 
-                [...formData.medications.filter(item => item !== 'Other'), formData.medicationsOther] : 
+            medications: formData.medications.includes('Other') ?
+                [...formData.medications.filter(item => item !== 'Other'), formData.medicationsOther] :
                 formData.medications,
-            currentSymptoms: formData.currentSymptoms.includes('Other') ? 
-                [...formData.currentSymptoms.filter(item => item !== 'Other'), formData.currentSymptomsOther] : 
+            currentSymptoms: formData.currentSymptoms.includes('Other') ?
+                [...formData.currentSymptoms.filter(item => item !== 'Other'), formData.currentSymptomsOther] :
                 formData.currentSymptoms,
-            insuranceProvider: formData.insuranceProvider === 'Other' ? 
+            insuranceProvider: formData.insuranceProvider === 'Other' ?
                 formData.insuranceProviderOther : formData.insuranceProvider
         };
 
         try {
-            const apiUrl = process.env.REACT_APP_API_URl || 'http://localhost:5000';
-            await axios.post(`${apiUrl}/api/medical`, submissionData, {
+            await axios.post(`${process.env.REACT_APP_BACKEND_URI}/api/medical`, submissionData, {
                 headers: {
                     Authorization: `Bearer ${token}`,
                     'Content-Type': 'application/json'
                 }
             });
-            
+
             showToast('Medical profile saved successfully!', 'success');
             if (onSubmissionSuccess) {
                 setTimeout(onSubmissionSuccess, 100);
@@ -231,44 +230,44 @@ const MedicalForm = ({ onSubmissionSuccess }) => {
         }
     };
 
-    return(
+    return (
         <div className="medical-form-container">
             <h2>Medical Information Form</h2>
             <form onSubmit={handleSubmit}>
                 {/* Personal Information Section */}
                 <fieldset className="form-section">
                     <legend>Personal Information</legend>
-                    
+
                     <div className="form-group">
                         <label>Full Name*</label>
-                        <input 
-                            type="text" 
-                            name="name" 
-                            value={formData.name} 
-                            onChange={handleChange} 
-                            required 
+                        <input
+                            type="text"
+                            name="name"
+                            value={formData.name}
+                            onChange={handleChange}
+                            required
                         />
                     </div>
-                    
+
                     <div className="form-row">
                         <div className="form-group">
                             <label>Date of Birth*</label>
-                            <input 
-                                type="date" 
-                                name="dob" 
-                                value={formData.dob} 
-                                onChange={handleChange} 
-                                required 
+                            <input
+                                type="date"
+                                name="dob"
+                                value={formData.dob}
+                                onChange={handleChange}
+                                required
                                 max={new Date().toISOString().split('T')[0]}
                             />
                         </div>
-                        
+
                         <div className="form-group">
                             <label>Gender*</label>
-                            <select 
-                                name="gender" 
-                                value={formData.gender} 
-                                onChange={handleChange} 
+                            <select
+                                name="gender"
+                                value={formData.gender}
+                                onChange={handleChange}
                                 required
                             >
                                 <option value="">Select Gender</option>
@@ -278,13 +277,13 @@ const MedicalForm = ({ onSubmissionSuccess }) => {
                             </select>
                         </div>
                     </div>
-                    
+
                     <div className="form-row">
                         <div className="form-group">
                             <label>Blood Group</label>
-                            <select 
-                                name="bloodGroup" 
-                                value={formData.bloodGroup} 
+                            <select
+                                name="bloodGroup"
+                                value={formData.bloodGroup}
                                 onChange={handleChange}
                             >
                                 <option value="">Select Blood Group</option>
@@ -293,13 +292,13 @@ const MedicalForm = ({ onSubmissionSuccess }) => {
                                 ))}
                             </select>
                         </div>
-                        
+
                         <div className="form-group">
                             <label>Diet Preference*</label>
-                            <select 
-                                name="dietPreference" 
-                                value={formData.dietPreference} 
-                                onChange={handleChange} 
+                            <select
+                                name="dietPreference"
+                                value={formData.dietPreference}
+                                onChange={handleChange}
                                 required
                             >
                                 <option value="">Select Diet</option>
@@ -309,7 +308,7 @@ const MedicalForm = ({ onSubmissionSuccess }) => {
                             </select>
                         </div>
                     </div>
-                    
+
                     <div className="form-row">
                         <div className="form-group">
                             <label>Height*(in cms)  </label>
@@ -326,14 +325,14 @@ const MedicalForm = ({ onSubmissionSuccess }) => {
                                 <option value="other">Other</option>
                             </select> */}
                             <input name="height" type="number"
-                                value={formData.height} 
-                                onChange={handleChange} 
+                                value={formData.height}
+                                onChange={handleChange}
                                 required></input>
                             {formData.height === 'other' && (
-                                <input 
-                                    type="number" 
-                                    name="customHeight" 
-                                    value={formData.customHeight} 
+                                <input
+                                    type="number"
+                                    name="customHeight"
+                                    value={formData.customHeight}
                                     onChange={handleChange}
                                     placeholder="Enter height in cm"
                                     className="custom-input"
@@ -343,13 +342,13 @@ const MedicalForm = ({ onSubmissionSuccess }) => {
                                 />
                             )}
                         </div>
-                        
+
                         <div className="form-group">
                             <label>Weight (kg)*</label>
-                            <select 
-                                name="weight" 
-                                value={formData.weight} 
-                                onChange={handleChange} 
+                            <select
+                                name="weight"
+                                value={formData.weight}
+                                onChange={handleChange}
                                 required
                             >
                                 <option value="">Select Weight</option>
@@ -359,10 +358,10 @@ const MedicalForm = ({ onSubmissionSuccess }) => {
                                 <option value="other">Other</option>
                             </select>
                             {formData.weight === 'other' && (
-                                <input 
-                                    type="number" 
-                                    name="customWeight" 
-                                    value={formData.customWeight} 
+                                <input
+                                    type="number"
+                                    name="customWeight"
+                                    value={formData.customWeight}
                                     onChange={handleChange}
                                     placeholder="Enter weight in kg"
                                     className="custom-input"
@@ -378,38 +377,38 @@ const MedicalForm = ({ onSubmissionSuccess }) => {
                 {/* Contact Information Section */}
                 <fieldset className="form-section">
                     <legend>Contact Information</legend>
-                    
+
                     <div className="form-group">
                         <label>Phone Number*</label>
-                        <input 
-                            type="tel" 
-                            name="phone" 
-                            value={formData.phone} 
-                            onChange={handlePhoneChange} 
+                        <input
+                            type="tel"
+                            name="phone"
+                            value={formData.phone}
+                            onChange={handlePhoneChange}
                             required
                             pattern="\+91\d{10}"
                             placeholder="+91XXXXXXXXXX"
                         />
                     </div>
-                    
+
                     <div className="form-row">
                         <div className="form-group">
                             <label>Emergency Contact Name*</label>
-                            <input 
-                                type="text" 
-                                name="emergencyContact" 
-                                value={formData.emergencyContact} 
-                                onChange={handleChange} 
+                            <input
+                                type="text"
+                                name="emergencyContact"
+                                value={formData.emergencyContact}
+                                onChange={handleChange}
                                 required
                             />
                         </div>
-                        
+
                         <div className="form-group">
                             <label>Emergency Phone*</label>
-                            <input 
-                                type="tel" 
-                                name="emergencyPhone" 
-                                value={formData.emergencyPhone} 
+                            <input
+                                type="tel"
+                                name="emergencyPhone"
+                                value={formData.emergencyPhone}
                                 onChange={handlePhoneChange}
                                 required
                                 pattern="\+91\d{10}"
@@ -417,14 +416,14 @@ const MedicalForm = ({ onSubmissionSuccess }) => {
                             />
                         </div>
                     </div>
-                    
+
                     <div className="form-group">
                         <label>Address*</label>
-                        <textarea 
-                            name="address" 
-                            value={formData.address} 
-                            onChange={handleChange} 
-                            rows="3" 
+                        <textarea
+                            name="address"
+                            value={formData.address}
+                            onChange={handleChange}
+                            rows="3"
                             required
                         />
                     </div>
@@ -433,146 +432,146 @@ const MedicalForm = ({ onSubmissionSuccess }) => {
                 {/* Medical Information Section */}
                 <fieldset className="form-section">
                     <legend>Medical Information</legend>
-                    
+
                     <div className="form-group">
-    <label>Medical History</label>
-    <div className="checkbox-grid">
-        {medicalHistoryOptions.map((option, index) => (
-            <div key={index} className="checkbox-item">
-                <input
-                    type="checkbox"
-                    id={`medicalHistory-${index}`}
-                    checked={formData.medicalHistory.includes(option)}
-                    onChange={() => handleCheckboxChange('medicalHistory', option)}
-                />
-                <label htmlFor={`medicalHistory-${index}`}>{option}</label>
-            </div>
-        ))}
-    </div>
-    {formData.medicalHistory.includes('Other') && (
-        <div className="form-group">
-            <input
-                type="text"
-                name="medicalHistoryOther"
-                value={formData.medicalHistoryOther}
-                onChange={handleChange}
-                placeholder="Specify other medical conditions"
-                className="other-input"
-            />
-        </div>
-    )}
-</div>
-                    
-<div className="form-group">
-    <label>Allergies</label>
-    <div className="checkbox-grid">
-        {allergiesOptions.map((option, index) => (
-            <div key={index} className="checkbox-item">
-                <input
-                    type="checkbox"
-                    id={`allergies-${index}`}
-                    checked={formData.allergies.includes(option)}
-                    onChange={() => handleCheckboxChange('allergies', option)}
-                />
-                <label htmlFor={`allergies-${index}`}>{option}</label>
-            </div>
-        ))}
-    </div>
-    {formData.allergies.includes('Other') && (
-        <div className="form-group">
-            <input
-                type="text"
-                name="allergiesOther"
-                value={formData.allergiesOther}
-                onChange={handleChange}
-                placeholder="Specify other allergies"
-                className="other-input"
-            />
-        </div>
-    )}
-</div>
-                    
-<div className="form-group">
-    <label>Current Medications</label>
-    <div className="checkbox-grid">
-        {medicationsOptions.map((option, index) => (
-            <div key={index} className="checkbox-item">
-                <input
-                    type="checkbox"
-                    id={`medications-${index}`}
-                    checked={formData.medications.includes(option)}
-                    onChange={() => handleCheckboxChange('medications', option)}
-                />
-                <label htmlFor={`medications-${index}`}>{option}</label>
-            </div>
-        ))}
-    </div>
-    {formData.medications.includes('Other') && (
-        <div className="form-group">
-            <input
-                type="text"
-                name="medicationsOther"
-                value={formData.medicationsOther}
-                onChange={handleChange}
-                placeholder="Specify other medications"
-                className="other-input"
-            />
-        </div>
-    )}
-</div>
-                    
-<div className="form-group">
-    <label>Current Symptoms</label>
-    <div className="checkbox-grid">
-        {symptomsOptions.map((option, index) => (
-            <div key={index} className="checkbox-item">
-                <input
-                    type="checkbox"
-                    id={`symptoms-${index}`}
-                    checked={formData.currentSymptoms.includes(option)}
-                    onChange={() => handleCheckboxChange('currentSymptoms', option)}
-                />
-                <label htmlFor={`symptoms-${index}`}>{option}</label>
-            </div>
-        ))}
-    </div>
-    {formData.currentSymptoms.includes('Other') && (
-        <div className="form-group">
-            <input
-                type="text"
-                name="currentSymptomsOther"
-                value={formData.currentSymptomsOther}
-                onChange={handleChange}
-                placeholder="Specify other symptoms"
-                className="other-input"
-            />
-        </div>
-    )}
-</div>
+                        <label>Medical History</label>
+                        <div className="checkbox-grid">
+                            {medicalHistoryOptions.map((option, index) => (
+                                <div key={index} className="checkbox-item">
+                                    <input
+                                        type="checkbox"
+                                        id={`medicalHistory-${index}`}
+                                        checked={formData.medicalHistory.includes(option)}
+                                        onChange={() => handleCheckboxChange('medicalHistory', option)}
+                                    />
+                                    <label htmlFor={`medicalHistory-${index}`}>{option}</label>
+                                </div>
+                            ))}
+                        </div>
+                        {formData.medicalHistory.includes('Other') && (
+                            <div className="form-group">
+                                <input
+                                    type="text"
+                                    name="medicalHistoryOther"
+                                    value={formData.medicalHistoryOther}
+                                    onChange={handleChange}
+                                    placeholder="Specify other medical conditions"
+                                    className="other-input"
+                                />
+                            </div>
+                        )}
+                    </div>
+
+                    <div className="form-group">
+                        <label>Allergies</label>
+                        <div className="checkbox-grid">
+                            {allergiesOptions.map((option, index) => (
+                                <div key={index} className="checkbox-item">
+                                    <input
+                                        type="checkbox"
+                                        id={`allergies-${index}`}
+                                        checked={formData.allergies.includes(option)}
+                                        onChange={() => handleCheckboxChange('allergies', option)}
+                                    />
+                                    <label htmlFor={`allergies-${index}`}>{option}</label>
+                                </div>
+                            ))}
+                        </div>
+                        {formData.allergies.includes('Other') && (
+                            <div className="form-group">
+                                <input
+                                    type="text"
+                                    name="allergiesOther"
+                                    value={formData.allergiesOther}
+                                    onChange={handleChange}
+                                    placeholder="Specify other allergies"
+                                    className="other-input"
+                                />
+                            </div>
+                        )}
+                    </div>
+
+                    <div className="form-group">
+                        <label>Current Medications</label>
+                        <div className="checkbox-grid">
+                            {medicationsOptions.map((option, index) => (
+                                <div key={index} className="checkbox-item">
+                                    <input
+                                        type="checkbox"
+                                        id={`medications-${index}`}
+                                        checked={formData.medications.includes(option)}
+                                        onChange={() => handleCheckboxChange('medications', option)}
+                                    />
+                                    <label htmlFor={`medications-${index}`}>{option}</label>
+                                </div>
+                            ))}
+                        </div>
+                        {formData.medications.includes('Other') && (
+                            <div className="form-group">
+                                <input
+                                    type="text"
+                                    name="medicationsOther"
+                                    value={formData.medicationsOther}
+                                    onChange={handleChange}
+                                    placeholder="Specify other medications"
+                                    className="other-input"
+                                />
+                            </div>
+                        )}
+                    </div>
+
+                    <div className="form-group">
+                        <label>Current Symptoms</label>
+                        <div className="checkbox-grid">
+                            {symptomsOptions.map((option, index) => (
+                                <div key={index} className="checkbox-item">
+                                    <input
+                                        type="checkbox"
+                                        id={`symptoms-${index}`}
+                                        checked={formData.currentSymptoms.includes(option)}
+                                        onChange={() => handleCheckboxChange('currentSymptoms', option)}
+                                    />
+                                    <label htmlFor={`symptoms-${index}`}>{option}</label>
+                                </div>
+                            ))}
+                        </div>
+                        {formData.currentSymptoms.includes('Other') && (
+                            <div className="form-group">
+                                <input
+                                    type="text"
+                                    name="currentSymptomsOther"
+                                    value={formData.currentSymptomsOther}
+                                    onChange={handleChange}
+                                    placeholder="Specify other symptoms"
+                                    className="other-input"
+                                />
+                            </div>
+                        )}
+                    </div>
                 </fieldset>
 
                 {/* Insurance Information Section */}
                 <fieldset className="form-section">
                     <legend>Insurance Information</legend>
-                    
+
                     <div className="form-group checkbox-group">
-                        <input 
-                            type="checkbox" 
+                        <input
+                            type="checkbox"
                             id="hasInsurance"
-                            name="hasInsurance" 
-                            checked={formData.hasInsurance} 
-                            onChange={handleChange} 
+                            name="hasInsurance"
+                            checked={formData.hasInsurance}
+                            onChange={handleChange}
                         />
                         <label htmlFor="hasInsurance">Do you have health insurance?</label>
                     </div>
-                    
+
                     {formData.hasInsurance && (
                         <>
                             <div className="form-group">
                                 <label>Insurance Provider</label>
-                                <select 
-                                    name="insuranceProvider" 
-                                    value={formData.insuranceProvider} 
+                                <select
+                                    name="insuranceProvider"
+                                    value={formData.insuranceProvider}
                                     onChange={handleChange}
                                 >
                                     <option value="">Select Provider</option>
@@ -591,29 +590,29 @@ const MedicalForm = ({ onSubmissionSuccess }) => {
                                     />
                                 )}
                             </div>
-                            
+
                             <div className="form-group">
                                 <label>Policy Number</label>
-                                <input 
-                                    type="text" 
-                                    name="policyNumber" 
-                                    value={formData.policyNumber} 
-                                    onChange={handleChange} 
+                                <input
+                                    type="text"
+                                    name="policyNumber"
+                                    value={formData.policyNumber}
+                                    onChange={handleChange}
                                 />
                             </div>
                         </>
                     )}
                 </fieldset>
 
-                <button 
-                    type="submit" 
+                <button
+                    type="submit"
                     className="submit-button"
                     disabled={isSubmitting}
                 >
                     {isSubmitting ? 'Submitting...' : 'Submit Medical Information'}
                 </button>
             </form>
-            <ToastContainer 
+            <ToastContainer
                 position="bottom-right"
                 autoClose={5000}
                 hideProgressBar={false}
