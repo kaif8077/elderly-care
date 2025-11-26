@@ -1,5 +1,4 @@
 require('dotenv').config();
-// console.log(process.env.NGROK_URL);
 const express = require('express');
 const path = require('path');
 const connectDB = require('./config/db');
@@ -15,16 +14,23 @@ const app = express();
 // Connect to the database
 connectDB();
 
-// Middleware
-app.use(cors());
-app.use(express.json());
+// CORS setup - EK HI BAAR USE KAREIN
 app.use(cors({
-    origin: process.env.FRONTEND_URL || 'http://localhost:3000',
-    methods: ['GET', 'POST', 'PUT', 'DELETE'],
-    allowedHeaders: ['Content-Type', 'Authorization'],
+    origin: [
+        'http://localhost:3000',
+        'https://elderly-care-xi.vercel.app',
+        'https://elderlycare-khaki.vercel.app'
+    ],
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization', 'Accept'],
     credentials: true
-  }));
+}));
 
+// Pre-flight requests handle karein
+app.options('*', cors());
+
+// Middleware
+app.use(express.json());
 
 // Routes
 app.use('/api/auth', authRoutes);
@@ -37,7 +43,13 @@ app.use('/api/recommendations', recommendationRoutes);
 app.use('/api/contact', require('./routes/contactRoutes'));
 app.use('/api/feedback', require('./routes/feedbackRoutes'));
 
-// console.log(path.join(__dirname, 'public/profiles'));
-
+// Health check route - ADD KAREIN
+app.get('/api/health', (req, res) => {
+    res.json({ 
+        status: 'OK', 
+        message: 'Backend is running successfully!',
+        frontend: 'https://elderly-care-xi.vercel.app'
+    });
+});
 
 module.exports = app;
