@@ -165,6 +165,12 @@
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 }
 
+@media (max-width: 576px) {
+  .about-image {
+    display: none;
+  }
+}
+
 /* ===== Features Section ===== */
 .features-section {
   padding: 5px 0;
