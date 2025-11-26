@@ -70,9 +70,9 @@ Make sure you have:
 ---
 
 ##  Backend Setup
-```
 
 Navigate to the backend folder:
+```
 cd backend
 npm install
 ```
@@ -101,19 +101,16 @@ HF_API_KEY="your_api_key"
 
 Start backend:
 ```
-
 npm start
 ```
 Frontend Setup
-```
 Navigate to the frontend:
+```
 cd frontend
 npm install
-
 ```
 Create a .env file inside /frontend:
 ```
-
 BACKEND_URI = "http://localhost:5000"
 
 ```
