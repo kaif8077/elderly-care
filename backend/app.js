@@ -43,11 +43,12 @@ app.use('/api/recommendations', recommendationRoutes);
 app.use('/api/contact', require('./routes/contactRoutes'));
 app.use('/api/feedback', require('./routes/feedbackRoutes'));
 
-// Health check route - ADD KAREIN
+// Health check route
 app.get('/api/health', (req, res) => {
     res.json({ 
         status: 'OK', 
         message: 'Backend is running successfully!',
+        timestamp: new Date().toISOString(),
         frontend: 'https://elderly-care-xi.vercel.app'
     });
 });
