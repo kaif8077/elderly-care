@@ -103,7 +103,8 @@ Start backend:
 ```
 npm start
 ```
-Frontend Setup
+##  Frontend Setup
+
 Navigate to the frontend:
 ```
 cd frontend
