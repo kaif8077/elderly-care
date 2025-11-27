@@ -1,59 +1,122 @@
 require('dotenv').config();
 const QRCode = require('../models/QRCode');
-const { generateQR, formatMedicalProfile, saveProfileHTML } = require('../utils/generateQR');
+const { generateQR, formatMedicalProfile } = require('../utils/generateQR');
 const MedicalProfile = require('../models/MedicalProfile');
 const twilio = require('twilio');
-const Otp = require('../models/Otp'); // New OTP model
-
+const Otp = require('../models/Otp');
 
 const accountSid = process.env.TWILIO_ACCOUNT_SID;
 const authToken = process.env.TWILIO_AUTH_TOKEN;
 const twilioClient = twilio(accountSid, authToken);
 
-exports.createQRCode = async (req, res) => {
-    const { userId } = req.body;
-
+// PROFILE PAGE SERVING - MAIN FUNCTION
+exports.serveProfilePage = async (req, res) => {
     try {
+        const { userId } = req.params;
+        
+        console.log('🎯 Serving profile for user:', userId);
+        
         const medicalProfile = await MedicalProfile.findOne({ userId })
             .sort({ createdAt: -1 })
             .exec();
 
         if (!medicalProfile) {
-            return res.status(404).json({ message: 'Medical profile not found' });
+            console.log('❌ Profile not found for:', userId);
+            return res.status(404).send(`
+                <html>
+                    <body style="font-family: Arial, sans-serif; text-align: center; padding: 50px;">
+                        <h1 style="color: #e74c3c;">Profile Not Found</h1>
+                        <p>Medical profile for user <strong>${userId}</strong> not found.</p>
+                        <p>Please check the user ID or create a new medical profile.</p>
+                        <a href="/" style="color: #0066ff;">Go Back</a>
+                    </body>
+                </html>
+            `);
         }
 
+        console.log('✅ Profile found, generating HTML...');
         const htmlContent = await formatMedicalProfile(medicalProfile);
-        const htmlFilePath = await saveProfileHTML(htmlContent, userId);
-
-        const serverIP = process.env.NGROK_URL;
-        const htmlFileUrl = `${serverIP}/profiles/${userId}_profile.html`;
-
-        const qrCodeImage = await generateQR(htmlFileUrl);
         
+        res.set('Content-Type', 'text/html');
+        res.send(htmlContent);
+        
+    } catch (error) {
+        console.error('❌ Error serving profile page:', error);
+        res.status(500).send(`
+            <html>
+                <body style="font-family: Arial, sans-serif; text-align: center; padding: 50px;">
+                    <h1 style="color: #e74c3c;">Server Error</h1>
+                    <p>Failed to load profile: ${error.message}</p>
+                    <a href="/" style="color: #0066ff;">Go Back</a>
+                </body>
+            </html>
+        `);
+    }
+};
+
+// QR CODE CREATION - UPDATED
+exports.createQRCode = async (req, res) => {
+    const { userId } = req.body;
+
+    try {
+        console.log('🔍 Looking for medical profile for user:', userId);
+        
+        const medicalProfile = await MedicalProfile.findOne({ userId })
+            .sort({ createdAt: -1 })
+            .exec();
+
+        if (!medicalProfile) {
+            console.log('❌ Medical profile not found for user:', userId);
+            return res.status(404).json({ 
+                success: false,
+                message: 'Medical profile not found. Please create a medical profile first.' 
+            });
+        }
+
+        // PERMANENT URL - No more ngrok!
+        const RENDER_BACKEND_URL = process.env.RENDER_BACKEND_URL || "https://elderly-care-backend-2hyt.onrender.com";
+        
+        // Profile URL that works everywhere
+        const profileUrl = `${RENDER_BACKEND_URL}/api/qr/profile/${userId}`;
+        
+        console.log('📱 Generating QR code for URL:', profileUrl);
+        
+        const qrCodeImage = await generateQR(profileUrl);
+        
+        // Update medical profile with QR code
         medicalProfile.qrCodeImage = qrCodeImage;
+        medicalProfile.profileUrl = profileUrl;
         await medicalProfile.save();
 
+        // Create QR code record
         const newQRCode = new QRCode({
             data: qrCodeImage,
             userId,
+            profileUrl: profileUrl
         });
         await newQRCode.save();
 
+        console.log('✅ QR code created successfully for user:', userId);
+        
         res.status(201).json({ 
+            success: true,
             qrCode: newQRCode, 
-            htmlFilePath,
-            qrCodeImage 
+            profileUrl: profileUrl,
+            qrCodeImage,
+            message: 'QR code generated successfully!'
         });
 
     } catch (error) {
-        console.error('Error creating QR code:', error);
+        console.error('❌ Error creating QR code:', error);
         res.status(500).json({ 
+            success: false,
             message: 'Error creating QR code',
             error: error.message 
         });
     }
 };
 
+// GET QR CODE
 exports.getQRCode = async (req, res) => {
     const { userId } = req.params;
 
@@ -63,22 +126,99 @@ exports.getQRCode = async (req, res) => {
             .exec();
 
         if (!qrCode) {
-            return res.status(404).json({ message: 'QR code not found' });
+            return res.status(404).json({ 
+                success: false,
+                message: 'QR code not found' 
+            });
         }
 
-        res.status(200).json({ qrCode });
+        res.status(200).json({ 
+            success: true,
+            qrCode 
+        });
 
     } catch (error) {
         console.error('Error fetching QR code:', error);
         res.status(500).json({ 
+            success: false,
             message: 'Error fetching QR code',
             error: error.message 
         });
     }
 };
 
+// TEST ROUTE - ALL USERS
+exports.testAllUsers = async (req, res) => {
+    try {
+        const allProfiles = await MedicalProfile.find().select('userId name createdAt').exec();
+        
+        let html = `
+            <html>
+                <head>
+                    <title>Available Medical Profiles</title>
+                    <style>
+                        body { font-family: Arial, sans-serif; padding: 20px; }
+                        ul { list-style-type: none; padding: 0; }
+                        li { padding: 10px; border-bottom: 1px solid #eee; }
+                        .user-id { font-weight: bold; color: #0066ff; }
+                    </style>
+                </head>
+                <body>
+                    <h1>Available Medical Profiles</h1>
+                    <p>Total profiles: ${allProfiles.length}</p>
+                    <ul>
+        `;
+        
+        allProfiles.forEach(profile => {
+            html += `
+                <li>
+                    <span class="user-id">${profile.userId}</span> 
+                    - ${profile.name || 'No Name'} 
+                    - <a href="/api/qr/profile/${profile.userId}" target="_blank">View Profile</a>
+                    - <a href="/api/qr/check-user/${profile.userId}" target="_blank">Check Data</a>
+                </li>
+            `;
+        });
+        
+        html += `
+                    </ul>
+                    <br>
+                    <a href="/">Go Back</a>
+                </body>
+            </html>
+        `;
+        
+        res.send(html);
+    } catch (error) {
+        res.status(500).send('Error fetching profiles: ' + error.message);
+    }
+};
 
-// In your sendOtp function (qrController.js)
+// TEST ROUTE - SPECIFIC USER CHECK
+exports.testSpecificUser = async (req, res) => {
+    try {
+        const { userId } = req.params;
+        const profile = await MedicalProfile.findOne({ userId }).exec();
+        
+        res.json({
+            success: true,
+            userId: userId,
+            profileExists: !!profile,
+            profile: profile ? {
+                name: profile.name,
+                phone: profile.phone,
+                createdAt: profile.createdAt
+            } : null
+        });
+    } catch (error) {
+        res.status(500).json({ 
+            success: false,
+            error: error.message 
+        });
+    }
+};
+
+// OTP FUNCTIONS (SAME AS BEFORE)
 exports.sendScannerOtp = async (req, res) => {
     try {
         console.log('Received OTP request for:', req.body.phone);
@@ -99,27 +239,21 @@ exports.sendScannerOtp = async (req, res) => {
 
         console.log('OTP saved to DB with ID:', otpRecord._id);
 
-        // Uncomment for production - comment out the alert
         await twilioClient.messages.create({
             body: `Your OTP is: ${otp}`,
             from: process.env.TWILIO_PHONE_NUMBER,
             to: formattedPhone
         });
 
-        // For testing - show OTP in console and alert
         console.log(`OTP for ${formattedPhone}: ${otp}`);
         res.json({ 
             success: true, 
             message: 'OTP sent successfully',
-            debugOtp: otp // Remove in production
+            debugOtp: otp
         });
 
     } catch (error) {
-        console.error('Full error details:', {
-            error: error.message,
-            stack: error.stack,
-            requestBody: req.body
-        });
+        console.error('Full error details:', error);
         res.status(500).json({ 
             success: false, 
             message: 'Failed to send OTP',
@@ -128,7 +262,6 @@ exports.sendScannerOtp = async (req, res) => {
     }
 };
 
-// New method for OTP verification
 exports.verifyScannerOtp = async (req, res) => {
     try {
         console.log('Verification attempt:', req.body);
@@ -137,7 +270,6 @@ exports.verifyScannerOtp = async (req, res) => {
         const formattedPhone = `+91${phone}`;
         const otp = req.body.otp;
 
-        // 1. Find the most recent OTP
         const otpRecord = await Otp.findOne({
             phone: formattedPhone
         }).sort({ createdAt: -1 });
@@ -145,31 +277,20 @@ exports.verifyScannerOtp = async (req, res) => {
         console.log('Found OTP record:', otpRecord);
 
         if (!otpRecord) {
-            console.log('No OTP found for phone:', formattedPhone);
             return res.status(400).json({ 
                 success: false, 
                 message: 'No OTP found for this number' 
             });
         }
 
-        // 2. Check if OTP matches (case insensitive)
         if (otpRecord.otp !== otp) {
-            console.log('OTP mismatch:', {
-                received: otp,
-                expected: otpRecord.otp
-            });
             return res.status(400).json({ 
                 success: false, 
                 message: 'Invalid OTP' 
             });
         }
 
-        // 3. Check expiration
         if (otpRecord.expiresAt < new Date()) {
-            console.log('Expired OTP:', {
-                expiresAt: otpRecord.expiresAt,
-                currentTime: new Date()
-            });
             await Otp.deleteOne({ _id: otpRecord._id });
             return res.status(400).json({ 
                 success: false, 
@@ -177,7 +298,6 @@ exports.verifyScannerOtp = async (req, res) => {
             });
         }
 
-        // 4. Verification successful
         await Otp.deleteOne({ _id: otpRecord._id });
         
         console.log('Successful verification for:', formattedPhone);
@@ -187,11 +307,7 @@ exports.verifyScannerOtp = async (req, res) => {
         });
 
     } catch (error) {
-        console.error('Verification error:', {
-            error: error.message,
-            stack: error.stack,
-            requestBody: req.body
-        });
+        console.error('Verification error:', error);
         res.status(500).json({ 
             success: false, 
             message: 'Error during verification',
