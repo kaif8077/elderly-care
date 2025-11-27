@@ -218,7 +218,7 @@ exports.testSpecificUser = async (req, res) => {
     }
 };
 
-// OTP FUNCTIONS (SAME AS BEFORE)
+// OTP FUNCTIONS
 exports.sendScannerOtp = async (req, res) => {
     try {
         console.log('Received OTP request for:', req.body.phone);
