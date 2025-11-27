@@ -20,8 +20,9 @@ exports.generateQR = async (data) => {
 
 exports.formatMedicalProfile = async (profile) => {
     try {
-        const serverIP = process.env.NGROK_URL;
-        console.log(serverIP);
+        // YEH LINE CHANGE KARO - ngrok ki jagah Render URL use karo
+        const RENDER_BACKEND_URL = process.env.RENDER_BACKEND_URL || "https://elderly-care-backend-2hyt.onrender.com";
+        console.log('Using backend URL:', RENDER_BACKEND_URL);
         
         const firstAidRecommendations = await generateFirstAidRecommendations(profile);
 
@@ -300,7 +301,8 @@ exports.formatMedicalProfile = async (profile) => {
     </div>
     
     <script>
-        const serverIP = "${serverIP}";
+        // YEH LINE IMPORTANT HAI - Render URL use karo
+        const serverIP = "${RENDER_BACKEND_URL}";
         let generatedOtp = null;
         
         // Language switching functionality
