@@ -96,6 +96,8 @@ SENDGRID_FROM_EMAIL="noreply@elderlycare.com"
 # HuggingFace AI API
 HF_API_KEY="your_api_key"
 
+RENDER_BACKEND_URL="https://example.onrender.com"
+
 ```
 
 
