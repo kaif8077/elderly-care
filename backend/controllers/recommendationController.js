@@ -786,10 +786,10 @@ const getFallbackFirstAidRecommendations = (profile) => {
     //               PERSONALIZED FIRST AID & EMERGENCY RESPONSE GUIDE
     // =============================================================================
 
-    recommendations.push("=".repeat(80));
+    recommendations.push("=".repeat(30));
     recommendations.push(" ".repeat(20) + "PERSONALIZED FIRST AID & EMERGENCY RESPONSE GUIDE");
     recommendations.push(" ".repeat(30) + "FOR " + name.toUpperCase());
-    recommendations.push("=".repeat(80));
+    recommendations.push("=".repeat(20));
     recommendations.push("");
 
     // PATIENT PROFILE SUMMARY
@@ -863,7 +863,7 @@ const getFallbackFirstAidRecommendations = (profile) => {
 
     // COMMON EMERGENCY SCENARIOS & RESPONSE PROTOCOLS
     recommendations.push("COMMON EMERGENCY SCENARIOS & RESPONSE PROTOCOLS");
-    recommendations.push("=".repeat(55));
+    recommendations.push("=".repeat(30));
     recommendations.push("");
 
     // SCENARIO 1: FALLS & INJURIES
@@ -1030,7 +1030,7 @@ const getFallbackFirstAidRecommendations = (profile) => {
 
     // EMERGENCY KIT CONTENTS
     recommendations.push("EMERGENCY KIT CONTENTS FOR " + name.toUpperCase());
-    recommendations.push("=".repeat(50));
+    recommendations.push("=".repeat(30));
     recommendations.push("");
     recommendations.push("ESSENTIAL DOCUMENTS (KEEP IN WATERPROOF BAG):");
     recommendations.push("1. Medical ID Card with:");
@@ -1084,7 +1084,7 @@ const getFallbackFirstAidRecommendations = (profile) => {
 
     // WHEN TO CALL EMERGENCY
     recommendations.push("🚨 WHEN TO CALL EMERGENCY IMMEDIATELY 🚨");
-    recommendations.push("=".repeat(45));
+    recommendations.push("=".repeat(30));
     recommendations.push("CALL WITHOUT DELAY FOR:");
     recommendations.push("1. Unconsciousness or unresponsiveness");
     recommendations.push("2. Difficulty breathing, choking, or not breathing");
@@ -1156,9 +1156,9 @@ const getFallbackFirstAidRecommendations = (profile) => {
     recommendations.push("");
 
     // FINAL SECTION
-    recommendations.push("=".repeat(80));
+    recommendations.push("=".repeat(30));
     recommendations.push(" ".repeat(15) + "KEEP THIS GUIDE ACCESSIBLE TO ALL CAREGIVERS");
-    recommendations.push("=".repeat(80));
+    recommendations.push("=".repeat(30));
     recommendations.push("");
     recommendations.push("LAST UPDATED: " + new Date().toLocaleDateString());
     recommendations.push("NEXT REVIEW DUE: " + new Date(Date.now() + 90*24*60*60*1000).toLocaleDateString());
@@ -1172,11 +1172,11 @@ const getFallbackFirstAidRecommendations = (profile) => {
     recommendations.push("• " + (profile.primaryPhysician ? 'Primary Doctor: ' + profile.primaryPhysician : ''));
     recommendations.push("• " + (profile.emergencyContact ? 'Emergency Contact: ' + profile.emergencyContact : ''));
     recommendations.push("");
-    recommendations.push("=".repeat(80));
+    recommendations.push("=".repeat(30));
     recommendations.push("IMPORTANT: This guide is personalized for " + name + ".");
     recommendations.push("Share with all caregivers, family members, and neighbors.");
     recommendations.push("Review regularly and update as health status changes.");
-    recommendations.push("=".repeat(80));
+    recommendations.push("=".repeat(30));
 
     return recommendations.join('\n');
 };
