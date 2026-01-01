@@ -108,10 +108,10 @@ const About = () => {
           color: "#FFD166"
         },
         {
-          name: "Ibrahim Saud",
+          name: "Mohd Sameer",
           role: "Quality Assurance",
           description: "Ensures flawless functionality and usability",
-          initials: "IS",
+          initials: "MS",
           color: "#06D6A0"
         }
       ].map((member, index) => (
