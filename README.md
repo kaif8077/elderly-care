@@ -34,7 +34,6 @@ This platform enhances the quality of life for elderly individuals by ensuring t
 
 ### **Frontend**
 - React.js
-- Tailwind CSS
 - QR Scanner Library
 
 ### **Backend**
@@ -47,7 +46,7 @@ This platform enhances the quality of life for elderly individuals by ensuring t
 ### **Third-Party Integrations**
 - Twilio (SMS)
 - SendGrid (Email)
-- Ngrok (for secure tunneling during development)
+- HuggingFace API (AI Suggestions)
 
 ### **Developer Tools**
 - Git & GitHub

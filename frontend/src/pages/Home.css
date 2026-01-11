@@ -208,11 +208,11 @@
   height: 100%;
   width: 100%;
   transition: all 0.3s ease;
-  border-top: 3px solid #0066ff;
+  border-top: 5px solid #0066ff;
 }
 
 .feature-slide:hover {
-  transform: translateY(-5px);
+  transform: translateY(-10px);
   box-shadow: 0 10px 25px rgba(0,0,0,0.1);
 }
 

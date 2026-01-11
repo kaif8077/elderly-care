@@ -128,14 +128,21 @@ const MedicalForm = ({ onSubmissionSuccess }) => {
 
     const handlePhoneChange = (e) => {
         const { name, value } = e.target;
-        if ((name === 'phone' || name === 'emergencyPhone') &&
-            (value.startsWith('+91') && value.length <= 13 || value === '+91 ')) {
+
+        if (
+            (name === 'phone' || name === 'emergencyPhone') &&
+            (
+                (value.startsWith('+91') && value.length <= 13) ||
+                value === '+91'
+            )
+        ) {
             setFormData(prev => ({
                 ...prev,
                 [name]: value
             }));
         }
     };
+
 
     const handleCheckboxChange = (field, option) => {
         setFormData(prev => {

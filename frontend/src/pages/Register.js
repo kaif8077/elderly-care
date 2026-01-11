@@ -82,7 +82,7 @@ const Register = () => {
                 setStep(2);
             } else if (step === 2) {
                 // Verify OTP
-                const response = await axios.post(`${process.env.REACT_APP_BACKEND_URI}/api/auth/verify-otp`, {
+                await axios.post(`${process.env.REACT_APP_BACKEND_URI}/api/auth/verify-otp`, {
                     email: formData.email,
                     otp: formData.otp
                 });

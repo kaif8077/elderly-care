@@ -1,5 +1,5 @@
 import React from 'react';
-import { Link } from 'react-router-dom';
+// import { Link } from 'react-router-dom';
 import '../pages/About.css';
 import aboutHero from '../assests/about-hero.jpg';
 import aboutUsImage from '../assests/about_us.png';

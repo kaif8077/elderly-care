@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
+// import { Link } from 'react-router-dom';
 import { submitContactForm } from '../services/contactService';
 import { submitFeedbackForm } from '../services/feedbackService';
 import '../pages/Contact.css';
@@ -96,7 +96,7 @@ const handleContactSubmit = async (e) => {
   setContactError('');
   
   try {
-    const response = await submitContactForm(contact);
+    await submitContactForm(contact);
     
     // Enhanced success message
     alert(`
