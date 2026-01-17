@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import '../pages/Home.css';
 import banner1 from '../assests/banner1.jpg';
@@ -34,55 +34,55 @@ const Home = () => {
 
     // Features data (12 items)
     const features = [
-    {
-        emoji: "📝",
-        title: "Health Profile Setup",
-        description: "Store medical history and emergency contacts securely for quick access during emergencies.",
-        link: "/services#form-filling"
-    },
-    {
-        emoji: "💡",
-        title: "Health Recommendations",
-        description: "Personalized health suggestions based on your medical conditions and treatment history.",
-        link: "/services#recommendations"
-    },
-    {
-        emoji: "📲",
-        title: "Digital Health ID",
-        description: "QR code containing vital medical information for emergency responders to scan.",
-        link: "/services#qr-code-id-card"
-    },
-    {
-        emoji: "🔍",
-        title: "QR Code Scanning",
-        description: "Scan QR codes to view medical details and emergency instructions instantly.",
-        link: "/services#qr-code-scan"
-    },
-    {
-        emoji: "🔔",
-        title: "Emergency Alerts",
-        description: "Instant notifications with location sent during critical health emergencies.",
-        link: "/services#alert-notifications"
-    },
-    {
-        emoji: "📄",
-        title: "Document Printing",
-        description: "Print complete medical profiles including prescriptions and emergency contacts.",
-        link: "/services#print-page"
-    },
-    {
-        emoji: "🌐",
-        title: "Language Options",
-        description: "Switch between multiple languages for easier system navigation.",
-        link: "/services#language-selection"
-    }
-];
+        {
+            emoji: "📝",
+            title: "Health Profile Setup",
+            description: "Store medical history and emergency contacts securely for quick access during emergencies.",
+            link: "/services#form-filling"
+        },
+        {
+            emoji: "💡",
+            title: "Health Recommendations",
+            description: "Personalized health suggestions based on your medical conditions and treatment history.",
+            link: "/services#recommendations"
+        },
+        {
+            emoji: "📲",
+            title: "Digital Health ID",
+            description: "QR code containing vital medical information for emergency responders to scan.",
+            link: "/services#qr-code-id-card"
+        },
+        {
+            emoji: "🔍",
+            title: "QR Code Scanning",
+            description: "Scan QR codes to view medical details and emergency instructions instantly.",
+            link: "/services#qr-code-scan"
+        },
+        {
+            emoji: "🔔",
+            title: "Emergency Alerts",
+            description: "Instant notifications with location sent during critical health emergencies.",
+            link: "/services#alert-notifications"
+        },
+        {
+            emoji: "📄",
+            title: "Document Printing",
+            description: "Print complete medical profiles including prescriptions and emergency contacts.",
+            link: "/services#print-page"
+        },
+        {
+            emoji: "🌐",
+            title: "Language Options",
+            description: "Switch between multiple languages for easier system navigation.",
+            link: "/services#language-selection"
+        }
+    ];
 
-    
-    
-    
-    
-    
+
+
+
+
+
 
     // Why Choose Us data
     const whyChooseUs = [
@@ -103,8 +103,8 @@ const Home = () => {
             description: "Empowers seniors with tools for independence, comfort, and safety."
         }
     ];
-    
-    
+
+
 
     // FAQ data
     const faqs = [
@@ -152,7 +152,7 @@ const Home = () => {
             }
             setCurrentFeatureSlide(0); // Reset to first slide on resize
         };
-    
+
         handleResize();
         window.addEventListener('resize', handleResize);
         return () => window.removeEventListener('resize', handleResize);
@@ -161,19 +161,19 @@ const Home = () => {
     const nextBanner = () => {
         setCurrentBanner((prev) => (prev + 1) % banners.length);
     };
-    
+
     const prevBanner = () => {
         setCurrentBanner((prev) => (prev - 1 + banners.length) % banners.length);
     };
 
     const nextFeatureSlide = () => {
-        setCurrentFeatureSlide(prev => 
+        setCurrentFeatureSlide(prev =>
             prev >= features.length - slidesToShow ? 0 : prev + 1
         );
     };
 
     const prevFeatureSlide = () => {
-        setCurrentFeatureSlide(prev => 
+        setCurrentFeatureSlide(prev =>
             prev <= 0 ? features.length - slidesToShow : prev - 1
         );
     };
@@ -192,9 +192,9 @@ const Home = () => {
             <div className="banner-carousel">
                 <div className="carousel-container" style={{ transform: `translateX(-${currentBanner * 100}%)` }}>
                     {banners.map((banner, index) => (
-                        <div 
+                        <div
                             key={index}
-                            className="carousel-slide" 
+                            className="carousel-slide"
                             style={{ backgroundImage: `url(${banner.image})` }}
                         >
                             <div className="carousel-content">
@@ -204,7 +204,7 @@ const Home = () => {
                         </div>
                     ))}
                 </div>
-                
+
                 {/* Navigation Buttons with Shadow Effect */}
                 <button className="carousel-nav prev" onClick={prevBanner}>
                     <span>&#10094;</span>
@@ -229,11 +229,11 @@ const Home = () => {
                             />
                         </div>
                         <div className="about-content">
-                        <p style={{ textAlign: 'justify' }}>ElderlyCare is a platform designed to help seniors manage their health records easily. It provides quick access to medical details via a QR code during emergencies, ensuring vital information is always available when needed.</p>
-                        <p style={{ textAlign: 'justify' }}>With personalized health recommendations, ElderlyCare promotes better well-being and peace of mind for both users and caregivers. By simplifying health management, we empower seniors to take control of their medical information while offering reassurance to their loved ones.</p>
-                            
+                            <p style={{ textAlign: 'justify' }}>ElderlyCare is a platform designed to help seniors manage their health records easily. It provides quick access to medical details via a QR code during emergencies, ensuring vital information is always available when needed.</p>
+                            <p style={{ textAlign: 'justify' }}>With personalized health recommendations, ElderlyCare promotes better well-being and peace of mind for both users and caregivers. By simplifying health management, we empower seniors to take control of their medical information while offering reassurance to their loved ones.</p>
+
                             <Link to="/about" className="learn-more-button">
-                                Learn More 
+                                Learn More
                             </Link>
                         </div>
                     </div>
@@ -247,12 +247,12 @@ const Home = () => {
                         <h2>Key Features</h2>
                         <p>Everything you need for comprehensive health management</p>
                     </div>
-                    
+
                     <div className="features-slider-container">
                         <div className="features-slider" style={featureSliderStyle}>
                             {features.map((feature, index) => (
-                                <Link 
-                                    key={index} 
+                                <Link
+                                    key={index}
                                     to={feature.link}
                                     className="feature-slide-link"
                                     style={{ flex: `0 0 ${100 / slidesToShow}%` }}
@@ -271,7 +271,7 @@ const Home = () => {
                         <button className="slider-nav next" onClick={nextFeatureSlide}>
                             &#10095;
                         </button>
-                        
+
                     </div>
                 </div>
             </div>
@@ -290,16 +290,7 @@ const Home = () => {
                 </div>
             </div>
 
-            {/* CTA Section */}
-            <div className="quote-panel-container">
-                <div className="quote-panel">
-                    <div className="quote-content">
-                        <h2>Start Your Care Journey Today!</h2>
-                        <p>Join ElderlyCare to access personalized senior care solutions that enhance well-being, combining professional expertise with compassionate support for your loved ones.</p>
-                        <Link to="/register" className="enquire-button">Sign Up Now →</Link>
-                    </div>
-                </div>
-            </div>
+
 
             {/* Why Choose Us Section */}
             <div className="section-container">
@@ -308,10 +299,10 @@ const Home = () => {
                         <h2>Why Choose Us?</h2>
                         <p>Discover what makes ElderlyCare the best choice for senior health management</p>
                     </div>
-                    
+
                     <div className="why-choose-us-content">
                         <div className="why-choose-us-image">
-                            <img 
+                            <img
                                 src={whyChooseUsImage}
                                 alt="Happy senior with caregiver"
                                 className="floating-image"
@@ -340,11 +331,10 @@ const Home = () => {
                     </div>
                     <div className="faq-container">
                         {faqs.map((faq, index) => (
-                            <div 
-                                key={index} 
+                            <div
+                                key={index}
                                 className={`faq-item ${activeFaq === index ? 'active' : ''}`}
-                                onClick={() => toggleFaq(index)}
-                            >
+                                onClick={() => toggleFaq(index)}>
                                 <div className="faq-question">
                                     <h3>{faq.question}</h3>
                                     <span>{activeFaq === index ? '−' : '+'}</span>
@@ -358,7 +348,7 @@ const Home = () => {
 
             {/* Footer Section */}
             <footer className="footer-section">
-                <p>&copy; 2025 ElderlyCare. All rights reserved.</p>
+                <p>&copy; {new Date().getFullYear()} ElderlyCare. All rights reserved.</p>
             </footer>
         </div>
     );

@@ -52,13 +52,13 @@ const Contact = () => {
   // Validate form function
   const validateForm = (formData, formType) => {
     const errors = {};
-    
+
     if (!formData.name.trim()) errors.name = 'Name is required';
-    
+
     if (!formData.email.match(/^\S+@\S+\.\S+$/)) {
       errors.email = 'Valid email required';
     }
-    
+
     if (formType === 'contact') {
       if (!formData.message.trim()) {
         errors.message = 'Message is required';
@@ -66,7 +66,7 @@ const Contact = () => {
         errors.message = 'Message must be at least 10 characters';
       }
     }
-    
+
     if (formType === 'feedback') {
       if (!formData.rating) {
         errors.rating = 'Please select a rating';
@@ -77,55 +77,55 @@ const Contact = () => {
         errors.comments = 'Comments must be at least 10 characters';
       }
     }
-    
+
     return errors;
   };
 
   // Handle contact form submission
   // In your Contact component
-const handleContactSubmit = async (e) => {
-  e.preventDefault();
-  
-  const errors = validateForm(contact, 'contact');
-  if (Object.keys(errors).length > 0) {
-    setContactError(Object.values(errors).join(', '));
-    return;
-  }
-  
-  setIsSubmittingContact(true);
-  setContactError('');
-  
-  try {
-    await submitContactForm(contact);
-    
-    // Enhanced success message
-    alert(`
+  const handleContactSubmit = async (e) => {
+    e.preventDefault();
+
+    const errors = validateForm(contact, 'contact');
+    if (Object.keys(errors).length > 0) {
+      setContactError(Object.values(errors).join(', '));
+      return;
+    }
+
+    setIsSubmittingContact(true);
+    setContactError('');
+
+    try {
+      await submitContactForm(contact);
+
+      // Enhanced success message
+      alert(`
       Thank you, ${contact.name}!
       Your message has been sent successfully.
       We've sent a confirmation to ${contact.email}.
     `);
-    
-    setContact({ name: '', email: '', message: '' });
-  } catch (error) {
-    setContactError(error.message || 'Failed to send message. Please try again later.');
-  } finally {
-    setIsSubmittingContact(false);
-  }
-};
+
+      setContact({ name: '', email: '', message: '' });
+    } catch (error) {
+      setContactError(error.message || 'Failed to send message. Please try again later.');
+    } finally {
+      setIsSubmittingContact(false);
+    }
+  };
 
   // Handle feedback form submission
   const handleFeedbackSubmit = async (e) => {
     e.preventDefault();
-    
+
     const errors = validateForm(feedback, 'feedback');
     if (Object.keys(errors).length > 0) {
       setFeedbackError(Object.values(errors).join(', '));
       return;
     }
-    
+
     setIsSubmittingFeedback(true);
     setFeedbackError('');
-    
+
     try {
       const response = await submitFeedbackForm(feedback);
       alert(response.message);
@@ -140,8 +140,8 @@ const handleContactSubmit = async (e) => {
   return (
     <div className="contact-page">
       {/* Hero Banner */}
-      <div 
-        className="contact-hero" 
+      <div
+        className="contact-hero"
         style={{ backgroundImage: `url(${aboutHero})`, backgroundSize: 'cover', backgroundPosition: 'center' }}
       >
         <div className="hero-overlay">
@@ -168,7 +168,7 @@ const handleContactSubmit = async (e) => {
               <h3>Email Us</h3>
               <p>Typically respond within 24 hours</p>
               <p className="contact-detail">
-                <a href="mailto:kaif8528576249@gmail.com">kaif8528576249@gmail.com</a>
+                <a href="mailto:mohdkaif90275@gmail.com">mohdkaif90275@gmail.com</a>
               </p>
             </div>
 
@@ -177,9 +177,9 @@ const handleContactSubmit = async (e) => {
               <h3>Visit Us</h3>
               <p>Our headquarters in Moradabad</p>
               <p className="contact-detail">
-                <a 
-                  href="https://maps.app.goo.gl/mVbpZJ9dhpVq8Xtf9" 
-                  target="_blank" 
+                <a
+                  href="https://maps.app.goo.gl/mVbpZJ9dhpVq8Xtf9"
+                  target="_blank"
                   rel="noopener noreferrer"
                 >
                   MIT College, Moradabad
@@ -201,44 +201,44 @@ const handleContactSubmit = async (e) => {
               <form className="contact-form" onSubmit={handleContactSubmit}>
                 <div className="form-group">
                   <label htmlFor="name">Full Name*</label>
-                  <input 
-                    type="text" 
-                    id="name" 
+                  <input
+                    type="text"
+                    id="name"
                     name="name"
                     value={contact.name}
                     onChange={handleContactChange}
-                    placeholder="Your name" 
-                    required 
+                    placeholder="Your name"
+                    required
                   />
                 </div>
-                
+
                 <div className="form-group">
                   <label htmlFor="email">Email Address*</label>
-                  <input 
-                    type="email" 
-                    id="email" 
+                  <input
+                    type="email"
+                    id="email"
                     name="email"
                     value={contact.email}
                     onChange={handleContactChange}
-                    placeholder="your@email.com" 
-                    required 
+                    placeholder="your@email.com"
+                    required
                   />
                 </div>
-                
+
                 <div className="form-group">
                   <label htmlFor="message">Your Message* (Minimum 10 characters)</label>
-                  <textarea 
-                    id="message" 
+                  <textarea
+                    id="message"
                     name="message"
                     value={contact.message}
                     onChange={handleContactChange}
-                    rows="6" 
-                    placeholder="How can we assist you today?" 
-                    minLength="10"
+                    rows="5"
+                    placeholder="How can we assist you today?"
+                    minLength=""
                     required
                   ></textarea>
                 </div>
-                
+
                 {contactError && (
                   <div className="error-message">
                     {contactError.split(', ').map((err, i) => (
@@ -246,9 +246,9 @@ const handleContactSubmit = async (e) => {
                     ))}
                   </div>
                 )}
-                
-                <button 
-                  type="submit" 
+
+                <button
+                  type="submit"
                   className="submit-button"
                   disabled={isSubmittingContact}
                 >
@@ -264,34 +264,34 @@ const handleContactSubmit = async (e) => {
               <form className="feedback-form" onSubmit={handleFeedbackSubmit}>
                 <div className="form-group">
                   <label htmlFor="feedback-name">Your Name*</label>
-                  <input 
-                    type="text" 
-                    id="feedback-name" 
+                  <input
+                    type="text"
+                    id="feedback-name"
                     name="name"
                     value={feedback.name}
                     onChange={handleFeedbackChange}
-                    placeholder="Your name" 
-                    required 
+                    placeholder="Your name"
+                    required
                   />
                 </div>
-                
+
                 <div className="form-group">
                   <label htmlFor="feedback-email">Email Address*</label>
-                  <input 
-                    type="email" 
-                    id="feedback-email" 
+                  <input
+                    type="email"
+                    id="feedback-email"
                     name="email"
                     value={feedback.email}
                     onChange={handleFeedbackChange}
-                    placeholder="your@email.com" 
-                    required 
+                    placeholder="your@email.com"
+                    required
                   />
                 </div>
 
                 <div className="form-group">
                   <label htmlFor="feedback-rating">Your Rating*</label>
-                  <select 
-                    id="feedback-rating" 
+                  <select
+                    id="feedback-rating"
                     name="rating"
                     value={feedback.rating}
                     onChange={handleFeedbackChange}
@@ -305,21 +305,21 @@ const handleContactSubmit = async (e) => {
                     <option value="1">⭐ (Poor)</option>
                   </select>
                 </div>
-                
+
                 <div className="form-group">
                   <label htmlFor="feedback-comments">Comments* (Minimum 10 characters)</label>
-                  <textarea 
-                    id="feedback-comments" 
+                  <textarea
+                    id="feedback-comments"
                     name="comments"
                     value={feedback.comments}
                     onChange={handleFeedbackChange}
-                    rows="4" 
-                    placeholder="Share your experience..." 
-                    minLength="10"
+                    rows="2"
+                    placeholder="Share your experience..."
+                    minLength=""
                     required
                   ></textarea>
                 </div>
-                
+
                 {feedbackError && (
                   <div className="error-message">
                     {feedbackError.split(', ').map((err, i) => (
@@ -327,9 +327,9 @@ const handleContactSubmit = async (e) => {
                     ))}
                   </div>
                 )}
-                
-                <button 
-                  type="submit" 
+
+                <button
+                  type="submit"
                   className="submit-button"
                   disabled={isSubmittingFeedback}
                 >
@@ -343,7 +343,7 @@ const handleContactSubmit = async (e) => {
 
       {/* Footer Section */}
       <footer className="footer-section">
-        <p>&copy; 2025 ElderlyCare. All rights reserved.</p>
+        <p>&copy; {new Date().getFullYear()} ElderlyCare. All rights reserved.</p>
       </footer>
     </div>
   );

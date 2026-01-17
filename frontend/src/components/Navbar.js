@@ -76,14 +76,14 @@ const Navbar = () => {
     return (
         <nav className="navbar">
             <ToastContainer position="top-right" />
-            
+
             {/* Logo on the left */}
             <div className="logo">
                 <Link to="/" onClick={handleHomeClick}>
                     <img src={logoImage} alt="Company Logo" className="logo-image" />
                 </Link>
             </div>
-            
+
             {/* Mobile menu button */}
             <div className="mobile-menu-btn" onClick={toggleMobileMenu}>
                 {mobileMenuOpen ? (
@@ -92,45 +92,45 @@ const Navbar = () => {
                     <FaBars size={24} className="menu-icon" />
                 )}
             </div>
-            
+
             {/* Navigation links in the center (desktop) */}
             <div className={`nav-links ${mobileMenuOpen ? 'mobile-open' : ''}`}>
-                <Link 
-                    to="/" 
+                <Link
+                    to="/"
                     className={`nav-link ${location.pathname === '/' ? 'active' : ''}`}
                     onClick={closeAllMenus}
                 >
                     Home
                 </Link>
-                <Link 
-                    to="/about" 
+                <Link
+                    to="/about"
                     className={`nav-link ${location.pathname === '/about' ? 'active' : ''}`}
                     onClick={closeAllMenus}
                 >
                     About Us
                 </Link>
-                <Link 
-                    to="/services" 
+                <Link
+                    to="/services"
                     className={`nav-link ${location.pathname === '/services' ? 'active' : ''}`}
                     onClick={closeAllMenus}
                 >
                     Services
                 </Link>
-                <Link 
-                    to="/contact" 
+                <Link
+                    to="/contact"
                     className={`nav-link ${location.pathname === '/contact' ? 'active' : ''}`}
                     onClick={closeAllMenus}
                 >
                     Contact Us
                 </Link>
             </div>
-            
+
             {/* Auth section on the right */}
             <div className={`auth-section ${mobileMenuOpen ? 'mobile-open' : ''}`}>
                 {user ? (
                     <div className="user-dropdown" ref={dropdownRef}>
-                        <div 
-                            className="user-info" 
+                        <div
+                            className="user-info"
                             onClick={() => setDropdownOpen(!dropdownOpen)}
                         >
                             <FaUserCircle className="user-icon" size={24} />
@@ -139,23 +139,23 @@ const Navbar = () => {
                         </div>
                         {dropdownOpen && (
                             <div className="dropdown-menu">
-                                <Link 
-                                    to="/profile" 
+                                <Link
+                                    to="/profile"
                                     className={`dropdown-item ${location.pathname === '/profile' ? 'active' : ''}`}
                                     onClick={closeAllMenus}
                                 >
                                     My Profile
                                 </Link>
-                                <Link 
-                                    to="/dashboard" 
+                                <Link
+                                    to="/dashboard"
                                     className={`dropdown-item ${location.pathname === '/dashboard' ? 'active' : ''}`}
                                     onClick={closeAllMenus}
                                 >
                                     Dashboard
                                 </Link>
                                 <div className="dropdown-divider"></div>
-                                <div 
-                                    className="dropdown-item logout" 
+                                <div
+                                    className="dropdown-item logout"
                                     onClick={handleLogout}
                                 >
                                     Logout
@@ -165,8 +165,8 @@ const Navbar = () => {
                     </div>
                 ) : (
                     <div className="auth-dropdown" ref={authDropdownRef}>
-                        <div 
-                            className="auth-toggle" 
+                        <div
+                            className="auth-toggle"
                             onClick={() => setAuthDropdownOpen(!authDropdownOpen)}
                         >
                             <FaUserCircle className="user-icon" size={24} />
@@ -175,15 +175,15 @@ const Navbar = () => {
                         </div>
                         {authDropdownOpen && (
                             <div className="dropdown-menu">
-                                <Link 
-                                    to="/login" 
+                                <Link
+                                    to="/login"
                                     className={`dropdown-item ${location.pathname === '/login' ? 'active' : ''}`}
                                     onClick={closeAllMenus}
                                 >
                                     Login
                                 </Link>
-                                <Link 
-                                    to="/register" 
+                                <Link
+                                    to="/register"
                                     className={`dropdown-item ${location.pathname === '/register' ? 'active' : ''}`}
                                     onClick={closeAllMenus}
                                 >

@@ -14,7 +14,7 @@ const Login = () => {
     const [loading, setLoading] = useState(false);
     const [showPassword, setShowPassword] = useState(false);
     const [isForgotPassword, setIsForgotPassword] = useState(false);
-    const [resetStep, setResetStep] = useState(1); // 1: email, 2: otp, 3: new password
+    const [resetStep, setResetStep] = useState(1);
     const [resetData, setResetData] = useState({
         email: '',
         otp: '',
@@ -29,7 +29,7 @@ const Login = () => {
     const handleChange = (e) => {
         const { name, value } = e.target;
         setFormData(prev => ({ ...prev, [name]: value }));
-        
+
         if (name === 'password') {
             checkPasswordStrength(value);
         }
@@ -46,7 +46,7 @@ const Login = () => {
     };
 
     const getPasswordStrengthColor = () => {
-        switch(passwordStrength) {
+        switch (passwordStrength) {
             case 0: return '#ccc';
             case 1: return '#ff4d4d';
             case 2: return '#ffa500';
@@ -79,18 +79,18 @@ const Login = () => {
     const handleLogin = async (e) => {
         e.preventDefault();
         setLoading(true);
-        
+
         try {
             const response = await axios.post(`${process.env.REACT_APP_BACKEND_URI}/api/auth/login`, formData);
-            
+
             if (response.data?.token && response.data?.user) {
                 localStorage.setItem("token", response.data.token);
                 login(response.data.user);
-                
+
                 toast.success("Login successful! Redirecting...", {
                     autoClose: 1000
                 });
-                
+
                 setTimeout(() => navigate('/dashboard'), 1500);
             }
         } catch (error) {
@@ -103,7 +103,7 @@ const Login = () => {
     const handleForgotPassword = async (e) => {
         e.preventDefault();
         setLoading(true);
-        
+
         try {
             if (resetStep === 1) {
                 await axios.post(`${process.env.REACT_APP_BACKEND_URI}/api/auth/forgot-password`, {
@@ -124,13 +124,13 @@ const Login = () => {
                     toast.error("Passwords don't match");
                     return;
                 }
-                
+
                 await axios.post(`${process.env.REACT_APP_BACKEND_URI}/api/auth/reset-password`, {
                     email: resetData.email,
-                    newPassword: resetData.newPassword, 
+                    newPassword: resetData.newPassword,
                     tempToken: resetData.tempToken
                 });
-                
+
                 toast.success("Password reset successfully. You can now login.");
                 setIsForgotPassword(false);
                 setResetStep(1);
@@ -166,7 +166,7 @@ const Login = () => {
                 <button className="close-btn" onClick={() => navigate('/')} aria-label="Close">
                     &times;
                 </button>
-                
+
                 {!isForgotPassword ? (
                     <>
                         <div className="auth-header">
@@ -198,18 +198,18 @@ const Login = () => {
                                         onChange={handleChange}
                                         required
                                     />
-                                    <button 
-                                        type="button" 
+                                    <button
+                                        type="button"
                                         className="toggle-password"
                                         onClick={() => setShowPassword(!showPassword)}
                                     >
                                         {showPassword ? '🔓' : '🔒'}
                                     </button>
                                 </div>
-                                
-                                <button 
-                                    type="button" 
-                                    className="forgot-password-btn" 
+
+                                <button
+                                    type="button"
+                                    className="forgot-password-btn"
                                     onClick={() => setIsForgotPassword(true)}
                                 >
                                     Forgot Password?
@@ -290,8 +290,8 @@ const Login = () => {
                                                 onChange={handleResetChange}
                                                 required
                                             />
-                                            <button 
-                                                type="button" 
+                                            <button
+                                                type="button"
                                                 className="toggle-password"
                                                 onClick={() => setShowPassword(!showPassword)}
                                             >
@@ -299,8 +299,8 @@ const Login = () => {
                                             </button>
                                         </div>
                                         <div className="password-strength-meter">
-                                            <div 
-                                                className="strength-bar" 
+                                            <div
+                                                className="strength-bar"
                                                 style={{
                                                     width: `${passwordStrength * 20}%`,
                                                     backgroundColor: getPasswordStrengthColor()
@@ -348,7 +348,7 @@ const Login = () => {
                             <button type="submit" disabled={loading} className="submit-btn">
                                 {loading ? (
                                     <>
-                                        <span className="spinner" aria-hidden="true"></span> 
+                                        <span className="spinner" aria-hidden="true"></span>
                                         {resetStep === 1 && 'Sending...'}
                                         {resetStep === 2 && 'Verifying...'}
                                         {resetStep === 3 && 'Resetting...'}
@@ -364,10 +364,10 @@ const Login = () => {
 
                             <div className="auth-footer">
                                 <p>
-                                    Remember your password? 
-                                    <button 
-                                        type="button" 
-                                        className="auth-link" 
+                                    Remember your password?
+                                    <button
+                                        type="button"
+                                        className="auth-link"
                                         onClick={() => {
                                             setIsForgotPassword(false);
                                             setResetStep(1);
@@ -381,7 +381,7 @@ const Login = () => {
                     </>
                 )}
             </div>
-            <ToastContainer position="bottom-right" />
+            <ToastContainer position="top-right" />
         </div>
     );
 };

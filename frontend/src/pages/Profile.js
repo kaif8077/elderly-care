@@ -19,12 +19,12 @@ const Profile = () => {
             try {
                 setIsLoading(true);
                 const token = localStorage.getItem('token');
-                
+
                 const medicalResponse = await axios.get(
                     `${process.env.REACT_APP_BACKEND_URI}/api/medical/${user._id}`,
                     { headers: { Authorization: `Bearer ${token}` } }
                 );
-                
+
                 const qrResponse = await axios.get(
                     `${process.env.REACT_APP_BACKEND_URI}/api/qr/${user._id}`,
                     { headers: { Authorization: `Bearer ${token}` } }
@@ -75,10 +75,10 @@ const Profile = () => {
     const formatArrayData = (data) => {
         if (!data) return 'None reported';
         if (Array.isArray(data)) {
-          return data.filter(item => item && item !== 'None').join(', ') || 'None reported';
+            return data.filter(item => item && item !== 'None').join(', ') || 'None reported';
         }
         return data || 'None reported';
-      };
+    };
 
     return (
         <div className="profile-page">
@@ -91,7 +91,7 @@ const Profile = () => {
 
             <div className="profile-container">
                 <ToastContainer position="top-right" autoClose={3000} />
-                
+
                 <div className="profile-header">
                     <h1 className="profile-title">Welcome, {medicalProfile?.name || 'User'}</h1>
                 </div>
@@ -109,7 +109,7 @@ const Profile = () => {
                             <p><strong>Blood Group:</strong> {medicalProfile?.bloodGroup || 'N/A'}</p>
                             <p><strong>Height:</strong> {medicalProfile?.height ? `${medicalProfile.height} cm` : 'N/A'}</p>
                             <p><strong>Weight:</strong> {medicalProfile?.weight ? `${medicalProfile.weight} kg` : 'N/A'}</p>
-                            
+
                         </div>
                     </div>
                 </div>
@@ -129,18 +129,18 @@ const Profile = () => {
                 </div>
 
                 <div className="profile-section">
-    <h2 className="section-title">Medical Information</h2>
-    <div className="profile-grid">
-        <div className="info-card">
-            <p><strong>Medical History:</strong> {formatArrayData(medicalProfile?.medicalHistory)}</p>
-            <p><strong>Allergies:</strong> {formatArrayData(medicalProfile?.allergies)}</p>
-        </div>
-        <div className="info-card">
-            <p><strong>Current Medications:</strong> {formatArrayData(medicalProfile?.medications)}</p>
-            <p><strong>Current Symptoms:</strong> {formatArrayData(medicalProfile?.currentSymptoms)}</p>
-        </div>
-    </div>
-</div>
+                    <h2 className="section-title">Medical Information</h2>
+                    <div className="profile-grid">
+                        <div className="info-card">
+                            <p><strong>Medical History:</strong> {formatArrayData(medicalProfile?.medicalHistory)}</p>
+                            <p><strong>Allergies:</strong> {formatArrayData(medicalProfile?.allergies)}</p>
+                        </div>
+                        <div className="info-card">
+                            <p><strong>Current Medications:</strong> {formatArrayData(medicalProfile?.medications)}</p>
+                            <p><strong>Current Symptoms:</strong> {formatArrayData(medicalProfile?.currentSymptoms)}</p>
+                        </div>
+                    </div>
+                </div>
 
                 <div className="profile-section">
                     <h2 className="section-title">Insurance Information</h2>
@@ -165,12 +165,7 @@ const Profile = () => {
                             <div className="id-card-name">
                                 {medicalProfile?.name.toUpperCase() || 'N/A'}
                             </div>
-                            {/* <div className="id-card-details">
-                                <p><strong>Emergency Contact:</strong></p>
-                                <p>{medicalProfile?.emergencyContact || 'N/A'}</p>
-                                <p><strong>Emergency Phone:</strong></p>
-                                <p>{medicalProfile?.emergencyPhone || 'N/A'}</p>
-                            </div> */}
+                            
                             <div className="id-card-qr">
                                 {qrCode ? (
                                     <img src={qrCode} alt="Medical QR Code" />
@@ -183,38 +178,38 @@ const Profile = () => {
                             </div>
                         </div>
                     </div>
-                    
+
                     <div className="id-card-instructions">
-  <div>
-    <h3>How to Use Your ID Card</h3>
-    <p style={{ textAlign: 'justify' }}>
-      Your ElderlyCare ID Card contains important medical information that can be 
-      accessed by scanning the QR code in case of emergency. Keep this card with 
-      you at all times.
-    </p>
-    <p style={{ textAlign: 'justify' }}>
-      Medical professionals can scan the QR code to access your vital health 
-      information when you're unable to communicate. This includes your medical 
-      history, allergies, and current medications.
-    </p>
-    <p style={{ textAlign: 'justify' }}>
-      For your safety, we recommend keeping a digital copy of this ID card on 
-      your phone and a printed copy in your wallet or purse.
-    </p>
-  </div>
-  <button 
-    className="download-id-btn" 
-    onClick={downloadIDCard}
-    disabled={!medicalProfile || !qrCode}
-  >
-    Download ID Card
-  </button>
-</div>
+                        <div>
+                            <h3>How to Use Your ID Card</h3>
+                            <p style={{ textAlign: 'justify' }}>
+                                Your ElderlyCare ID Card contains important medical information that can be
+                                accessed by scanning the QR code in case of emergency. Keep this card with
+                                you at all times.
+                            </p>
+                            <p style={{ textAlign: 'justify' }}>
+                                Medical professionals can scan the QR code to access your vital health
+                                information when you're unable to communicate. This includes your medical
+                                history, allergies, and current medications.
+                            </p>
+                            <p style={{ textAlign: 'justify' }}>
+                                For your safety, we recommend keeping a digital copy of this ID card on
+                                your phone and a printed copy in your wallet or purse.
+                            </p>
+                        </div>
+                        <button
+                            className="download-id-btn"
+                            onClick={downloadIDCard}
+                            disabled={!medicalProfile || !qrCode}
+                        >
+                            Download ID Card
+                        </button>
+                    </div>
                 </div>
             </div>
 
             <footer className="footer-section">
-                <p>&copy; 2025 ElderlyCare. All rights reserved.</p>
+                <p>&copy; {new Date().getFullYear()} ElderlyCare. All rights reserved.</p>
             </footer>
         </div>
     );

@@ -1,6 +1,6 @@
 
-import React, { useState, useEffect } from 'react';
-// import { Link } from 'react-router-dom';
+import { useState, useEffect } from 'react';
+
 import '../pages/Services.css';
 import aboutHero from '../assests/about-hero.jpg';
 import formFillingImg from '../assests/form.png';
@@ -10,7 +10,7 @@ import secureAccessImg from '../assests/secure.png';
 import emergencyAlertsImg from '../assests/emergency.png';
 import printProfileImg from '../assests/print.png';
 import languageImg from '../assests/language.png';
-// import securityImg from '../assests/secure1.png';
+
 
 const Services = () => {
     const [activeService, setActiveService] = useState(0);

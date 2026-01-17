@@ -19,9 +19,9 @@ const MedicalForm = ({ onSubmissionSuccess }) => {
         dietPreference: '',
 
         // Contact Information
-        phone: '+91 ',
+        phone: '+91',
         emergencyContact: '',
-        emergencyPhone: '+91 ',
+        emergencyPhone: '+91',
         address: '',
 
         // Medical Information
@@ -319,18 +319,7 @@ const MedicalForm = ({ onSubmissionSuccess }) => {
                     <div className="form-row">
                         <div className="form-group">
                             <label>Height*(in cms)  </label>
-                            {/* <select 
-                                name="height" 
-                                value={formData.height} 
-                                onChange={handleChange} 
-                                required
-                            >
-                                <option value="">Select Height</option>
-                                {heightOptions.map((height, index) => (
-                                    <option key={index} value={height.value}>{height.label}</option>
-                                ))}
-                                <option value="other">Other</option>
-                            </select> */}
+                            
                             <input name="height" type="number"
                                 value={formData.height}
                                 onChange={handleChange}

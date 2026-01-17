@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 const api = axios.create({
-  baseURL: process.env.REACT_APP_BACKEND_URI || 'http://localhost:5000', // /api removed from here
+  baseURL: process.env.REACT_APP_BACKEND_URI || 'http://localhost:5000', 
   headers: {
     'Content-Type': 'application/json'
   },
@@ -30,11 +30,11 @@ api.interceptors.response.use(
     if (error.code === 'ECONNABORTED') {
       throw new Error('Request timeout. Please try again.');
     }
-    
+
     if (!error.response) {
       throw new Error('Network error. Please check your connection.');
     }
-    
+
     return Promise.reject(error);
   }
 );

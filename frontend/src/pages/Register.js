@@ -26,11 +26,11 @@ const Register = () => {
             ...prev,
             [name]: value
         }));
-        
+
         if (errors[name]) {
             setErrors(prev => ({ ...prev, [name]: '' }));
         }
-        
+
         if (name === 'password') {
             checkPasswordStrength(value);
         }
@@ -49,7 +49,7 @@ const Register = () => {
     const validateForm = () => {
         const newErrors = {};
         const strongPasswordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*(),.?":{}|<>]).{8,}$/;
-        
+
         if (step === 1) {
             if (!formData.name.trim()) newErrors.name = 'Name is required';
             if (!formData.email) newErrors.email = 'Email is required';
@@ -62,7 +62,7 @@ const Register = () => {
         } else if (step === 2) {
             if (!formData.otp || formData.otp.length !== 6) newErrors.otp = 'Please enter a valid 6-digit OTP';
         }
-        
+
         setErrors(newErrors);
         return Object.keys(newErrors).length === 0;
     };
@@ -77,7 +77,7 @@ const Register = () => {
                 // Send registration request to get OTP
                 const { confirmPassword, ...dataToSend } = formData;
                 await axios.post(`${process.env.REACT_APP_BACKEND_URI}/api/auth/register`, dataToSend);
-                
+
                 toast.success("OTP sent to your email");
                 setStep(2);
             } else if (step === 2) {
@@ -86,14 +86,14 @@ const Register = () => {
                     email: formData.email,
                     otp: formData.otp
                 });
-                
+
                 toast.success("Email verified successfully");
                 setStep(3);
             } else if (step === 3) {
                 // Complete registration
                 const { confirmPassword, otp, ...dataToSend } = formData;
                 const response = await axios.post(`${process.env.REACT_APP_BACKEND_URI}/api/auth/complete-registration`, dataToSend);
-                
+
                 localStorage.setItem("token", response.data.token);
                 toast.success("Registration successful! Redirecting...", { autoClose: 2000 });
                 setTimeout(() => navigate('/Login'), 2500);
@@ -120,7 +120,7 @@ const Register = () => {
     };
 
     const getPasswordStrengthColor = () => {
-        switch(passwordStrength) {
+        switch (passwordStrength) {
             case 0: return '#ccc';
             case 1: return '#ff4d4d';
             case 2: return '#ffa500';
@@ -137,7 +137,7 @@ const Register = () => {
                 <button className="close-btn" onClick={() => navigate('/')} aria-label="Close">
                     &times;
                 </button>
-                
+
                 <div className="auth-header">
                     <h2>
                         {step === 1 && 'Create Account'}
@@ -181,57 +181,57 @@ const Register = () => {
                             </div>
 
                             <div className="form-group">
-    <label htmlFor="password">Password*</label>
-    <div className="password-input-container">
-        <input
-            type={showPassword ? "text" : "password"}
-            id="password"
-            name="password"
-            value={formData.password}
-            onChange={handleChange}
-            className={errors.password ? 'error' : ''}
-        />
-        <button 
-            type="button" 
-            className="toggle-password"
-            onClick={() => setShowPassword(!showPassword)}
-        >
-            {showPassword ? '🔓' : '🔒'}
-        </button>
-    </div>
-    <div className="password-strength-meter">
-        <div 
-            className="strength-bar" 
-            style={{
-                width: `${passwordStrength * 20}%`,
-                backgroundColor: getPasswordStrengthColor()
-            }}
-        ></div>
-    </div>
-    {formData.password && (
-        <div className="password-requirements">
-            <p>Password must contain:</p>
-            <ul>
-                <li className={formData.password.length >= 8 ? 'valid' : 'invalid'}>
-                    At least 8 characters
-                </li>
-                <li className={/[A-Z]/.test(formData.password) ? 'valid' : 'invalid'}>
-                    One uppercase letter
-                </li>
-                <li className={/[a-z]/.test(formData.password) ? 'valid' : 'invalid'}>
-                    One lowercase letter
-                </li>
-                <li className={/\d/.test(formData.password) ? 'valid' : 'invalid'}>
-                    One number
-                </li>
-                <li className={/[@$!%*?&]/.test(formData.password) ? 'valid' : 'invalid'}>
-                    One special character (@$!%*?&)
-                </li>
-            </ul>
-        </div>
-    )}
-    {errors.password && <span className="error-message">{errors.password}</span>}
-</div>
+                                <label htmlFor="password">Password*</label>
+                                <div className="password-input-container">
+                                    <input
+                                        type={showPassword ? "text" : "password"}
+                                        id="password"
+                                        name="password"
+                                        value={formData.password}
+                                        onChange={handleChange}
+                                        className={errors.password ? 'error' : ''}
+                                    />
+                                    <button
+                                        type="button"
+                                        className="toggle-password"
+                                        onClick={() => setShowPassword(!showPassword)}
+                                    >
+                                        {showPassword ? '🔓' : '🔒'}
+                                    </button>
+                                </div>
+                                <div className="password-strength-meter">
+                                    <div
+                                        className="strength-bar"
+                                        style={{
+                                            width: `${passwordStrength * 20}%`,
+                                            backgroundColor: getPasswordStrengthColor()
+                                        }}
+                                    ></div>
+                                </div>
+                                {formData.password && (
+                                    <div className="password-requirements">
+                                        <p>Password must contain:</p>
+                                        <ul>
+                                            <li className={formData.password.length >= 8 ? 'valid' : 'invalid'}>
+                                                At least 8 characters
+                                            </li>
+                                            <li className={/[A-Z]/.test(formData.password) ? 'valid' : 'invalid'}>
+                                                One uppercase letter
+                                            </li>
+                                            <li className={/[a-z]/.test(formData.password) ? 'valid' : 'invalid'}>
+                                                One lowercase letter
+                                            </li>
+                                            <li className={/\d/.test(formData.password) ? 'valid' : 'invalid'}>
+                                                One number
+                                            </li>
+                                            <li className={/[@$!%*?&]/.test(formData.password) ? 'valid' : 'invalid'}>
+                                                One special character (@$!%*?&)
+                                            </li>
+                                        </ul>
+                                    </div>
+                                )}
+                                {errors.password && <span className="error-message">{errors.password}</span>}
+                            </div>
 
                             <div className="form-group">
                                 <label htmlFor="confirmPassword">Confirm Password*</label>
@@ -278,7 +278,7 @@ const Register = () => {
                     <button type="submit" disabled={loading} className="submit-btn">
                         {loading ? (
                             <>
-                                <span className="spinner" aria-hidden="true"></span> 
+                                <span className="spinner" aria-hidden="true"></span>
                                 {step === 1 && 'Processing...'}
                                 {step === 2 && 'Verifying...'}
                                 {step === 3 && 'Completing...'}
@@ -297,7 +297,7 @@ const Register = () => {
                     </div>
                 </form>
             </div>
-            <ToastContainer position="bottom-right" />
+            <ToastContainer position="top-right" />
         </div>
     );
 };

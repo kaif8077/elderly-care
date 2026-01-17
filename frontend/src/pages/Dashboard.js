@@ -43,7 +43,7 @@ const Dashboard = () => {
 
             {/* Footer Section */}
             <footer className="footer-section">
-                <p>&copy; 2025 ElderlyCare. All rights reserved.</p>
+                <p>&copy; {new Date().getFullYear()} ElderlyCare. All rights reserved.</p>
             </footer>
         </div>
     );

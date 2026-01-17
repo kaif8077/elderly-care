@@ -10,7 +10,7 @@ const Contact = () => {
     email: '',
     message: ''
   });
-  
+
   // Feedback form state
   const [feedback, setFeedback] = useState({
     name: '',
@@ -18,15 +18,15 @@ const Contact = () => {
     rating: '',
     comments: ''
   });
-  
+
   // Loading states
   const [isSubmittingContact, setIsSubmittingContact] = useState(false);
   const [isSubmittingFeedback, setIsSubmittingFeedback] = useState(false);
-  
+
   // Success states
   const [contactSuccess, setContactSuccess] = useState('');
   const [feedbackSuccess, setFeedbackSuccess] = useState('');
-  
+
   // Errors
   const [contactError, setContactError] = useState('');
   const [feedbackError, setFeedbackError] = useState('');
@@ -37,7 +37,7 @@ const Contact = () => {
     setIsSubmittingContact(true);
     setContactError('');
     setContactSuccess('');
-    
+
     try {
       const response = await submitContactForm(contact);
       setContactSuccess(response.message);
@@ -55,7 +55,7 @@ const Contact = () => {
     setIsSubmittingFeedback(true);
     setFeedbackError('');
     setFeedbackSuccess('');
-    
+
     try {
       const response = await submitFeedbackForm(feedback);
       setFeedbackSuccess(response.message);
@@ -104,7 +104,7 @@ const Contact = () => {
                   disabled={isSubmittingContact}
                 />
               </div>
-              
+
               <div className="form-group">
                 <label htmlFor="contact-email">Email Address *</label>
                 <input
@@ -118,7 +118,7 @@ const Contact = () => {
                   disabled={isSubmittingContact}
                 />
               </div>
-              
+
               <div className="form-group">
                 <label htmlFor="contact-message">Message *</label>
                 <textarea
@@ -132,21 +132,21 @@ const Contact = () => {
                   disabled={isSubmittingContact}
                 />
               </div>
-              
+
               {contactError && (
                 <div className="error-message">
                   <strong>Error:</strong> {contactError}
                 </div>
               )}
-              
+
               {contactSuccess && (
                 <div className="success-message">
                   <strong>Success:</strong> {contactSuccess}
                 </div>
               )}
-              
-              <button 
-                type="submit" 
+
+              <button
+                type="submit"
                 disabled={isSubmittingContact}
                 className="submit-btn"
               >
@@ -179,7 +179,7 @@ const Contact = () => {
                   disabled={isSubmittingFeedback}
                 />
               </div>
-              
+
               <div className="form-group">
                 <label htmlFor="feedback-email">Email Address *</label>
                 <input
@@ -193,7 +193,7 @@ const Contact = () => {
                   disabled={isSubmittingFeedback}
                 />
               </div>
-              
+
               <div className="form-group">
                 <label htmlFor="feedback-rating">Your Rating *</label>
                 <select
@@ -212,7 +212,7 @@ const Contact = () => {
                   <option value="1">⭐️ Poor</option>
                 </select>
               </div>
-              
+
               <div className="form-group">
                 <label htmlFor="feedback-comments">Comments *</label>
                 <textarea
@@ -226,21 +226,21 @@ const Contact = () => {
                   disabled={isSubmittingFeedback}
                 />
               </div>
-              
+
               {feedbackError && (
                 <div className="error-message">
                   <strong>Error:</strong> {feedbackError}
                 </div>
               )}
-              
+
               {feedbackSuccess && (
                 <div className="success-message">
                   <strong>Success:</strong> {feedbackSuccess}
                 </div>
               )}
-              
-              <button 
-                type="submit" 
+
+              <button
+                type="submit"
                 disabled={isSubmittingFeedback}
                 className="submit-btn"
               >
