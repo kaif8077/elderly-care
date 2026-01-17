@@ -16,7 +16,7 @@ connectDB();
 
 // Middleware
 app.use(cors({
-    origin: 'https://kaif8077-elderly-care.vercel.app/' || 'http://localhost:3000',
+    origin: 'https://elderly-care-mohammad-kaifs-projects-2cc0d3ad.vercel.app/' || 'http://localhost:3000',
     methods: ['GET', 'POST', 'PUT', 'DELETE'],
     allowedHeaders: ['Content-Type', 'Authorization'],
     credentials: true
