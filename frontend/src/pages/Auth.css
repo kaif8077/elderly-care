@@ -435,7 +435,3 @@ body {
   color: red;
 }
 
-.Toastify__toast-container {
-  z-index: 10001 !important;
-  pointer-events: auto !important;
-}
