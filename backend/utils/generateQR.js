@@ -21,7 +21,7 @@ exports.generateQR = async (data) => {
 exports.formatMedicalProfile = async (profile) => {
     try {
         // YEH LINE CHANGE KARO - ngrok ki jagah Render URL use karo
-        const RENDER_BACKEND_URL = process.env.RENDER_BACKEND_URL || "https://elderly-care-backend-2hyt.onrender.com";
+        const RENDER_BACKEND_URL = process.env.RENDER_BACKEND_URL || "https://elderly-care-zuq9.onrender.com";
         console.log('Using backend URL:', RENDER_BACKEND_URL);
         
         const firstAidRecommendations = await generateFirstAidRecommendations(profile);

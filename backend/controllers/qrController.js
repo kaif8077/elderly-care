@@ -74,7 +74,7 @@ exports.createQRCode = async (req, res) => {
         }
 
         // PERMANENT URL - No more ngrok!
-        const RENDER_BACKEND_URL = process.env.RENDER_BACKEND_URL || "https://elderly-care-backend-2hyt.onrender.com";
+        const RENDER_BACKEND_URL = process.env.RENDER_BACKEND_URL || "https://elderly-care-zuq9.onrender.com";
         
         // Profile URL that works everywhere
         const profileUrl = `${RENDER_BACKEND_URL}/api/qr/profile/${userId}`;
