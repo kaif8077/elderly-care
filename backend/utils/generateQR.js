@@ -2,6 +2,7 @@ require('dotenv').config();
 const QRCode = require('qrcode');
 const fs = require('fs');
 const path = require('path');
+const { generateFirstAidRecommendations } = require('../controllers/recommendationController');
 const twilio = require('twilio');
 const { translations } = require('../utils/translationService');
 
@@ -17,39 +18,43 @@ exports.generateQR = async (data) => {
     }
 };
 
-// Simple function to generate first aid recommendations - NO API CALL
-const generateSimpleRecommendations = (profile) => {
-    // Calculate age from DOB
-    let age = 'N/A';
-    if (profile.dob) {
-        const birthDate = new Date(profile.dob);
-        const today = new Date();
-        age = today.getFullYear() - birthDate.getFullYear();
-        const monthDiff = today.getMonth() - birthDate.getMonth();
-        if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthDate.getDate())) {
-            age--;
+exports.formatMedicalProfile = async (profile) => {
+    try {
+
+        const RENDER_BACKEND_URL = process.env.RENDER_BACKEND_URL || "https://elderly-care-zuq9.onrender.com";
+        console.log('Using backend URL:', RENDER_BACKEND_URL);
+
+        // Calculate age from DOB
+        let age = 'N/A';
+        if (profile.dob) {
+            const birthDate = new Date(profile.dob);
+            const today = new Date();
+            age = today.getFullYear() - birthDate.getFullYear();
+            const monthDiff = today.getMonth() - birthDate.getMonth();
+            if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthDate.getDate())) {
+                age--;
+            }
         }
-    }
 
-    // Check for critical conditions
-    const criticalConditions = [];
-    const medicalHistory = (profile.medicalHistory || '').toLowerCase();
-    if (medicalHistory.includes('diabetes') || medicalHistory.includes('diabetic')) criticalConditions.push('Diabetes');
-    if (medicalHistory.includes('heart') || medicalHistory.includes('cardiac') || medicalHistory.includes('bp') || medicalHistory.includes('hypertension')) criticalConditions.push('Heart Disease');
-    if (medicalHistory.includes('asthma') || medicalHistory.includes('respiratory') || medicalHistory.includes('copd')) criticalConditions.push('Asthma');
-    if (medicalHistory.includes('stroke')) criticalConditions.push('Stroke');
-    if (medicalHistory.includes('epilepsy') || medicalHistory.includes('seizure')) criticalConditions.push('Epilepsy');
-    if (medicalHistory.includes('kidney') || medicalHistory.includes('renal')) criticalConditions.push('Kidney Disease');
-    
-    const hasCriticalCondition = criticalConditions.length > 0;
-    const conditionText = hasCriticalCondition ? criticalConditions.join(', ') : 'No critical conditions reported';
+        // Check for critical conditions
+        const criticalConditions = [];
+        const medicalHistory = (profile.medicalHistory || '').toLowerCase();
+        if (medicalHistory.includes('diabetes') || medicalHistory.includes('diabetic')) criticalConditions.push('Diabetes');
+        if (medicalHistory.includes('heart') || medicalHistory.includes('cardiac') || medicalHistory.includes('bp') || medicalHistory.includes('hypertension')) criticalConditions.push('Heart Disease');
+        if (medicalHistory.includes('asthma') || medicalHistory.includes('respiratory') || medicalHistory.includes('copd')) criticalConditions.push('Asthma');
+        if (medicalHistory.includes('stroke')) criticalConditions.push('Stroke');
+        if (medicalHistory.includes('epilepsy') || medicalHistory.includes('seizure')) criticalConditions.push('Epilepsy');
+        if (medicalHistory.includes('kidney') || medicalHistory.includes('renal')) criticalConditions.push('Kidney Disease');
+        
+        const hasCriticalCondition = criticalConditions.length > 0;
+        const conditionText = hasCriticalCondition ? criticalConditions.join(', ') : 'No critical conditions reported';
 
-    // Get emergency contact info
-    const emergencyContactName = profile.emergencyContact || 'Emergency Contact';
-    const emergencyPhone = profile.emergencyPhone || 'Not provided';
+        // Get emergency contact info
+        const emergencyContactName = profile.emergencyContact || 'Emergency Contact';
+        const emergencyPhone = profile.emergencyPhone || 'Not provided';
 
-    // Generate simple first aid recommendations
-    return `
+        // Generate simple first aid recommendations
+        const simpleRecommendations = `
 Patient Profile:
 Name: ${profile.name || 'N/A'} | Age: ${age} | Blood Group: ${profile.bloodGroup || 'N/A'}
 
@@ -66,17 +71,7 @@ ${emergencyContactName} – ${emergencyPhone}
 
 Full Details:
 Complete medical information including medical history, medications, allergies, and other personal health details is available in the profile below.
-    `;
-};
-
-exports.formatMedicalProfile = async (profile) => {
-    try {
-
-        const RENDER_BACKEND_URL = process.env.RENDER_BACKEND_URL || "https://elderly-care-zuq9.onrender.com";
-        console.log('Using backend URL:', RENDER_BACKEND_URL);
-
-        // Generate simple recommendations directly - NO EXTERNAL API CALL
-        const simpleRecommendations = generateSimpleRecommendations(profile);
+        `;
 
         const formattedRecommendations = simpleRecommendations
             .split('\n')
@@ -91,18 +86,6 @@ exports.formatMedicalProfile = async (profile) => {
                 return `<p>${line}</p>`;
             })
             .join('');
-
-        // Calculate age for display
-        let age = 'N/A';
-        if (profile.dob) {
-            const birthDate = new Date(profile.dob);
-            const today = new Date();
-            age = today.getFullYear() - birthDate.getFullYear();
-            const monthDiff = today.getMonth() - birthDate.getMonth();
-            if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthDate.getDate())) {
-                age--;
-            }
-        }
 
         return `
 <!DOCTYPE html>
