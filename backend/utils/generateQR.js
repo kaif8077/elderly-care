@@ -19,8 +19,9 @@ exports.generateQR = async (data) => {
 
 // Function to generate basic first aid recommendations based on condition
 const getBasicFirstAid = (profile) => {
-    const medicalHistory = (profile.medicalHistory || '').toLowerCase();
-    const currentSymptoms = (profile.currentSymptoms || '').toLowerCase();
+    // SAFE CHECK - ensure profile and its properties exist
+    const medicalHistory = (profile && profile.medicalHistory) ? profile.medicalHistory.toLowerCase() : '';
+    const currentSymptoms = (profile && profile.currentSymptoms) ? profile.currentSymptoms.toLowerCase() : '';
     
     let recommendations = [];
     
@@ -49,7 +50,7 @@ const getBasicFirstAid = (profile) => {
         });
     }
     
-    if (medicalHistory.includes('heart') || medicalHistory.includes('cardiac') || medicalHistory.includes('bp')) {
+    if (medicalHistory.includes('heart') || medicalHistory.includes('cardiac') || medicalHistory.includes('bp') || medicalHistory.includes('hypertension')) {
         recommendations.push({
             title: "🟠 FOR HEART/BLOOD PRESSURE PATIENT",
             tips: [
@@ -61,7 +62,7 @@ const getBasicFirstAid = (profile) => {
         });
     }
     
-    if (medicalHistory.includes('asthma') || medicalHistory.includes('respiratory')) {
+    if (medicalHistory.includes('asthma') || medicalHistory.includes('respiratory') || medicalHistory.includes('copd')) {
         recommendations.push({
             title: "🟠 FOR ASTHMA/RESPIRATORY PATIENT",
             tips: [
@@ -69,31 +70,59 @@ const getBasicFirstAid = (profile) => {
                 "Ask for their inhaler and help them use it",
                 "Encourage slow, deep breathing",
                 "Stay calm and reassure the person"
-            ]);
-        }
+            ]
+        });
     }
     
-    if (currentSymptoms.includes('fever') || currentSymptoms.includes('vomiting') || currentSymptoms.includes('cough')) {
+    if (currentSymptoms.includes('fever')) {
         recommendations.push({
-            title: "🟡 FOR CURRENT SYMPTOMS",
+            title: "🟡 FOR FEVER",
             tips: [
                 "Keep the person hydrated: give small sips of water",
-                "Use cool cloth on forehead for fever",
-                "If vomiting, keep head turned to side to prevent choking",
-                "Monitor temperature and symptoms"
-            ]);
-        }
+                "Use cool cloth on forehead",
+                "Monitor temperature",
+                "Rest in a cool, well-ventilated room"
+            ]
+        });
+    }
+    
+    if (currentSymptoms.includes('vomiting')) {
+        recommendations.push({
+            title: "🟡 FOR VOMITING",
+            tips: [
+                "Keep head turned to side to prevent choking",
+                "Give small sips of water after vomiting stops",
+                "Do not give solid food immediately",
+                "Seek medical help if vomiting continues"
+            ]
+        });
+    }
+    
+    if (currentSymptoms.includes('cough')) {
+        recommendations.push({
+            title: "🟡 FOR COUGH",
+            tips: [
+                "Keep the person upright",
+                "Give warm water to drink",
+                "Avoid cold air or smoke",
+                "Use honey if available (for adults only)"
+            ]
+        });
     }
     
     // Emergency contact info
+    const emergencyName = (profile && profile.emergencyContact) ? profile.emergencyContact : 'Emergency Contact';
+    const emergencyPhoneNum = (profile && profile.emergencyPhone) ? profile.emergencyPhone : 'Number not available';
+    
     recommendations.push({
         title: "📞 IMMEDIATE ACTIONS",
         tips: [
-            `Call emergency contact: ${profile.emergencyContact || 'Emergency Contact'} at ${profile.emergencyPhone || 'Number not available'}`,
+            `Call emergency contact: ${emergencyName} at ${emergencyPhoneNum}`,
             "Call ambulance: 102 or 108",
             "Share your current location with emergency services",
             "Do not leave the person alone until help arrives"
-        ]);
+        ]
+    });
     
     return recommendations;
 };
@@ -102,16 +131,27 @@ exports.formatMedicalProfile = async (profile) => {
     try {
         const RENDER_BACKEND_URL = process.env.RENDER_BACKEND_URL || "https://elderly-care-zuq9.onrender.com";
         console.log('Using backend URL:', RENDER_BACKEND_URL);
+        
+        // SAFE CHECK - ensure profile exists
+        if (!profile) {
+            console.error('Profile is undefined or null');
+            throw new Error('Profile data is missing');
+        }
 
         // Calculate age from DOB
         let age = 'N/A';
-        if (profile.dob) {
-            const birthDate = new Date(profile.dob);
-            const today = new Date();
-            age = today.getFullYear() - birthDate.getFullYear();
-            const monthDiff = today.getMonth() - birthDate.getMonth();
-            if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthDate.getDate())) {
-                age--;
+        if (profile.dob && profile.dob !== 'N/A') {
+            try {
+                const birthDate = new Date(profile.dob);
+                const today = new Date();
+                age = today.getFullYear() - birthDate.getFullYear();
+                const monthDiff = today.getMonth() - birthDate.getMonth();
+                if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthDate.getDate())) {
+                    age--;
+                }
+                if (isNaN(age) || age < 0) age = 'N/A';
+            } catch(e) {
+                age = 'N/A';
             }
         }
 
@@ -135,7 +175,7 @@ exports.formatMedicalProfile = async (profile) => {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-    <title>Medical Profile - ${profile.name || 'Patient'}</title>
+    <title>Medical Profile - ${(profile.name || 'Patient').replace(/[<>]/g, '')}</title>
     <style>
         * {
             margin: 0;
@@ -409,6 +449,31 @@ exports.formatMedicalProfile = async (profile) => {
                 font-size: 14px;
             }
         }
+        
+        .error-page {
+            text-align: center;
+            padding: 40px 20px;
+        }
+        
+        .error-page h1 {
+            color: #e74c3c;
+            margin-bottom: 20px;
+        }
+        
+        .error-page button {
+            background-color: #0066ff;
+            color: white;
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            margin-top: 20px;
+            width: auto;
+        }
+        
+        .error-page button:hover {
+            background-color: #ff6b00;
+        }
     </style>
 </head>
 <body>
@@ -444,29 +509,29 @@ exports.formatMedicalProfile = async (profile) => {
                 <h1 class="section-title" data-translate="medicalProfile">Medical Profile</h1>
                 <div class="section-content">
                     <h3 data-translate="personalInfo">📋 Personal Information</h3>
-                    <p><strong data-translate="name">Name:</strong> ${profile.name || 'N/A'}</p>
-                    <p><strong data-translate="dob">Date of Birth:</strong> ${profile.dob || 'N/A'} (Age: ${age})</p>
-                    <p><strong data-translate="gender">Gender:</strong> ${profile.gender || 'N/A'}</p>
-                    <p><strong data-translate="bloodGroup">Blood Group:</strong> ${profile.bloodGroup || 'N/A'}</p>
-                    <p><strong data-translate="dietPreference">Diet Preference:</strong> ${profile.dietPreference || 'N/A'}</p>
+                    <p><strong data-translate="name">Name:</strong> ${(profile.name || 'N/A').replace(/[<>]/g, '')}</p>
+                    <p><strong data-translate="dob">Date of Birth:</strong> ${(profile.dob || 'N/A').replace(/[<>]/g, '')} (Age: ${age})</p>
+                    <p><strong data-translate="gender">Gender:</strong> ${(profile.gender || 'N/A').replace(/[<>]/g, '')}</p>
+                    <p><strong data-translate="bloodGroup">Blood Group:</strong> ${(profile.bloodGroup || 'N/A').replace(/[<>]/g, '')}</p>
+                    <p><strong data-translate="dietPreference">Diet Preference:</strong> ${(profile.dietPreference || 'N/A').replace(/[<>]/g, '')}</p>
                     
                     <h3 data-translate="contactInfo">📞 Contact Information</h3>
-                    <p><strong data-translate="phone">Phone:</strong> ${profile.phone || 'N/A'}</p>
-                    <p><strong data-translate="address">Address:</strong> ${profile.address || 'N/A'}</p>
-                    <p><strong data-translate="emergencyContact">Emergency Contact:</strong> ${profile.emergencyContact || 'N/A'}</p>
-                    <p><strong data-translate="emergencyPhone">Emergency Phone:</strong> ${profile.emergencyPhone || 'N/A'}</p>
+                    <p><strong data-translate="phone">Phone:</strong> ${(profile.phone || 'N/A').replace(/[<>]/g, '')}</p>
+                    <p><strong data-translate="address">Address:</strong> ${(profile.address || 'N/A').replace(/[<>]/g, '')}</p>
+                    <p><strong data-translate="emergencyContact">Emergency Contact:</strong> ${(profile.emergencyContact || 'N/A').replace(/[<>]/g, '')}</p>
+                    <p><strong data-translate="emergencyPhone">Emergency Phone:</strong> ${(profile.emergencyPhone || 'N/A').replace(/[<>]/g, '')}</p>
                     
                     <h3 data-translate="medicalInfo">🏥 Medical Information</h3>
-                    <p><strong data-translate="medicalHistory">Medical History:</strong> ${profile.medicalHistory || 'N/A'}</p>
-                    <p><strong data-translate="allergies">Allergies:</strong> ${profile.allergies || 'N/A'}</p>
-                    <p><strong data-translate="medications">Medications:</strong> ${profile.medications || 'N/A'}</p>
-                    <p><strong data-translate="currentSymptoms">Current Symptoms:</strong> ${profile.currentSymptoms || 'N/A'}</p>
+                    <p><strong data-translate="medicalHistory">Medical History:</strong> ${(profile.medicalHistory || 'N/A').replace(/[<>]/g, '')}</p>
+                    <p><strong data-translate="allergies">Allergies:</strong> ${(profile.allergies || 'N/A').replace(/[<>]/g, '')}</p>
+                    <p><strong data-translate="medications">Medications:</strong> ${(profile.medications || 'N/A').replace(/[<>]/g, '')}</p>
+                    <p><strong data-translate="currentSymptoms">Current Symptoms:</strong> ${(profile.currentSymptoms || 'N/A').replace(/[<>]/g, '')}</p>
                     
                     <h3 data-translate="insuranceInfo">📄 Insurance Information</h3>
                     <p><strong data-translate="hasInsurance">Has Insurance:</strong> ${profile.hasInsurance ? 'Yes' : 'No'}</p>
                     ${profile.hasInsurance ? `
-                        <p><strong data-translate="insuranceProvider">Insurance Provider:</strong> ${profile.insuranceProvider || 'N/A'}</p>
-                        <p><strong data-translate="policyNumber">Policy Number:</strong> ${profile.policyNumber || 'N/A'}</p>
+                        <p><strong data-translate="insuranceProvider">Insurance Provider:</strong> ${(profile.insuranceProvider || 'N/A').replace(/[<>]/g, '')}</p>
+                        <p><strong data-translate="policyNumber">Policy Number:</strong> ${(profile.policyNumber || 'N/A').replace(/[<>]/g, '')}</p>
                     ` : ''}
                 </div>
             </div>
@@ -490,7 +555,6 @@ exports.formatMedicalProfile = async (profile) => {
     
     <script>
         const serverIP = "${RENDER_BACKEND_URL}";
-        
         
         const translations = ${JSON.stringify(translations)};
         
@@ -557,8 +621,7 @@ exports.formatMedicalProfile = async (profile) => {
                 const data = await response.json();
                 if (!response.ok) throw new Error(data.message || 'Failed to send OTP');
                 
-                
-                alert('OTP sent. Your OTP is: ' + phone);
+                alert('OTP sent successfully!');
                 
                 document.getElementById('otpSection').style.display = 'block';
                 document.getElementById('requestOtpBtn').style.display = 'none';
@@ -615,8 +678,8 @@ exports.formatMedicalProfile = async (profile) => {
         
         const sendEmergencyMessage = async (latitude, longitude) => {
             try {
-                const emergencyContact = "${profile.emergencyPhone}";
-                const profileName = "${profile.name}";
+                const emergencyContact = "${(profile.emergencyPhone || '').replace(/[<>]/g, '')}";
+                const profileName = "${(profile.name || 'Patient').replace(/[<>]/g, '')}";
                 const scannerName = sessionStorage.getItem('scannerName') || 'Unknown Scanner';
                 const scannerPhone = sessionStorage.getItem('scannerPhone') || 'Unknown Phone';
                 
@@ -672,7 +735,53 @@ exports.formatMedicalProfile = async (profile) => {
         `;
     } catch (error) {
         console.error('Error formatting medical profile:', error);
-        throw error;
+        return `
+        <!DOCTYPE html>
+        <html>
+        <head>
+            <meta charset="UTF-8">
+            <meta name="viewport" content="width=device-width, initial-scale=1.0">
+            <title>Error Loading Profile</title>
+            <style>
+                body {
+                    font-family: Arial, sans-serif;
+                    display: flex;
+                    justify-content: center;
+                    align-items: center;
+                    height: 100vh;
+                    margin: 0;
+                    background-color: #f5f5f5;
+                }
+                .error-container {
+                    text-align: center;
+                    padding: 40px;
+                    background: white;
+                    border-radius: 12px;
+                    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+                    max-width: 400px;
+                }
+                h1 { color: #e74c3c; margin-bottom: 20px; }
+                p { color: #666; margin-bottom: 20px; }
+                button {
+                    background-color: #0066ff;
+                    color: white;
+                    padding: 12px 24px;
+                    border: none;
+                    border-radius: 8px;
+                    cursor: pointer;
+                }
+                button:hover { background-color: #ff6b00; }
+            </style>
+        </head>
+        <body>
+            <div class="error-container">
+                <h1>⚠️ Server Error</h1>
+                <p>Failed to load medical profile. Please go back and try again.</p>
+                <button onclick="history.back()">Go Back</button>
+            </div>
+        </body>
+        </html>
+        `;
     }
 };
 
