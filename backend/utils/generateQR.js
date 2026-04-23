@@ -20,8 +20,8 @@ exports.generateQR = async (data) => {
 // Function to generate basic first aid recommendations based on condition
 const getBasicFirstAid = (profile) => {
     // SAFE CHECK - ensure profile and its properties exist
-    const medicalHistory = (profile && profile.medicalHistory) ? profile.medicalHistory.toLowerCase() : '';
-    const currentSymptoms = (profile && profile.currentSymptoms) ? profile.currentSymptoms.toLowerCase() : '';
+    const medicalHistory = (profile && profile.medicalHistory) ? String(profile.medicalHistory).toLowerCase() : '';
+    const currentSymptoms = (profile && profile.currentSymptoms) ? String(profile.currentSymptoms).toLowerCase() : '';
     
     let recommendations = [];
     
@@ -129,8 +129,10 @@ const getBasicFirstAid = (profile) => {
 
 exports.formatMedicalProfile = async (profile) => {
     try {
+        console.log('=== formatMedicalProfile START ===');
+        console.log('Received profile:', JSON.stringify(profile, null, 2));
+        
         const RENDER_BACKEND_URL = process.env.RENDER_BACKEND_URL || "https://elderly-care-zuq9.onrender.com";
-        console.log('Using backend URL:', RENDER_BACKEND_URL);
         
         // SAFE CHECK - ensure profile exists
         if (!profile) {
@@ -138,44 +140,71 @@ exports.formatMedicalProfile = async (profile) => {
             throw new Error('Profile data is missing');
         }
 
+        // Create a safe copy of profile with defaults
+        const safeProfile = {
+            name: profile.name || 'N/A',
+            dob: profile.dob || 'N/A',
+            gender: profile.gender || 'N/A',
+            bloodGroup: profile.bloodGroup || 'N/A',
+            dietPreference: profile.dietPreference || 'N/A',
+            phone: profile.phone || 'N/A',
+            address: profile.address || 'N/A',
+            emergencyContact: profile.emergencyContact || 'N/A',
+            emergencyPhone: profile.emergencyPhone || 'N/A',
+            medicalHistory: profile.medicalHistory || 'No medical history reported',
+            allergies: profile.allergies || 'No known allergies',
+            medications: profile.medications || 'No current medications',
+            currentSymptoms: profile.currentSymptoms || 'No symptoms reported',
+            hasInsurance: profile.hasInsurance || false,
+            insuranceProvider: profile.insuranceProvider || 'N/A',
+            policyNumber: profile.policyNumber || 'N/A'
+        };
+        
+        console.log('Safe profile created:', JSON.stringify(safeProfile, null, 2));
+
         // Calculate age from DOB
         let age = 'N/A';
-        if (profile.dob && profile.dob !== 'N/A') {
+        if (safeProfile.dob && safeProfile.dob !== 'N/A') {
             try {
-                const birthDate = new Date(profile.dob);
-                const today = new Date();
-                age = today.getFullYear() - birthDate.getFullYear();
-                const monthDiff = today.getMonth() - birthDate.getMonth();
-                if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthDate.getDate())) {
-                    age--;
+                const birthDate = new Date(safeProfile.dob);
+                if (!isNaN(birthDate.getTime())) {
+                    const today = new Date();
+                    age = today.getFullYear() - birthDate.getFullYear();
+                    const monthDiff = today.getMonth() - birthDate.getMonth();
+                    if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthDate.getDate())) {
+                        age--;
+                    }
+                    if (age < 0) age = 'N/A';
                 }
-                if (isNaN(age) || age < 0) age = 'N/A';
             } catch(e) {
+                console.error('Age calculation error:', e);
                 age = 'N/A';
             }
         }
 
         // Get basic first aid recommendations
-        const firstAidRecommendations = getBasicFirstAid(profile);
+        const firstAidRecommendations = getBasicFirstAid(safeProfile);
         
         // Generate HTML for recommendations
         let recommendationsHtml = '';
         for (const rec of firstAidRecommendations) {
-            recommendationsHtml += `<h3 class="rec-title">${rec.title}</h3>`;
+            recommendationsHtml += `<h3 class="rec-title">${escapeHtml(rec.title)}</h3>`;
             recommendationsHtml += `<ul class="rec-list">`;
             for (const tip of rec.tips) {
-                recommendationsHtml += `<li class="rec-item">${tip}</li>`;
+                recommendationsHtml += `<li class="rec-item">${escapeHtml(tip)}</li>`;
             }
             recommendationsHtml += `</ul>`;
         }
 
+        console.log('HTML generated successfully');
+        
         return `
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-    <title>Medical Profile - ${(profile.name || 'Patient').replace(/[<>]/g, '')}</title>
+    <title>Medical Profile - ${escapeHtml(safeProfile.name)}</title>
     <style>
         * {
             margin: 0;
@@ -449,31 +478,6 @@ exports.formatMedicalProfile = async (profile) => {
                 font-size: 14px;
             }
         }
-        
-        .error-page {
-            text-align: center;
-            padding: 40px 20px;
-        }
-        
-        .error-page h1 {
-            color: #e74c3c;
-            margin-bottom: 20px;
-        }
-        
-        .error-page button {
-            background-color: #0066ff;
-            color: white;
-            padding: 12px 24px;
-            border: none;
-            border-radius: 8px;
-            cursor: pointer;
-            margin-top: 20px;
-            width: auto;
-        }
-        
-        .error-page button:hover {
-            background-color: #ff6b00;
-        }
     </style>
 </head>
 <body>
@@ -509,29 +513,29 @@ exports.formatMedicalProfile = async (profile) => {
                 <h1 class="section-title" data-translate="medicalProfile">Medical Profile</h1>
                 <div class="section-content">
                     <h3 data-translate="personalInfo">📋 Personal Information</h3>
-                    <p><strong data-translate="name">Name:</strong> ${(profile.name || 'N/A').replace(/[<>]/g, '')}</p>
-                    <p><strong data-translate="dob">Date of Birth:</strong> ${(profile.dob || 'N/A').replace(/[<>]/g, '')} (Age: ${age})</p>
-                    <p><strong data-translate="gender">Gender:</strong> ${(profile.gender || 'N/A').replace(/[<>]/g, '')}</p>
-                    <p><strong data-translate="bloodGroup">Blood Group:</strong> ${(profile.bloodGroup || 'N/A').replace(/[<>]/g, '')}</p>
-                    <p><strong data-translate="dietPreference">Diet Preference:</strong> ${(profile.dietPreference || 'N/A').replace(/[<>]/g, '')}</p>
+                    <p><strong data-translate="name">Name:</strong> ${escapeHtml(safeProfile.name)}</p>
+                    <p><strong data-translate="dob">Date of Birth:</strong> ${escapeHtml(safeProfile.dob)} (Age: ${age})</p>
+                    <p><strong data-translate="gender">Gender:</strong> ${escapeHtml(safeProfile.gender)}</p>
+                    <p><strong data-translate="bloodGroup">Blood Group:</strong> ${escapeHtml(safeProfile.bloodGroup)}</p>
+                    <p><strong data-translate="dietPreference">Diet Preference:</strong> ${escapeHtml(safeProfile.dietPreference)}</p>
                     
                     <h3 data-translate="contactInfo">📞 Contact Information</h3>
-                    <p><strong data-translate="phone">Phone:</strong> ${(profile.phone || 'N/A').replace(/[<>]/g, '')}</p>
-                    <p><strong data-translate="address">Address:</strong> ${(profile.address || 'N/A').replace(/[<>]/g, '')}</p>
-                    <p><strong data-translate="emergencyContact">Emergency Contact:</strong> ${(profile.emergencyContact || 'N/A').replace(/[<>]/g, '')}</p>
-                    <p><strong data-translate="emergencyPhone">Emergency Phone:</strong> ${(profile.emergencyPhone || 'N/A').replace(/[<>]/g, '')}</p>
+                    <p><strong data-translate="phone">Phone:</strong> ${escapeHtml(safeProfile.phone)}</p>
+                    <p><strong data-translate="address">Address:</strong> ${escapeHtml(safeProfile.address)}</p>
+                    <p><strong data-translate="emergencyContact">Emergency Contact:</strong> ${escapeHtml(safeProfile.emergencyContact)}</p>
+                    <p><strong data-translate="emergencyPhone">Emergency Phone:</strong> ${escapeHtml(safeProfile.emergencyPhone)}</p>
                     
                     <h3 data-translate="medicalInfo">🏥 Medical Information</h3>
-                    <p><strong data-translate="medicalHistory">Medical History:</strong> ${(profile.medicalHistory || 'N/A').replace(/[<>]/g, '')}</p>
-                    <p><strong data-translate="allergies">Allergies:</strong> ${(profile.allergies || 'N/A').replace(/[<>]/g, '')}</p>
-                    <p><strong data-translate="medications">Medications:</strong> ${(profile.medications || 'N/A').replace(/[<>]/g, '')}</p>
-                    <p><strong data-translate="currentSymptoms">Current Symptoms:</strong> ${(profile.currentSymptoms || 'N/A').replace(/[<>]/g, '')}</p>
+                    <p><strong data-translate="medicalHistory">Medical History:</strong> ${escapeHtml(safeProfile.medicalHistory)}</p>
+                    <p><strong data-translate="allergies">Allergies:</strong> ${escapeHtml(safeProfile.allergies)}</p>
+                    <p><strong data-translate="medications">Medications:</strong> ${escapeHtml(safeProfile.medications)}</p>
+                    <p><strong data-translate="currentSymptoms">Current Symptoms:</strong> ${escapeHtml(safeProfile.currentSymptoms)}</p>
                     
                     <h3 data-translate="insuranceInfo">📄 Insurance Information</h3>
-                    <p><strong data-translate="hasInsurance">Has Insurance:</strong> ${profile.hasInsurance ? 'Yes' : 'No'}</p>
-                    ${profile.hasInsurance ? `
-                        <p><strong data-translate="insuranceProvider">Insurance Provider:</strong> ${(profile.insuranceProvider || 'N/A').replace(/[<>]/g, '')}</p>
-                        <p><strong data-translate="policyNumber">Policy Number:</strong> ${(profile.policyNumber || 'N/A').replace(/[<>]/g, '')}</p>
+                    <p><strong data-translate="hasInsurance">Has Insurance:</strong> ${safeProfile.hasInsurance ? 'Yes' : 'No'}</p>
+                    ${safeProfile.hasInsurance ? `
+                        <p><strong data-translate="insuranceProvider">Insurance Provider:</strong> ${escapeHtml(safeProfile.insuranceProvider)}</p>
+                        <p><strong data-translate="policyNumber">Policy Number:</strong> ${escapeHtml(safeProfile.policyNumber)}</p>
                     ` : ''}
                 </div>
             </div>
@@ -557,6 +561,17 @@ exports.formatMedicalProfile = async (profile) => {
         const serverIP = "${RENDER_BACKEND_URL}";
         
         const translations = ${JSON.stringify(translations)};
+        
+        // Helper function for HTML escaping in JavaScript
+        function escapeHtml(text) {
+            if (!text) return '';
+            return text.replace(/[&<>]/g, function(m) {
+                if (m === '&') return '&amp;';
+                if (m === '<') return '&lt;';
+                if (m === '>') return '&gt;';
+                return m;
+            });
+        }
         
         const translateElement = (element, lang) => {
             if (!element.dataset.translate) return;
@@ -678,8 +693,8 @@ exports.formatMedicalProfile = async (profile) => {
         
         const sendEmergencyMessage = async (latitude, longitude) => {
             try {
-                const emergencyContact = "${(profile.emergencyPhone || '').replace(/[<>]/g, '')}";
-                const profileName = "${(profile.name || 'Patient').replace(/[<>]/g, '')}";
+                const emergencyContact = "${escapeHtml(safeProfile.emergencyPhone)}";
+                const profileName = "${escapeHtml(safeProfile.name)}";
                 const scannerName = sessionStorage.getItem('scannerName') || 'Unknown Scanner';
                 const scannerPhone = sessionStorage.getItem('scannerPhone') || 'Unknown Phone';
                 
@@ -735,55 +750,135 @@ exports.formatMedicalProfile = async (profile) => {
         `;
     } catch (error) {
         console.error('Error formatting medical profile:', error);
+        console.error('Error stack:', error.stack);
+        
+        // Return a proper error page
         return `
-        <!DOCTYPE html>
-        <html>
-        <head>
-            <meta charset="UTF-8">
-            <meta name="viewport" content="width=device-width, initial-scale=1.0">
-            <title>Error Loading Profile</title>
-            <style>
-                body {
-                    font-family: Arial, sans-serif;
-                    display: flex;
-                    justify-content: center;
-                    align-items: center;
-                    height: 100vh;
-                    margin: 0;
-                    background-color: #f5f5f5;
-                }
-                .error-container {
-                    text-align: center;
-                    padding: 40px;
-                    background: white;
-                    border-radius: 12px;
-                    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-                    max-width: 400px;
-                }
-                h1 { color: #e74c3c; margin-bottom: 20px; }
-                p { color: #666; margin-bottom: 20px; }
-                button {
-                    background-color: #0066ff;
-                    color: white;
-                    padding: 12px 24px;
-                    border: none;
-                    border-radius: 8px;
-                    cursor: pointer;
-                }
-                button:hover { background-color: #ff6b00; }
-            </style>
-        </head>
-        <body>
-            <div class="error-container">
-                <h1>⚠️ Server Error</h1>
-                <p>Failed to load medical profile. Please go back and try again.</p>
-                <button onclick="history.back()">Go Back</button>
-            </div>
-        </body>
-        </html>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Error Loading Profile</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Arial, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+        .error-card {
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            max-width: 450px;
+            text-align: center;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            animation: slideIn 0.5s ease-out;
+        }
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(-30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        .error-icon {
+            font-size: 80px;
+            margin-bottom: 20px;
+        }
+        h1 {
+            color: #e74c3c;
+            margin-bottom: 15px;
+            font-size: 28px;
+        }
+        p {
+            color: #666;
+            margin-bottom: 15px;
+            line-height: 1.6;
+        }
+        .error-details {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 10px;
+            margin: 20px 0;
+            text-align: left;
+            font-family: monospace;
+            font-size: 12px;
+            color: #e74c3c;
+            word-break: break-word;
+        }
+        button {
+            background: #0066ff;
+            color: white;
+            border: none;
+            padding: 14px 30px;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            margin-top: 10px;
+        }
+        button:hover {
+            background: #ff6b00;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+        .retry-btn {
+            background: #28a745;
+            margin-left: 10px;
+        }
+        .retry-btn:hover {
+            background: #218838;
+        }
+    </style>
+</head>
+<body>
+    <div class="error-card">
+        <div class="error-icon">⚠️</div>
+        <h1>Server Error</h1>
+        <p>Failed to load medical profile. This could be due to:</p>
+        <ul style="text-align: left; margin: 15px 0 15px 25px; color: #666;">
+            <li>Invalid or corrupted profile data</li>
+            <li>Network connection issue</li>
+            <li>Server configuration problem</li>
+        </ul>
+        <div class="error-details">
+            ${escapeHtml(error.message || 'Unknown error occurred')}
+        </div>
+        <div>
+            <button onclick="history.back()">← Go Back</button>
+            <button class="retry-btn" onclick="location.reload()">⟳ Retry</button>
+        </div>
+    </div>
+</body>
+</html>
         `;
     }
 };
+
+// Helper function to escape HTML
+function escapeHtml(text) {
+    if (!text) return '';
+    return String(text)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#39;');
+}
 
 exports.saveProfileHTML = async (htmlContent, userId) => {
     const dir = path.join(__dirname, '../public/profiles');
