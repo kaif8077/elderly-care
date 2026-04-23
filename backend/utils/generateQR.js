@@ -703,7 +703,8 @@ exports.formatMedicalProfile = async (profile) => {
                      alert("❌ Emergency contact number not found in patient's profile!");
                      return;
                 }
-
+                
+                let apiNumber = emergencyContactNum.replace(/\s/g, '');
 
                 const message = "🚨 EMERGENCY ALERT 🚨\\n\\n" +
                     "Patient: " + profileName + " needs immediate assistance!\\n\\n" +
@@ -718,7 +719,7 @@ exports.formatMedicalProfile = async (profile) => {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
-                        to: +91 8528576249,  
+                        to: apiNumber,  
                         body: message,
                         latitude: latitude || null,
                         longitude: longitude || null
@@ -728,7 +729,7 @@ exports.formatMedicalProfile = async (profile) => {
                 const responseData = await smsResponse.json();
                 if (!smsResponse.ok) throw new Error(responseData.message || 'Failed to send SMS');
                 
-                alert("Emergency alert sent successfully " + emergencyContactNum + "!");
+                alert("Emergency alert sent successfully " + apiNumber + "!");
             } catch (error) {
                 alert("Failed to send: " + error.message);
             }
