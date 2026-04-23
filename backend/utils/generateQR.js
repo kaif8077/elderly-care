@@ -2,7 +2,6 @@ require('dotenv').config();
 const QRCode = require('qrcode');
 const fs = require('fs');
 const path = require('path');
-const { generateFirstAidRecommendations } = require('../controllers/recommendationController');
 const twilio = require('twilio');
 const { translations } = require('../utils/translationService');
 
@@ -18,9 +17,89 @@ exports.generateQR = async (data) => {
     }
 };
 
+// Function to generate basic first aid recommendations based on condition
+const getBasicFirstAid = (profile) => {
+    const medicalHistory = (profile.medicalHistory || '').toLowerCase();
+    const currentSymptoms = (profile.currentSymptoms || '').toLowerCase();
+    
+    let recommendations = [];
+    
+    // Basic general first aid
+    recommendations.push({
+        title: "🔴 GENERAL FIRST AID",
+        tips: [
+            "Check if the person is conscious and breathing",
+            "If unconscious, place them in recovery position (on their side)",
+            "Loosen tight clothing around neck and chest",
+            "Keep the person warm with a blanket or jacket",
+            "Do not give anything to eat or drink if unconscious"
+        ]
+    });
+    
+    // Condition-specific recommendations
+    if (medicalHistory.includes('diabetes') || medicalHistory.includes('diabetic')) {
+        recommendations.push({
+            title: "🟠 FOR DIABETES PATIENT",
+            tips: [
+                "Check for low blood sugar signs: sweating, confusion, weakness",
+                "If conscious and able to swallow, give sweet juice or sugar",
+                "If unconscious, do not give anything by mouth - seek emergency help",
+                "Monitor blood sugar if possible"
+            ]
+        });
+    }
+    
+    if (medicalHistory.includes('heart') || medicalHistory.includes('cardiac') || medicalHistory.includes('bp')) {
+        recommendations.push({
+            title: "🟠 FOR HEART/BLOOD PRESSURE PATIENT",
+            tips: [
+                "Keep the person in a comfortable sitting position",
+                "Loosen tight clothing, especially around neck",
+                "Ask if they have prescribed medication (like Nitroglycerin)",
+                "Monitor breathing and pulse continuously"
+            ]
+        });
+    }
+    
+    if (medicalHistory.includes('asthma') || medicalHistory.includes('respiratory')) {
+        recommendations.push({
+            title: "🟠 FOR ASTHMA/RESPIRATORY PATIENT",
+            tips: [
+                "Help them sit upright in a comfortable position",
+                "Ask for their inhaler and help them use it",
+                "Encourage slow, deep breathing",
+                "Stay calm and reassure the person"
+            ]);
+        }
+    }
+    
+    if (currentSymptoms.includes('fever') || currentSymptoms.includes('vomiting') || currentSymptoms.includes('cough')) {
+        recommendations.push({
+            title: "🟡 FOR CURRENT SYMPTOMS",
+            tips: [
+                "Keep the person hydrated: give small sips of water",
+                "Use cool cloth on forehead for fever",
+                "If vomiting, keep head turned to side to prevent choking",
+                "Monitor temperature and symptoms"
+            ]);
+        }
+    }
+    
+    // Emergency contact info
+    recommendations.push({
+        title: "📞 IMMEDIATE ACTIONS",
+        tips: [
+            `Call emergency contact: ${profile.emergencyContact || 'Emergency Contact'} at ${profile.emergencyPhone || 'Number not available'}`,
+            "Call ambulance: 102 or 108",
+            "Share your current location with emergency services",
+            "Do not leave the person alone until help arrives"
+        ]);
+    
+    return recommendations;
+};
+
 exports.formatMedicalProfile = async (profile) => {
     try {
-
         const RENDER_BACKEND_URL = process.env.RENDER_BACKEND_URL || "https://elderly-care-zuq9.onrender.com";
         console.log('Using backend URL:', RENDER_BACKEND_URL);
 
@@ -36,56 +115,19 @@ exports.formatMedicalProfile = async (profile) => {
             }
         }
 
-        // Check for critical conditions
-        const criticalConditions = [];
-        const medicalHistory = (profile.medicalHistory || '').toLowerCase();
-        if (medicalHistory.includes('diabetes') || medicalHistory.includes('diabetic')) criticalConditions.push('Diabetes');
-        if (medicalHistory.includes('heart') || medicalHistory.includes('cardiac') || medicalHistory.includes('bp') || medicalHistory.includes('hypertension')) criticalConditions.push('Heart Disease');
-        if (medicalHistory.includes('asthma') || medicalHistory.includes('respiratory') || medicalHistory.includes('copd')) criticalConditions.push('Asthma');
-        if (medicalHistory.includes('stroke')) criticalConditions.push('Stroke');
-        if (medicalHistory.includes('epilepsy') || medicalHistory.includes('seizure')) criticalConditions.push('Epilepsy');
-        if (medicalHistory.includes('kidney') || medicalHistory.includes('renal')) criticalConditions.push('Kidney Disease');
+        // Get basic first aid recommendations
+        const firstAidRecommendations = getBasicFirstAid(profile);
         
-        const hasCriticalCondition = criticalConditions.length > 0;
-        const conditionText = hasCriticalCondition ? criticalConditions.join(', ') : 'No critical conditions reported';
-
-        // Get emergency contact info
-        const emergencyContactName = profile.emergencyContact || 'Emergency Contact';
-        const emergencyPhone = profile.emergencyPhone || 'Not provided';
-
-        // Generate simple first aid recommendations
-        const simpleRecommendations = `
-Patient Profile:
-Name: ${profile.name || 'N/A'} | Age: ${age} | Blood Group: ${profile.bloodGroup || 'N/A'}
-
-Medical Condition:
-${conditionText}
-
-Emergency Guidance:
-${hasCriticalCondition ? 
-    '⚠️ CRITICAL: The patient has a pre-existing medical condition. If the person is unconscious or in critical condition, immediately contact the emergency number below, share the current location with them, and call an ambulance (102 / 108) without delay.' : 
-    'If the person is unconscious or in critical condition, immediately contact the emergency number below, share the current location with them, and call an ambulance (102 / 108) without delay.\nIf the person is stable and responsive, no immediate action is required—keep them calm and monitor their condition.'}
-
-Emergency Contact:
-${emergencyContactName} – ${emergencyPhone}
-
-Full Details:
-Complete medical information including medical history, medications, allergies, and other personal health details is available in the profile below.
-        `;
-
-        const formattedRecommendations = simpleRecommendations
-            .split('\n')
-            .map(line => {
-                if (line.trim() === '') return '<br>';
-                if (line.startsWith('Patient Profile:')) return `<p><strong>📋 ${line}</strong></p>`;
-                if (line.startsWith('Medical Condition:')) return `<p><strong>🏥 ${line}</strong></p>`;
-                if (line.startsWith('Emergency Guidance:')) return `<p><strong>🚨 ${line}</strong></p>`;
-                if (line.startsWith('Emergency Contact:')) return `<p><strong>📞 ${line}</strong></p>`;
-                if (line.startsWith('Full Details:')) return `<p><strong>📄 ${line}</strong></p>`;
-                if (line.startsWith('⚠️ CRITICAL:')) return `<p class="critical-warning">${line}</p>`;
-                return `<p>${line}</p>`;
-            })
-            .join('');
+        // Generate HTML for recommendations
+        let recommendationsHtml = '';
+        for (const rec of firstAidRecommendations) {
+            recommendationsHtml += `<h3 class="rec-title">${rec.title}</h3>`;
+            recommendationsHtml += `<ul class="rec-list">`;
+            for (const tip of rec.tips) {
+                recommendationsHtml += `<li class="rec-item">${tip}</li>`;
+            }
+            recommendationsHtml += `</ul>`;
+        }
 
         return `
 <!DOCTYPE html>
@@ -111,12 +153,10 @@ Complete medical information including medical history, medications, allergies, 
             line-height: 1.5;
         }
         
-        /* Main Container */
         .main-container {
             max-width: 800px;
             margin: 0 auto;
             background: white;
-            border-radius: 0;
             overflow: hidden;
             box-shadow: 0 1px 3px rgba(0,0,0,0.1);
         }
@@ -146,8 +186,6 @@ Complete medical information including medical history, medications, allergies, 
             border-radius: 8px;
             font-size: 16px;
             width: 100%;
-            -webkit-appearance: none;
-            appearance: none;
         }
         
         .auth-form input:focus {
@@ -164,17 +202,11 @@ Complete medical information including medical history, medications, allergies, 
             cursor: pointer;
             font-size: 16px;
             font-weight: 500;
-            transition: all 0.3s;
             width: 100%;
         }
         
         .auth-form button:active {
             transform: scale(0.98);
-        }
-        
-        .auth-form button:disabled {
-            background-color: #cccccc;
-            cursor: not-allowed;
         }
         
         .profile-content {
@@ -213,7 +245,6 @@ Complete medical information including medical history, medications, allergies, 
         .section-title:after {
             content: '−';
             font-size: 24px;
-            font-weight: normal;
         }
         
         .section-title.collapsed:after {
@@ -224,9 +255,7 @@ Complete medical information including medical history, medications, allergies, 
             padding-left: 0;
         }
         
-        .section-content p,
-        .section-content li {
-            text-align: justify;
+        .section-content p {
             margin-bottom: 8px;
         }
         
@@ -255,12 +284,7 @@ Complete medical information including medical history, medications, allergies, 
             cursor: pointer;
             font-size: 16px;
             font-weight: 500;
-            transition: all 0.3s;
             width: 100%;
-        }
-        
-        button:active {
-            transform: scale(0.98);
         }
         
         #emergencyBtn {
@@ -268,51 +292,53 @@ Complete medical information including medical history, medications, allergies, 
             color: white;
         }
         
-        #emergencyBtn:hover {
-            background-color: #c0392b;
-        }
-        
         #printBtn {
             background-color: #0066ff;
             color: white;
         }       
-        
-        #printBtn:hover {
-            background-color: #ff6b00;
-        }
         
         /* Recommendations */
         .recommendations {
             background-color: #f8f9fa;
             padding: 16px;
             border-radius: 8px;
-            margin-top: 12px;
         }
         
-        .recommendations p {
-            margin-bottom: 12px;
-            line-height: 1.6;
+        .rec-title {
+            color: #e74c3c;
+            font-size: 1rem;
+            margin: 16px 0 10px 0;
+            font-weight: 600;
         }
         
-        .recommendations strong {
+        .rec-title:first-child {
+            margin-top: 0;
+        }
+        
+        .rec-list {
+            list-style: none;
+            padding-left: 0;
+            margin-bottom: 16px;
+        }
+        
+        .rec-item {
+            padding-left: 20px;
+            margin-bottom: 8px;
+            position: relative;
+        }
+        
+        .rec-item:before {
+            content: "•";
             color: #0066ff;
-        }
-        
-        .critical-warning {
-            background-color: #ffe5e5;
-            border-left: 4px solid #e74c3c;
-            padding: 12px;
-            margin: 10px 0;
-            border-radius: 4px;
-            color: #c0392b;
-            font-weight: 500;
+            font-weight: bold;
+            position: absolute;
+            left: 5px;
         }
         
         /* Language Switcher */
         .language-switcher {
             position: sticky;
             top: 0;
-            right: 0;
             z-index: 1000;
             display: flex;
             justify-content: flex-end;
@@ -338,17 +364,9 @@ Complete medical information including medical history, medications, allergies, 
             border-color: #0066ff;
         }
         
-        /* Print Styles */
         @media print {
             .no-print {
                 display: none;
-            }
-            .main-container {
-                box-shadow: none;
-                padding: 0;
-            }
-            .profile-content {
-                padding: 0;
             }
             body {
                 background: white;
@@ -356,87 +374,38 @@ Complete medical information including medical history, medications, allergies, 
             }
         }
         
-        /* Tablet Styles */
+        /* Responsive */
         @media (min-width: 768px) {
             body {
                 padding: 20px;
             }
-            
             .profile-content {
                 padding: 24px;
             }
-            
             .button-group {
                 flex-direction: row;
             }
-            
             button {
                 width: auto;
                 flex: 1;
             }
-            
             .auth-container {
                 padding: 32px;
             }
         }
         
-        /* Desktop Styles */
-        @media (min-width: 1024px) {
-            body {
-                padding: 30px;
-            }
-            
-            .main-container {
-                border-radius: 12px;
-            }
-            
-            .profile-content {
-                padding: 32px;
-            }
-        }
-        
-        /* Small Mobile */
         @media (max-width: 480px) {
             body {
                 padding: 12px;
             }
-            
             .profile-content {
                 padding: 16px;
             }
-            
-            .auth-container {
-                padding: 20px;
-            }
-            
             .section-title {
                 font-size: 1.1rem;
             }
-            
-            .section-content h3 {
-                font-size: 1rem;
-            }
-            
-            .auth-form input {
-                padding: 10px 14px;
-                font-size: 14px;
-            }
-            
-            .auth-form button {
-                padding: 12px 16px;
-                font-size: 14px;
-            }
-            
             button {
                 padding: 12px 16px;
-                font-size: 14px;
-            }
-            
-            .recommendations {
-                padding: 12px;
-            }
-            
-            .recommendations p {
                 font-size: 14px;
             }
         }
@@ -454,11 +423,11 @@ Complete medical information including medical history, medications, allergies, 
             <form class="auth-form" id="authForm">
                 <div>
                     <input type="text" id="scannerName" placeholder="Your Name" data-translate="yourName" required>
-                    <div class="error-message" id="nameError" data-translate="nameRequired"></div>
+                    <div class="error-message" id="nameError"></div>
                 </div>
                 <div>
                     <input type="tel" id="scannerPhone" placeholder="Your Phone Number (10 digits)" data-translate="yourPhone" required>
-                    <div class="error-message" id="phoneError" data-translate="phoneRequired"></div>
+                    <div class="error-message" id="phoneError"></div>
                 </div>
                 <div id="otpSection" style="display: none;">
                     <input type="text" id="otp" placeholder="Enter 6-digit OTP" data-translate="enterOtp" required>
@@ -470,31 +439,30 @@ Complete medical information including medical history, medications, allergies, 
         </div>
 
         <div class="profile-content" id="profileContent">
+            <!-- Medical Profile Section -->
             <div class="section">
                 <h1 class="section-title" data-translate="medicalProfile">Medical Profile</h1>
                 <div class="section-content">
-                    <h3 data-translate="personalInfo">Personal Information</h3>
+                    <h3 data-translate="personalInfo">📋 Personal Information</h3>
                     <p><strong data-translate="name">Name:</strong> ${profile.name || 'N/A'}</p>
                     <p><strong data-translate="dob">Date of Birth:</strong> ${profile.dob || 'N/A'} (Age: ${age})</p>
                     <p><strong data-translate="gender">Gender:</strong> ${profile.gender || 'N/A'}</p>
                     <p><strong data-translate="bloodGroup">Blood Group:</strong> ${profile.bloodGroup || 'N/A'}</p>
                     <p><strong data-translate="dietPreference">Diet Preference:</strong> ${profile.dietPreference || 'N/A'}</p>
-                    <p><strong data-translate="height">Height:</strong> ${profile.height ? `${profile.height} cm` : 'N/A'}</p>
-                    <p><strong data-translate="weight">Weight:</strong> ${profile.weight ? `${profile.weight} kg` : 'N/A'}</p>
                     
-                    <h3 data-translate="contactInfo">Contact Information</h3>
+                    <h3 data-translate="contactInfo">📞 Contact Information</h3>
                     <p><strong data-translate="phone">Phone:</strong> ${profile.phone || 'N/A'}</p>
                     <p><strong data-translate="address">Address:</strong> ${profile.address || 'N/A'}</p>
                     <p><strong data-translate="emergencyContact">Emergency Contact:</strong> ${profile.emergencyContact || 'N/A'}</p>
                     <p><strong data-translate="emergencyPhone">Emergency Phone:</strong> ${profile.emergencyPhone || 'N/A'}</p>
                     
-                    <h3 data-translate="medicalInfo">Medical Information</h3>
-                    <p><strong data-translate="medicalHistory">Medical History/Conditions:</strong> ${profile.medicalHistory || 'N/A'}</p>
+                    <h3 data-translate="medicalInfo">🏥 Medical Information</h3>
+                    <p><strong data-translate="medicalHistory">Medical History:</strong> ${profile.medicalHistory || 'N/A'}</p>
                     <p><strong data-translate="allergies">Allergies:</strong> ${profile.allergies || 'N/A'}</p>
-                    <p><strong data-translate="medications">Current Medications:</strong> ${profile.medications || 'N/A'}</p>
+                    <p><strong data-translate="medications">Medications:</strong> ${profile.medications || 'N/A'}</p>
                     <p><strong data-translate="currentSymptoms">Current Symptoms:</strong> ${profile.currentSymptoms || 'N/A'}</p>
                     
-                    <h3 data-translate="insuranceInfo">Insurance Information</h3>
+                    <h3 data-translate="insuranceInfo">📄 Insurance Information</h3>
                     <p><strong data-translate="hasInsurance">Has Insurance:</strong> ${profile.hasInsurance ? 'Yes' : 'No'}</p>
                     ${profile.hasInsurance ? `
                         <p><strong data-translate="insuranceProvider">Insurance Provider:</strong> ${profile.insuranceProvider || 'N/A'}</p>
@@ -503,25 +471,26 @@ Complete medical information including medical history, medications, allergies, 
                 </div>
             </div>
 
+            <!-- First Aid Recommendations Section -->
             <div class="section">
-                <h2 class="section-title" data-translate="emergencyInstructions">Emergency First Aid Instructions</h2>
+                <h2 class="section-title" data-translate="emergencyInstructions">🚑 Emergency First Aid</h2>
                 <div class="section-content">
                     <div class="recommendations">
-                        ${formattedRecommendations}
+                        ${recommendationsHtml}
                     </div>    
                 </div>
             </div>
             
             <div class="button-group no-print">
-                <button id="emergencyBtn" data-translate="sendEmergencyAlert">Send Emergency Alert</button>
-                <button id="printBtn" data-translate="printPage">Print This Page</button>
+                <button id="emergencyBtn" data-translate="sendEmergencyAlert">📢 Send Emergency Alert</button>
+                <button id="printBtn" data-translate="printPage">🖨️ Print Page</button>
             </div>
         </div>
     </div>
     
     <script>
         const serverIP = "${RENDER_BACKEND_URL}";
-        let generatedOtp = null;
+        
         
         const translations = ${JSON.stringify(translations)};
         
@@ -552,7 +521,7 @@ Complete medical information including medical history, medications, allergies, 
         document.getElementById('enBtn').addEventListener('click', () => translatePage('en'));
         document.getElementById('hiBtn').addEventListener('click', () => translatePage('hi'));
 
-        // Authentication logic
+        // Authentication
         document.getElementById('requestOtpBtn').addEventListener('click', async () => {
             const name = document.getElementById('scannerName').value.trim();
             let phone = document.getElementById('scannerPhone').value.trim();
@@ -565,14 +534,14 @@ Complete medical information including medical history, medications, allergies, 
             const lang = localStorage.getItem('preferredLanguage') || 'en';
             
             if (!name) {
-                document.getElementById('nameError').textContent = translations[lang]['nameRequired'];
+                document.getElementById('nameError').textContent = translations[lang]['nameRequired'] || 'Name required';
                 isValid = false;
             }
             if (!phone) {
-                document.getElementById('phoneError').textContent = translations[lang]['phoneRequired'];
+                document.getElementById('phoneError').textContent = translations[lang]['phoneRequired'] || 'Phone required';
                 isValid = false;
             } else if (phone.length !== 10) {
-                document.getElementById('phoneError').textContent = translations[lang]['phoneDigits'];
+                document.getElementById('phoneError').textContent = translations[lang]['phoneDigits'] || 'Enter 10 digits';
                 isValid = false;
             }
             
@@ -588,8 +557,8 @@ Complete medical information including medical history, medications, allergies, 
                 const data = await response.json();
                 if (!response.ok) throw new Error(data.message || 'Failed to send OTP');
                 
-                generatedOtp = Math.floor(100000 + Math.random() * 900000).toString();
-                alert('OTP sent successfully. Your OTP is: ' + generatedOtp);
+                
+                alert('OTP sent. Your OTP is: ' + phone);
                 
                 document.getElementById('otpSection').style.display = 'block';
                 document.getElementById('requestOtpBtn').style.display = 'none';
@@ -658,7 +627,7 @@ Complete medical information including medical history, medications, allergies, 
                     "   Phone: " + scannerPhone + "\\n\\n" +
                     "📍 LOCATION:\\n" +
                     (latitude && longitude ? "   https://www.google.com/maps?q=" + latitude + "," + longitude : "   Location not available") + "\\n\\n" +
-                    "⚠️ This is an automated emergency alert. Please respond immediately.";
+                    "⚠️ Please respond immediately.";
                 
                 const smsResponse = await fetch(serverIP + '/api/send-sms', {
                     method: 'POST',
@@ -674,26 +643,21 @@ Complete medical information including medical history, medications, allergies, 
                 const responseData = await smsResponse.json();
                 if (!smsResponse.ok) throw new Error(responseData.message || 'Failed to send SMS');
                 
-                const lang = localStorage.getItem('preferredLanguage') || 'en';
-                alert(translations[lang]['emergencyMessageSent'] || "Emergency message sent to " + emergencyContact);
+                alert("Emergency alert sent successfully!");
             } catch (error) {
-                const lang = localStorage.getItem('preferredLanguage') || 'en';
-                alert(translations[lang]['emergencyMessageFailed'] || "Failed to send emergency message: " + error.message);
+                alert("Failed to send: " + error.message);
             }
         };
         
         const getLocationAndSendMessage = () => {
-            const lang = localStorage.getItem('preferredLanguage') || 'en';
-            const confirmMessage = translations[lang]['confirmEmergency'] || "Send emergency alert?";
-            
-            if (confirm(confirmMessage)) {
+            if (confirm("Send emergency alert?")) {
                 if (navigator.geolocation) {
                     navigator.geolocation.getCurrentPosition(
                         async (position) => {
                             await sendEmergencyMessage(position.coords.latitude, position.coords.longitude);
                         },
                         () => sendEmergencyMessage(null, null),
-                        { timeout: 10000, enableHighAccuracy: true }
+                        { timeout: 10000 }
                     );
                 } else {
                     sendEmergencyMessage(null, null);
