@@ -2,34 +2,21 @@ import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import '../pages/Home.css';
 import banner1 from '../assests/banner1.jpg';
-import banner2 from '../assests/banner2.jpg';
-import banner3 from '../assests/banner3.jpg';
 import aboutUsImage from '../assests/about-us.jpg';
 import whyChooseUsImage from '../assests/why-choose-us.jpg';
 
 const Home = () => {
-    const [currentBanner, setCurrentBanner] = useState(0);
     const [activeFaq, setActiveFaq] = useState(null);
     const [currentFeatureSlide, setCurrentFeatureSlide] = useState(0);
     const [slidesToShow, setSlidesToShow] = useState(4);
 
-    // Banner data
+    // Banner data (only one banner now)
     const banners = [
         {
             image: banner1,
             heading: "Welcome to ElderlyCare",
             paragraph: "Empowering seniors with accessible health records anytime, anywhere.",
-        },
-        {
-            image: banner2,
-            heading: "Instant Medical Access",
-            paragraph: "Scan the QR code in emergencies to access vital health information",
-        },
-        {
-            image: banner3,
-            heading: "Smart Health Recommendations",
-            paragraph: "Personalized health tips based on medical history for better well-being.",
-        },
+        }
     ];
 
     // Features data (12 items)
@@ -78,12 +65,6 @@ const Home = () => {
         }
     ];
 
-
-
-
-
-
-
     // Why Choose Us data
     const whyChooseUs = [
         {
@@ -103,8 +84,6 @@ const Home = () => {
             description: "Empowers seniors with tools for independence, comfort, and safety."
         }
     ];
-
-
 
     // FAQ data
     const faqs = [
@@ -130,14 +109,6 @@ const Home = () => {
         }
     ];
 
-    // Auto-rotate banners
-    useEffect(() => {
-        const bannerInterval = setInterval(() => {
-            setCurrentBanner((prev) => (prev + 1) % banners.length);
-        }, 10000);
-        return () => clearInterval(bannerInterval);
-    }, [banners.length]);
-
     // Handle window resize for feature slider
     useEffect(() => {
         const handleResize = () => {
@@ -157,14 +128,6 @@ const Home = () => {
         window.addEventListener('resize', handleResize);
         return () => window.removeEventListener('resize', handleResize);
     }, []);
-
-    const nextBanner = () => {
-        setCurrentBanner((prev) => (prev + 1) % banners.length);
-    };
-
-    const prevBanner = () => {
-        setCurrentBanner((prev) => (prev - 1 + banners.length) % banners.length);
-    };
 
     const nextFeatureSlide = () => {
         setCurrentFeatureSlide(prev =>
@@ -188,32 +151,17 @@ const Home = () => {
 
     return (
         <div className="home-container">
-            {/* Banner Section - Owl Carousel Style */}
-            <div className="banner-carousel">
-                <div className="carousel-container" style={{ transform: `translateX(-${currentBanner * 100}%)` }}>
-                    {banners.map((banner, index) => (
-                        <div
-                            key={index}
-                            className="carousel-slide"
-                            style={{ backgroundImage: `url(${banner.image})` }}
-                        >
-                            <div className="carousel-content">
-                                <h1>{banner.heading}</h1>
-                                <p>{banner.paragraph}</p>
-                            </div>
-                        </div>
-                    ))}
+            {/* Banner Section - Single Banner */}
+            <div className="banner-single">
+                <div 
+                    className="banner-image"
+                    style={{ backgroundImage: `url(${banners[0].image})` }}
+                >
+                    <div className="banner-content">
+                        <h1>{banners[0].heading}</h1>
+                        <p>{banners[0].paragraph}</p>
+                    </div>
                 </div>
-
-                {/* Navigation Buttons with Shadow Effect */}
-                <button className="carousel-nav prev" onClick={prevBanner}>
-                    <span>&#10094;</span>
-                    <div className="nav-shadow left"></div>
-                </button>
-                <button className="carousel-nav next" onClick={nextBanner}>
-                    <span>&#10095;</span>
-                    <div className="nav-shadow right"></div>
-                </button>
             </div>
 
             {/* About Section */}
@@ -221,7 +169,7 @@ const Home = () => {
                 <div className="about-section section-header">
                     <h2>About Us</h2>
                     <div className="about-content-wrapper">
-                        <div className="about-image">
+                        <div className="about-image1">
                             <img
                                 src={aboutUsImage}
                                 alt="About Us"
@@ -271,7 +219,6 @@ const Home = () => {
                         <button className="slider-nav next" onClick={nextFeatureSlide}>
                             &#10095;
                         </button>
-
                     </div>
                 </div>
             </div>
@@ -289,8 +236,6 @@ const Home = () => {
                     </div>
                 </div>
             </div>
-
-
 
             {/* Why Choose Us Section */}
             <div className="section-container">

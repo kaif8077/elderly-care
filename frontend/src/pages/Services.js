@@ -11,11 +11,7 @@ import emergencyAlertsImg from '../assests/emergency.png';
 import printProfileImg from '../assests/print.png';
 import languageImg from '../assests/language.png';
 
-
-const Services = () => {
-    const [activeService, setActiveService] = useState(0);
-
-    const features = [
+const features = [
         {
             id: "form-filling",
             title: "Medical Form Filling",
@@ -122,6 +118,10 @@ const Services = () => {
             }
         }
     ];
+const Services = () => {
+    const [activeService, setActiveService] = useState(0);
+
+    
 
     // Scroll to the correct section when page loads with hash
     useEffect(() => {

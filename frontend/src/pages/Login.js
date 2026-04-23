@@ -2,7 +2,7 @@ import React, { useState, useContext } from 'react';
 import axios from 'axios';
 import { useNavigate, Link } from 'react-router-dom';
 import { AuthContext } from '../context/AuthContext';
-import { ToastContainer, toast } from 'react-toastify';
+import {  toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import './Auth.css';
 
@@ -381,7 +381,7 @@ const Login = () => {
                     </>
                 )}
             </div>
-            {/* <ToastContainer /> */}
+            
         </div>
     );
 };
