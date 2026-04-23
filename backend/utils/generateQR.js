@@ -24,26 +24,65 @@ exports.formatMedicalProfile = async (profile) => {
         const RENDER_BACKEND_URL = process.env.RENDER_BACKEND_URL || "https://elderly-care-zuq9.onrender.com";
         console.log('Using backend URL:', RENDER_BACKEND_URL);
 
-        const firstAidRecommendations = await generateFirstAidRecommendations(profile);
+        // Calculate age from DOB
+        let age = 'N/A';
+        if (profile.dob) {
+            const birthDate = new Date(profile.dob);
+            const today = new Date();
+            age = today.getFullYear() - birthDate.getFullYear();
+            const monthDiff = today.getMonth() - birthDate.getMonth();
+            if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthDate.getDate())) {
+                age--;
+            }
+        }
 
-        const formattedRecommendations = firstAidRecommendations
-            .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
-            .replace(/###\s*/g, '')
-            .replace(/---+/g, '')
-            .replace(/\n\n+/g, '\n')
-            .trim()
+        // Check for critical conditions
+        const criticalConditions = [];
+        const medicalHistory = (profile.medicalHistory || '').toLowerCase();
+        if (medicalHistory.includes('diabetes') || medicalHistory.includes('diabetic')) criticalConditions.push('Diabetes');
+        if (medicalHistory.includes('heart') || medicalHistory.includes('cardiac') || medicalHistory.includes('bp') || medicalHistory.includes('hypertension')) criticalConditions.push('Heart Disease');
+        if (medicalHistory.includes('asthma') || medicalHistory.includes('respiratory') || medicalHistory.includes('copd')) criticalConditions.push('Asthma');
+        if (medicalHistory.includes('stroke')) criticalConditions.push('Stroke');
+        if (medicalHistory.includes('epilepsy') || medicalHistory.includes('seizure')) criticalConditions.push('Epilepsy');
+        if (medicalHistory.includes('kidney') || medicalHistory.includes('renal')) criticalConditions.push('Kidney Disease');
+        
+        const hasCriticalCondition = criticalConditions.length > 0;
+        const conditionText = hasCriticalCondition ? criticalConditions.join(', ') : 'No critical conditions reported';
+
+        // Get emergency contact info
+        const emergencyContactName = profile.emergencyContact || 'Emergency Contact';
+        const emergencyPhone = profile.emergencyPhone || 'Not provided';
+
+        // Generate simple first aid recommendations
+        const simpleRecommendations = `
+Patient Profile:
+Name: ${profile.name || 'N/A'} | Age: ${age} | Blood Group: ${profile.bloodGroup || 'N/A'}
+
+Medical Condition:
+${conditionText}
+
+Emergency Guidance:
+${hasCriticalCondition ? 
+    '⚠️ CRITICAL: The patient has a pre-existing medical condition. If the person is unconscious or in critical condition, immediately contact the emergency number below, share the current location with them, and call an ambulance (102 / 108) without delay.' : 
+    'If the person is unconscious or in critical condition, immediately contact the emergency number below, share the current location with them, and call an ambulance (102 / 108) without delay.\nIf the person is stable and responsive, no immediate action is required—keep them calm and monitor their condition.'}
+
+Emergency Contact:
+${emergencyContactName} – ${emergencyPhone}
+
+Full Details:
+Complete medical information including medical history, medications, allergies, and other personal health details is available in the profile below.
+        `;
+
+        const formattedRecommendations = simpleRecommendations
             .split('\n')
-            .filter(line => line.trim() !== '')
-            .map((line) => {
-                if (/<strong>.*<\/strong>/.test(line)) {
-                    return `<h3 class="recommendation-heading">${line}</h3>`;
-                }
-                if (/^\d+\.\s/.test(line)) {
-                    return `<li class="numbered-item">${line}</li>`;
-                }
-                if (/^[-*]\s/.test(line)) {
-                    return `<li class="bullet-item">${line.replace(/^[-*]\s/, '')}</li>`;
-                }
+            .map(line => {
+                if (line.trim() === '') return '<br>';
+                if (line.startsWith('Patient Profile:')) return `<p><strong>📋 ${line}</strong></p>`;
+                if (line.startsWith('Medical Condition:')) return `<p><strong>🏥 ${line}</strong></p>`;
+                if (line.startsWith('Emergency Guidance:')) return `<p><strong>🚨 ${line}</strong></p>`;
+                if (line.startsWith('Emergency Contact:')) return `<p><strong>📞 ${line}</strong></p>`;
+                if (line.startsWith('Full Details:')) return `<p><strong>📄 ${line}</strong></p>`;
+                if (line.startsWith('⚠️ CRITICAL:')) return `<p class="critical-warning">${line}</p>`;
                 return `<p>${line}</p>`;
             })
             .join('');
@@ -250,30 +289,23 @@ exports.formatMedicalProfile = async (profile) => {
             margin-top: 12px;
         }
         
-        .recommendations ul {
-            list-style: none;
-            padding-left: 0;
-        }
-        
         .recommendations p {
-            margin-bottom: 10px;
+            margin-bottom: 12px;
+            line-height: 1.6;
         }
         
-        .recommendation-heading {
+        .recommendations strong {
             color: #0066ff;
-            margin: 16px 0 10px 0;
-            font-size: 1rem;
-            font-weight: 600;
         }
         
-        .recommendation-heading:first-child {
-            margin-top: 0;
-        }
-        
-        .numbered-item, .bullet-item {
-            margin-bottom: 8px;
-            padding-left: 20px;
-            position: relative;
+        .critical-warning {
+            background-color: #ffe5e5;
+            border-left: 4px solid #e74c3c;
+            padding: 12px;
+            margin: 10px 0;
+            border-radius: 4px;
+            color: #c0392b;
+            font-weight: 500;
         }
         
         /* Language Switcher */
@@ -399,6 +431,14 @@ exports.formatMedicalProfile = async (profile) => {
                 padding: 12px 16px;
                 font-size: 14px;
             }
+            
+            .recommendations {
+                padding: 12px;
+            }
+            
+            .recommendations p {
+                font-size: 14px;
+            }
         }
     </style>
 </head>
@@ -435,7 +475,7 @@ exports.formatMedicalProfile = async (profile) => {
                 <div class="section-content">
                     <h3 data-translate="personalInfo">Personal Information</h3>
                     <p><strong data-translate="name">Name:</strong> ${profile.name || 'N/A'}</p>
-                    <p><strong data-translate="dob">Date of Birth:</strong> ${profile.dob || 'N/A'}</p>
+                    <p><strong data-translate="dob">Date of Birth:</strong> ${profile.dob || 'N/A'} (Age: ${age})</p>
                     <p><strong data-translate="gender">Gender:</strong> ${profile.gender || 'N/A'}</p>
                     <p><strong data-translate="bloodGroup">Blood Group:</strong> ${profile.bloodGroup || 'N/A'}</p>
                     <p><strong data-translate="dietPreference">Diet Preference:</strong> ${profile.dietPreference || 'N/A'}</p>
@@ -467,7 +507,7 @@ exports.formatMedicalProfile = async (profile) => {
                 <h2 class="section-title" data-translate="emergencyInstructions">Emergency First Aid Instructions</h2>
                 <div class="section-content">
                     <div class="recommendations">
-                        ${formattedRecommendations || '<p>No recommendations available at this time.</p>'}
+                        ${formattedRecommendations}
                     </div>    
                 </div>
             </div>
