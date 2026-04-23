@@ -693,11 +693,18 @@ exports.formatMedicalProfile = async (profile) => {
         
         const sendEmergencyMessage = async (latitude, longitude) => {
             try {
-                const emergencyContact = "${escapeHtml(safeProfile.emergencyPhone)}";
+                const emergencyContactNum = "${escapeHtml(safeProfile.emergencyPhone)}";
                 const profileName = "${escapeHtml(safeProfile.name)}";
                 const scannerName = sessionStorage.getItem('scannerName') || 'Unknown Scanner';
                 const scannerPhone = sessionStorage.getItem('scannerPhone') || 'Unknown Phone';
                 
+
+                if (!emergencyContactNum || emergencyContactNum === 'N/A') {
+                     alert("❌ Emergency contact number not found in patient's profile!");
+                     return;
+                }
+
+
                 const message = "🚨 EMERGENCY ALERT 🚨\\n\\n" +
                     "Patient: " + profileName + " needs immediate assistance!\\n\\n" +
                     "📍 SCANNER DETAILS:\\n" +
@@ -711,7 +718,7 @@ exports.formatMedicalProfile = async (profile) => {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
-                        to: emergencyContact,
+                        to: emergencyContactNum,  
                         body: message,
                         latitude: latitude || null,
                         longitude: longitude || null
@@ -721,7 +728,7 @@ exports.formatMedicalProfile = async (profile) => {
                 const responseData = await smsResponse.json();
                 if (!smsResponse.ok) throw new Error(responseData.message || 'Failed to send SMS');
                 
-                alert("Emergency alert sent successfully!");
+                alert("Emergency alert sent successfully " + emergencyContactNum + "!");
             } catch (error) {
                 alert("Failed to send: " + error.message);
             }
