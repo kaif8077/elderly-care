@@ -706,9 +706,11 @@ exports.formatMedicalProfile = async (profile) => {
                 
                 let apiNumber = emergencyContactNum.replace(/\s/g, '');
 
-                const message = `ALERT: ${profileName}
-${scannerName}: ${scannerPhone}
-${latitude && longitude ? `maps.google.com/?q=${latitude},${longitude}` : ''}`;
+                const message = "ALERT: " + profileName + "\n" +
+                scannerName + ": " + scannerPhone + "\n" +
+                (latitude && longitude 
+                  ? "maps.google.com/?q=" + latitude + "," + longitude 
+                  : "");
                 
                 const smsResponse = await fetch(serverIP + '/api/send-sms', {
                     method: 'POST',
