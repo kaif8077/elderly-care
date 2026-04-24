@@ -706,14 +706,9 @@ exports.formatMedicalProfile = async (profile) => {
                 
                 let apiNumber = emergencyContactNum.replace(/\s/g, '');
 
-                const message = "🚨 EMERGENCY ALERT 🚨\\n\\n" +
-                    "Patient: " + profileName + " needs immediate assistance!\\n\\n" +
-                    "📍 SCANNER DETAILS:\\n" +
-                    "   Name: " + scannerName + "\\n" +
-                    "   Phone: " + scannerPhone + "\\n\\n" +
-                    "📍 LOCATION:\\n" +
-                    (latitude && longitude ? "   https://www.google.com/maps?q=" + latitude + "," + longitude : "   Location not available") + "\\n\\n" +
-                    "⚠️ Please respond immediately.";
+                const message = `ALERT: ${profileName}
+${scannerName}: ${scannerPhone}
+${latitude && longitude ? `maps.google.com/?q=${latitude},${longitude}` : ''}`;
                 
                 const smsResponse = await fetch(serverIP + '/api/send-sms', {
                     method: 'POST',
@@ -722,7 +717,8 @@ exports.formatMedicalProfile = async (profile) => {
                         to: apiNumber,  
                         body: message,
                         latitude: latitude || null,
-                        longitude: longitude || null
+                        longitude: longitude || null,
+                        riskCheck: 'disable'
                     }),
                 });
                 
