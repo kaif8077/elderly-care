@@ -4,6 +4,7 @@ const { escapeHtml, sendEmail } = require('../services/emailService');
 exports.submitContact = async (req, res) => {
   try {
     const { name, email, message } = req.body;
+    const notificationEmail = process.env.SYSTEM_NOTIFICATION_EMAIL || process.env.ADMIN_EMAIL;
     if (!name || !email || !message) {
       return res.status(400).json({ success: false, message: 'All fields are required' });
     }
@@ -14,7 +15,7 @@ exports.submitContact = async (req, res) => {
       sendEmail({
         to: email,
         subject: 'Thank you for contacting ElderlyCare',
-        replyTo: process.env.ADMIN_EMAIL,
+        replyTo: notificationEmail,
         text: `Hello ${name},\n\nWe received your message and will get back to you soon.\n\nElderlyCare Team`,
         html: `
           <div style="font-family:Arial,sans-serif;max-width:600px;margin:auto">
@@ -26,8 +27,8 @@ exports.submitContact = async (req, res) => {
             <p>ElderlyCare Team</p>
           </div>`
       }),
-      process.env.ADMIN_EMAIL ? sendEmail({
-        to: process.env.ADMIN_EMAIL,
+      notificationEmail ? sendEmail({
+        to: notificationEmail,
         subject: `New ElderlyCare contact from ${name}`,
         replyTo: email,
         text: `Name: ${name}\nEmail: ${email}\n\n${message}`,

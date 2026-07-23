@@ -109,6 +109,9 @@ exports.login = async (req, res) => {
     if (!user || !(await bcrypt.compare(req.body.password || '', user.password))) {
       return res.status(401).json({ message: 'Invalid credentials' });
     }
+    if (user.accountStatus !== 'active' || user.isDeleted) {
+      return res.status(403).json({ message: 'This account is not active' });
+    }
     if (!user.isVerified) {
       return res.status(401).json({ message: 'Email is not verified' });
     }

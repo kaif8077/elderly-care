@@ -4,6 +4,7 @@ const { escapeHtml, sendEmail } = require('../services/emailService');
 exports.submitFeedback = async (req, res) => {
   try {
     const { name, email, comments } = req.body;
+    const notificationEmail = process.env.SYSTEM_NOTIFICATION_EMAIL || process.env.ADMIN_EMAIL;
     const rating = Number(req.body.rating);
     await Feedback.create({ name, email, rating, comments });
 
@@ -11,7 +12,7 @@ exports.submitFeedback = async (req, res) => {
       sendEmail({
         to: email,
         subject: 'Thank you for your ElderlyCare feedback',
-        replyTo: process.env.ADMIN_EMAIL,
+        replyTo: notificationEmail,
         text: `Hello ${name},\n\nThank you for your ${rating}/5 rating and feedback.\n\nElderlyCare Team`,
         html: `
           <div style="font-family:Arial,sans-serif;max-width:600px;margin:auto">
@@ -23,8 +24,8 @@ exports.submitFeedback = async (req, res) => {
             <p>ElderlyCare Team</p>
           </div>`
       }),
-      process.env.ADMIN_EMAIL ? sendEmail({
-        to: process.env.ADMIN_EMAIL,
+      notificationEmail ? sendEmail({
+        to: notificationEmail,
         subject: `New ElderlyCare feedback: ${rating}/5`,
         replyTo: email,
         text: `Name: ${name}\nEmail: ${email}\nRating: ${rating}/5\n\n${comments}`,

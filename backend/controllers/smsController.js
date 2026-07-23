@@ -2,8 +2,9 @@ const { escapeHtml, sendEmail } = require('../services/emailService');
 
 exports.sendSMS = async (req, res) => {
   try {
-    if (!process.env.ADMIN_EMAIL) {
-      return res.status(503).json({ message: 'ADMIN_EMAIL is not configured' });
+    const notificationEmail = process.env.SYSTEM_NOTIFICATION_EMAIL || process.env.ADMIN_EMAIL;
+    if (!notificationEmail) {
+      return res.status(503).json({ message: 'SYSTEM_NOTIFICATION_EMAIL is not configured' });
     }
 
     const { body, latitude, longitude } = req.body;
@@ -12,7 +13,7 @@ exports.sendSMS = async (req, res) => {
       : null;
 
     await sendEmail({
-      to: process.env.ADMIN_EMAIL,
+      to: notificationEmail,
       subject: 'URGENT: ElderlyCare emergency alert',
       text: `${body || 'Emergency assistance requested'}${locationUrl ? `\nLocation: ${locationUrl}` : ''}`,
       html: `

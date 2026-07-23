@@ -8,6 +8,7 @@ const qrRoutes = require('./routes/qrRoutes');
 const locationRoutes = require('./routes/locationRoutes');
 const smsRoutes = require('./routes/smsRoutes');
 const recommendationRoutes = require('./routes/recommendationRoutes');
+const adminAuthRoutes = require('./routes/adminAuthRoutes');
 const cors = require('cors');
 const app = express();
 
@@ -28,6 +29,7 @@ app.use('/profiles', express.static(path.join(__dirname, 'public/profiles')));
 
 // API Routes
 app.use('/api/auth', authRoutes);
+app.use('/api/admin/auth', adminAuthRoutes);
 app.use('/api/medical', medicalRoutes);
 app.use('/api/qr', qrRoutes);
 app.use('/api/location', locationRoutes);
