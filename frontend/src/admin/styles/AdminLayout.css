@@ -146,7 +146,7 @@
 .admin-status-badge { display: inline-flex; padding: 5px 8px; border-radius: 999px; background: #edf2f1; color: #536b65; font-size: .75rem; font-weight: 800; text-transform: capitalize; white-space: nowrap; }
 .status-active, .status-generated { background: #e3f5ed; color: #176b57; }
 .status-inactive, .status-suspended, .status-missing { background: #fff1d6; color: #825900; }
-.status-archived { background: #eceff1; color: #4f5b62; }
+.status-archived, .status-revoked, .status-legacy { background: #eceff1; color: #4f5b62; }
 .admin-table-action { display: inline-flex; align-items: center; min-height: 36px; padding: 6px 11px; border: 1px solid #cbd8d4; border-radius: 7px; background: #fff; color: #176b57; text-decoration: none; }
 .admin-table-loading, .admin-state-card { padding: 45px 22px; text-align: center; }
 .admin-pagination { display: flex; align-items: center; justify-content: flex-end; gap: 22px; padding: 14px 16px; border-top: 1px solid #e2ebe8; }
@@ -185,10 +185,51 @@
 .admin-empty-feature small { color: #71847f; }
 .admin-privacy-note { display: flex; align-items: center; gap: 9px; margin: 18px 0 0; padding: 12px; border-radius: 9px; background: #eef5f3; color: #45635b; }
 .admin-detail-skeleton { min-height: 420px; border-radius: 14px; }
+.admin-detail-actions { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 18px; }
+.admin-detail-actions a { text-decoration: none; }
+.admin-action-message { margin: 14px 0 0; padding: 10px 12px; border-radius: 8px; background: #eef5f3; color: #28584c; }
+.admin-danger-button {
+  display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+  min-height: 42px; padding: 9px 14px; border: 1px solid #b94343; border-radius: 8px;
+  background: #fff; color: #9d2f2f; font-weight: 800; cursor: pointer;
+}
+.admin-danger-button:disabled { opacity: .5; cursor: not-allowed; }
+.admin-card-workspace { display: grid; grid-template-columns: minmax(0, 1.6fr) minmax(280px, .8fr); gap: 22px; align-items: start; }
+.elder-card-preview {
+  width: 100%; max-width: 760px; min-height: 410px; overflow: hidden;
+  border: 1px solid #b9d0c9; border-radius: 22px; background: #fff;
+  box-shadow: 0 16px 38px rgba(20,65,53,.13);
+}
+.elder-card-header { display: flex; justify-content: space-between; align-items: center; padding: 20px 24px; background: #123f35; color: #fff; }
+.elder-card-header strong { letter-spacing: .12em; }
+.elder-card-header span { color: #cde4dd; }
+.elder-card-body { display: grid; grid-template-columns: minmax(0,1.6fr) minmax(180px,.7fr); gap: 25px; padding: 28px; }
+.elder-card-photo { display: grid; width: 68px; height: 68px; place-items: center; border-radius: 18px; background: #e0f0eb; color: #176b57; font-size: 1.8rem; font-weight: 900; }
+.elder-card-details h2 { margin: 13px 0; font-size: 1.6rem; }
+.elder-card-details p { margin: 9px 0; }
+.elder-blood-group { color: #a52f2f; font-size: 1.12rem; }
+.elder-card-qr { display: grid; align-content: center; justify-items: center; text-align: center; }
+.elder-card-qr img { width: min(190px,100%); aspect-ratio: 1; }
+.elder-card-qr > div { display: grid; width: 160px; height: 160px; place-items: center; border: 2px dashed #aebfba; color: #6d7f7a; font-size: 2rem; }
+.elder-card-qr > div span { font-size: .85rem; }
+.elder-card-qr small { margin-top: 8px; color: #455f58; font-weight: 800; }
+.elder-card-footer { display: flex; justify-content: space-between; gap: 15px; padding: 14px 24px; border-top: 1px solid #dce8e4; background: #f4f8f7; color: #526b64; font-size: .82rem; }
+.admin-card-controls { display: grid; gap: 12px; padding: 22px; border: 1px solid #d8e5e1; border-radius: 14px; background: #fff; }
+.admin-card-controls h2, .admin-card-controls p { margin: 0; }
+.admin-card-controls p { color: #526b64; line-height: 1.5; }
+.admin-card-controls button { width: 100%; }
+.admin-card-controls small { color: #71847f; line-height: 1.45; }
 
 @media (prefers-reduced-motion: reduce) {
   .admin-sidebar, .admin-shell-main, .admin-stat-card { transition: none; }
   .skeleton { animation: none; }
+}
+@media print {
+  .admin-sidebar, .admin-topbar, .admin-page-actions, .admin-back-link, .admin-card-controls { display: none!important; }
+  .admin-shell-main { margin: 0!important; }
+  .admin-page-content { padding: 0; }
+  .admin-card-workspace { display: block; }
+  .elder-card-preview { max-width: none; box-shadow: none; break-inside: avoid; }
 }
 @media (max-width: 1180px) {
   .admin-stat-grid { grid-template-columns: repeat(2,minmax(0,1fr)); }
@@ -210,6 +251,7 @@
   .admin-topbar { grid-template-columns: 1fr auto; padding: 12px 18px; }
   .admin-global-search { grid-column: 1 / -1; grid-row: 2; }
   .admin-dashboard-columns { grid-template-columns: 1fr; }
+  .admin-card-workspace { grid-template-columns: 1fr; }
 }
 @media (max-width: 600px) {
   .admin-page-content { padding: 18px 14px; }
@@ -225,4 +267,7 @@
   .admin-detail-statuses { width: 100%; margin-left: 0; }
   .admin-detail-grid, .admin-detail-columns { grid-template-columns: 1fr; }
   .admin-detail-field { grid-template-columns: 1fr; gap: 5px; }
+  .elder-card-body { grid-template-columns: 1fr; }
+  .elder-card-qr { border-top: 1px solid #dce8e4; padding-top: 18px; }
+  .elder-card-footer { flex-direction: column; }
 }

@@ -14,7 +14,8 @@ const AdminLayout = () => {
   const [collapsed, setCollapsed] = useState(false);
   const location = useLocation();
   const title = titles[location.pathname]
-    || (location.pathname.startsWith('/admin/users/') ? 'User details' : 'Administration');
+    || (location.pathname.startsWith('/admin/users/') ? 'User details' : null)
+    || (location.pathname.startsWith('/admin/id-cards/') ? 'ID card' : 'Administration');
 
   return (
     <div className={`admin-shell ${collapsed ? 'sidebar-collapsed' : ''}`}>

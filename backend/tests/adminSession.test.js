@@ -18,6 +18,8 @@ const {
 const { configuredOrigins } = require('../middleware/requireTrustedOrigin');
 const { calculateCompletion, isProfileComplete, parseQuery } = require('../services/adminUserQueryService');
 const { getAdminUserDetail } = require('../services/adminUserDetailService');
+const { getCard } = require('../services/adminIdCardService');
+const QRCodeModel = require('../models/QRCode');
 
 test('admin session token contains only expected authorization claims', () => {
   const admin = {
@@ -109,4 +111,17 @@ test('profile completeness requires emergency-ready contact fields', () => {
 
 test('admin user detail rejects malformed identifiers before querying MongoDB', async () => {
   assert.equal(await getAdminUserDetail('not-a-mongodb-id'), null);
+});
+
+test('admin ID card lookup rejects malformed identifiers before querying MongoDB', async () => {
+  assert.equal(await getCard('not-a-mongodb-id'), null);
+});
+
+test('QR records support opaque tokens and revocation metadata', () => {
+  const paths = QRCodeModel.schema.paths;
+  assert.ok(paths.token);
+  assert.ok(paths.status);
+  assert.ok(paths.revokedAt);
+  assert.ok(paths.revokedBy);
+  assert.deepEqual(paths.status.enumValues, ['active', 'revoked']);
 });

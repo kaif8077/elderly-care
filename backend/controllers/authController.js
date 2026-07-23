@@ -5,7 +5,7 @@ const { sendOtpEmail } = require('../services/emailService');
 const { createOtp, normalizeIdentifier, verifyOtp } = require('../services/otpService');
 
 const signUserToken = (user) => jwt.sign(
-  { id: user._id },
+  { id: user._id, sessionVersion: user.sessionVersion },
   process.env.JWT_SECRET,
   { expiresIn: '7d' }
 );
@@ -132,7 +132,9 @@ exports.verifyLoginOTP = async (req, res) => {
     if (!result.valid) return res.status(400).json({ message: result.message });
 
     const user = await User.findOne({ email });
-    if (!user) return res.status(401).json({ message: 'Invalid login request' });
+    if (!user || user.accountStatus !== 'active' || user.isDeleted) {
+      return res.status(403).json({ message: 'This account is not active' });
+    }
 
     res.json({ token: signUserToken(user), user: publicUser(user) });
   } catch (error) {

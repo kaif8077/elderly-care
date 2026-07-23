@@ -97,7 +97,8 @@ const AdminUsers = () => {
         </label>
         <label>QR
           <select value={query.qrStatus || ''} onChange={(e) => updateQuery({ qrStatus: e.target.value })}>
-            <option value="">All QR states</option><option value="generated">Generated</option><option value="missing">Missing</option>
+            <option value="">All QR states</option><option value="active">Active</option><option value="revoked">Revoked</option>
+            <option value="generated">Any generated</option><option value="missing">Missing</option>
           </select>
         </label>
         <label>Sort

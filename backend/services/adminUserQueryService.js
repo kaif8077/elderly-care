@@ -99,7 +99,7 @@ const listUsers = async (query) => {
           { $match: { $expr: { $eq: ['$userId', '$$userId'] } } },
           { $sort: { createdAt: -1 } },
           { $limit: 1 },
-          { $project: { _id: 1, createdAt: 1 } }
+          { $project: { _id: 1, createdAt: 1, status: 1, token: 1 } }
         ],
         as: 'qrCodes'
       }
@@ -128,6 +128,8 @@ const listUsers = async (query) => {
     pipeline.push({ $match: { $expr: { $not: [completeProfileExpression] } } });
   }
   if (query.qrStatus === 'generated') pipeline.push({ $match: { qrCode: { $ne: null } } });
+  if (query.qrStatus === 'active') pipeline.push({ $match: { 'qrCode.status': 'active', 'qrCode.token': { $ne: null } } });
+  if (query.qrStatus === 'revoked') pipeline.push({ $match: { 'qrCode.status': 'revoked' } });
   if (query.qrStatus === 'missing') pipeline.push({ $match: { qrCode: null } });
 
   pipeline.push(
@@ -168,7 +170,7 @@ const listUsers = async (query) => {
     profileCompletion: calculateCompletion(user.profile),
     profileStatus: isProfileComplete(user.profile) ? 'complete' : 'incomplete',
     reportStatus: 'not_available',
-    qrStatus: user.qrCode ? 'generated' : 'missing',
+    qrStatus: user.qrCode?.token ? user.qrCode.status : (user.qrCode ? 'legacy' : 'missing'),
     accountStatus: user.accountStatus || 'active',
     createdAt: user.createdAt || null,
     updatedAt: user.profile?.updatedAt || user.updatedAt || null

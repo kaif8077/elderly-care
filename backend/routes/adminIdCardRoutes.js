@@ -1,14 +1,13 @@
 const express = require('express');
 const authenticateAdmin = require('../middleware/authenticateAdmin');
 const { requirePermission, requireRole } = require('../middleware/requirePermission');
-const adminUserController = require('../controllers/adminUserController');
+const controller = require('../controllers/adminIdCardController');
 const requireTrustedOrigin = require('../middleware/requireTrustedOrigin');
 
 const router = express.Router();
-
 router.use(authenticateAdmin, requireRole('admin', 'super_admin'));
-router.get('/', requirePermission('users.read'), adminUserController.listUsers);
-router.get('/:userId', requirePermission('profiles.read'), adminUserController.getUser);
-router.patch('/:userId/status', requireTrustedOrigin, requirePermission('users.update'), adminUserController.updateStatus);
+router.get('/:userId', requirePermission('idCards.read'), controller.getCard);
+router.post('/:userId/regenerate', requireTrustedOrigin, requirePermission('qr.regenerate'), controller.regenerateQr);
+router.post('/:userId/revoke', requireTrustedOrigin, requirePermission('qr.revoke'), controller.revokeQr);
 
 module.exports = router;

@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useState } from 'react';
-import { FaArrowLeft, FaFileMedical, FaQrcode, FaUser } from 'react-icons/fa';
+import { FaArrowLeft, FaFileMedical, FaIdCard, FaQrcode, FaUser } from 'react-icons/fa';
 import { Link, useParams } from 'react-router-dom';
 import adminApi from '../../services/adminApi';
 import AdminStatusBadge from '../components/AdminStatusBadge';
@@ -24,6 +24,8 @@ const AdminUserDetail = () => {
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
+  const [statusSaving, setStatusSaving] = useState(false);
+  const [actionMessage, setActionMessage] = useState('');
 
   const load = useCallback(async () => {
     setLoading(true);
@@ -55,6 +57,21 @@ const AdminUserDetail = () => {
   const medical = profile?.medical;
   const insurance = profile?.insurance;
 
+  const changeStatus = async (status) => {
+    if (!window.confirm(`Change this account to ${status}?${status !== 'active' ? ' Existing sessions and active QR access will be revoked.' : ''}`)) return;
+    setStatusSaving(true);
+    setActionMessage('');
+    try {
+      await adminApi.patch(`/users/${userId}/status`, { status });
+      setActionMessage(`Account changed to ${status}.`);
+      await load();
+    } catch (requestError) {
+      setActionMessage(requestError.response?.data?.message || 'Unable to update account status.');
+    } finally {
+      setStatusSaving(false);
+    }
+  };
+
   const overview = (
     <div className="admin-detail-grid">
       <section className="admin-detail-card">
@@ -76,6 +93,15 @@ const AdminUserDetail = () => {
           <Field label="Saved reports"><AdminStatusBadge status={reports.available ? 'available' : 'not available'} /></Field>
           <Field label="QR record"><AdminStatusBadge status={qr.status} /></Field>
         </dl>
+        <div className="admin-detail-actions">
+          <Link className="admin-primary-button" to={`/admin/id-cards/${userId}`}><FaIdCard /> View ID card</Link>
+          {user.accountStatus === 'active' ? (
+            <button className="admin-danger-button" disabled={statusSaving} onClick={() => changeStatus('inactive')}>Deactivate account</button>
+          ) : (
+            <button className="admin-primary-button" disabled={statusSaving || user.isDeleted} onClick={() => changeStatus('active')}>Activate account</button>
+          )}
+        </div>
+        {actionMessage && <p className="admin-action-message" role="status">{actionMessage}</p>}
       </section>
     </div>
   );
@@ -112,6 +138,7 @@ const AdminUserDetail = () => {
     QR: <section className="admin-detail-card"><h2>QR information</h2><dl>
       <Field label="Status"><AdminStatusBadge status={qr.status} /></Field>
       <Field label="Legacy QR records">{qr.totalRecords}</Field>
+      <Field label="Revoked QR records">{qr.revokedRecords || 0}</Field>
       <Field label="Latest generated">{dateValue(qr.generatedAt, true)}</Field>
       <Field label="Revocation support">{qr.revocationSupported ? 'Available' : 'Not available in legacy model'}</Field>
     </dl><p className="admin-privacy-note"><FaQrcode aria-hidden="true" /> QR payload data is intentionally not displayed in the admin directory.</p></section>

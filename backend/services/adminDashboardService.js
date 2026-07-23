@@ -59,9 +59,10 @@ const getProfileStatistics = async () => {
   return latestProfiles[0] || { withProfile: 0, complete: 0 };
 };
 
-const getGeneratedQrUserCount = async () => {
+const getQrStatistics = async () => {
   const rows = await QRCode.aggregate([
-    { $group: { _id: '$userId' } },
+    { $sort: { createdAt: -1 } },
+    { $group: { _id: '$userId', qr: { $first: '$$ROOT' } } },
     {
       $lookup: {
         from: 'users',
@@ -72,9 +73,17 @@ const getGeneratedQrUserCount = async () => {
     },
     { $set: { user: { $first: '$user' } } },
     { $match: { 'user.role': { $nin: ['admin', 'super_admin'] }, 'user.isDeleted': { $ne: true } } },
-    { $count: 'count' }
+    {
+      $group: {
+        _id: null,
+        generated: { $sum: 1 },
+        active: { $sum: { $cond: [{ $and: [{ $eq: ['$qr.status', 'active'] }, { $ne: ['$qr.token', null] }] }, 1, 0] } },
+        revoked: { $sum: { $cond: [{ $eq: ['$qr.status', 'revoked'] }, 1, 0] } },
+        legacy: { $sum: { $cond: [{ $eq: [{ $ifNull: ['$qr.token', null] }, null] }, 1, 0] } }
+      }
+    }
   ]);
-  return rows[0]?.count || 0;
+  return rows[0] || { generated: 0, active: 0, revoked: 0, legacy: 0 };
 };
 
 const getMonthlyRegistrations = async () => {
@@ -114,7 +123,7 @@ const getDashboardStatistics = async () => {
     registeredToday,
     registeredThisMonth,
     profileStats,
-    generatedQrUsers,
+    qrStats,
     registrationsByMonth
   ] = await Promise.all([
     User.countDocuments(regularUsers),
@@ -124,7 +133,7 @@ const getDashboardStatistics = async () => {
     User.countDocuments({ ...regularUsers, createdAt: { $gte: startOfDay() } }),
     User.countDocuments({ ...regularUsers, createdAt: { $gte: startOfMonth() } }),
     getProfileStatistics(),
-    getGeneratedQrUserCount(),
+    getQrStatistics(),
     getMonthlyRegistrations()
   ]);
 
@@ -143,10 +152,11 @@ const getDashboardStatistics = async () => {
       created: profileStats.withProfile
     },
     qrCodes: {
-      generated: generatedQrUsers,
-      active: null,
-      revoked: null,
-      capability: 'legacy'
+      generated: qrStats.generated,
+      active: qrStats.active,
+      revoked: qrStats.revoked,
+      legacy: qrStats.legacy,
+      capability: 'revocable_tokens'
     },
     reports: { total: null, capability: 'not_implemented' },
     emergencyAlerts: { today: null, unresolved: null, capability: 'not_implemented' },

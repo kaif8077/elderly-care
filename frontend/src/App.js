@@ -18,6 +18,7 @@ import AdminLayout from './admin/layout/AdminLayout';
 import AdminDashboard from './admin/pages/AdminDashboard';
 import AdminUsers from './admin/pages/AdminUsers';
 import AdminUserDetail from './admin/pages/AdminUserDetail';
+import AdminIdCard from './admin/pages/AdminIdCard';
 import './App.css';
 
 const AppRoutes = () => {
@@ -44,6 +45,7 @@ const AppRoutes = () => {
                     <Route path="dashboard" element={<AdminDashboard />} />
                     <Route path="users" element={<AdminUsers />} />
                     <Route path="users/:userId" element={<AdminUserDetail />} />
+                    <Route path="id-cards/:userId" element={<AdminIdCard />} />
                     <Route path="phase-1" element={<AdminDashboardPlaceholder />} />
                 </Route>
             </Routes>

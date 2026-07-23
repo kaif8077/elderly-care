@@ -12,12 +12,13 @@ const cards = (data) => [
   { label: 'Registered today', value: data.users.registeredToday, icon: FaUserPlus, to: '/admin/users?sortBy=createdAt' },
   { label: 'Complete profiles', value: data.profiles.complete, icon: FaCheckCircle, to: '/admin/users?profileStatus=complete' },
   { label: 'Incomplete profiles', value: data.profiles.incomplete, icon: FaAddressCard, to: '/admin/users?profileStatus=incomplete' },
-  { label: 'Generated QR records', value: data.qrCodes.generated, icon: FaQrcode, to: '/admin/users?qrStatus=generated' }
+  { label: 'Generated QR records', value: data.qrCodes.generated, icon: FaQrcode, to: '/admin/users?qrStatus=generated' },
+  { label: 'Active secure QR', value: data.qrCodes.active, icon: FaQrcode, to: '/admin/users?qrStatus=active' }
 ];
 
 const DashboardSkeleton = () => (
   <div className="admin-stat-grid" aria-label="Loading dashboard statistics">
-    {Array.from({ length: 7 }, (_, index) => <div className="admin-stat-card skeleton" key={index} />)}
+    {Array.from({ length: 8 }, (_, index) => <div className="admin-stat-card skeleton" key={index} />)}
   </div>
 );
 
@@ -98,7 +99,8 @@ const AdminDashboard = () => {
                 <li><span>Medical reports</span><strong>Not implemented</strong></li>
                 <li><span>Emergency alert tracking</span><strong>Not implemented</strong></li>
                 <li><span>Versioned ID cards</span><strong>Not implemented</strong></li>
-                <li><span>QR revocation</span><strong>Legacy QR model</strong></li>
+                <li><span>QR revocation</span><strong>Available for secure tokens</strong></li>
+                {data.qrCodes.legacy > 0 && <li><span>Legacy QR migrations</span><strong>{data.qrCodes.legacy} remaining</strong></li>}
               </ul>
             </section>
           </div>

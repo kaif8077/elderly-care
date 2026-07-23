@@ -16,10 +16,12 @@ const getAdminUserDetail = async (userId) => {
 
   if (!user) return null;
 
-  const [profile, qrCount, latestQr] = await Promise.all([
+  const [profile, qrCount, revokedQrCount, latestQr] = await Promise.all([
     MedicalProfile.findOne({ userId }).sort({ createdAt: -1 }).lean(),
     QRCode.countDocuments({ userId }),
-    QRCode.findOne({ userId }).sort({ createdAt: -1 }).select('_id createdAt updatedAt').lean()
+    QRCode.countDocuments({ userId, status: 'revoked' }),
+    QRCode.findOne({ userId, status: 'active', token: { $exists: true, $ne: null } })
+      .sort({ createdAt: -1 }).select('_id createdAt updatedAt').lean()
   ]);
 
   return {
@@ -78,8 +80,9 @@ const getAdminUserDetail = async (userId) => {
       updatedAt: profile.updatedAt
     } : null,
     qr: {
-      status: latestQr ? 'generated' : 'missing',
+      status: latestQr ? 'active' : (revokedQrCount ? 'revoked' : 'missing'),
       totalRecords: qrCount,
+      revokedRecords: revokedQrCount,
       latestId: latestQr?._id || null,
       generatedAt: latestQr?.createdAt || null,
       updatedAt: latestQr?.updatedAt || null,

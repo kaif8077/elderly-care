@@ -11,6 +11,7 @@ const recommendationRoutes = require('./routes/recommendationRoutes');
 const adminAuthRoutes = require('./routes/adminAuthRoutes');
 const adminDashboardRoutes = require('./routes/adminDashboardRoutes');
 const adminUserRoutes = require('./routes/adminUserRoutes');
+const adminIdCardRoutes = require('./routes/adminIdCardRoutes');
 const cors = require('cors');
 const app = express();
 
@@ -20,7 +21,7 @@ connectDB();
 // Middleware
 app.use(cors({
     origin: process.env.FRONTEND_URL || 'http://localhost:3000',
-    methods: ['GET', 'POST', 'PUT', 'DELETE'],
+    methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE'],
     allowedHeaders: ['Content-Type', 'Authorization'],
     credentials: true
 }));
@@ -34,6 +35,7 @@ app.use('/api/auth', authRoutes);
 app.use('/api/admin/auth', adminAuthRoutes);
 app.use('/api/admin/dashboard', adminDashboardRoutes);
 app.use('/api/admin/users', adminUserRoutes);
+app.use('/api/admin/id-cards', adminIdCardRoutes);
 app.use('/api/medical', medicalRoutes);
 app.use('/api/qr', qrRoutes);
 app.use('/api/location', locationRoutes);
@@ -49,8 +51,6 @@ app.get('/api', (req, res) => {
         timestamp: new Date().toISOString(),
         availableEndpoints: [
             'GET /api/ - API Status (you are here)',
-            'GET /api/qr/test-all-users - Test all users',
-            'GET /api/qr/profile/:userId - View medical profile',
             'POST /api/qr/ - Create QR code',
             'POST /api/auth/register - User registration',
             'POST /api/auth/login - User login',
