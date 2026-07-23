@@ -17,6 +17,7 @@ const {
 } = require('../middleware/requirePermission');
 const { configuredOrigins } = require('../middleware/requireTrustedOrigin');
 const { calculateCompletion, isProfileComplete, parseQuery } = require('../services/adminUserQueryService');
+const { getAdminUserDetail } = require('../services/adminUserDetailService');
 
 test('admin session token contains only expected authorization claims', () => {
   const admin = {
@@ -104,4 +105,8 @@ test('profile completeness requires emergency-ready contact fields', () => {
     emergencyContact: 'Contact',
     emergencyPhone: '+910000000001'
   }), true);
+});
+
+test('admin user detail rejects malformed identifiers before querying MongoDB', async () => {
+  assert.equal(await getAdminUserDetail('not-a-mongodb-id'), null);
 });

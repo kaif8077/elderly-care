@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { FaChevronLeft, FaChevronRight, FaSearch, FaSyncAlt } from 'react-icons/fa';
-import { useSearchParams } from 'react-router-dom';
+import { Link, useSearchParams } from 'react-router-dom';
 import adminApi from '../../services/adminApi';
 import AdminStatusBadge from '../components/AdminStatusBadge';
 
@@ -134,7 +134,7 @@ const AdminUsers = () => {
                     <td><AdminStatusBadge status={user.qrStatus} /></td>
                     <td><AdminStatusBadge status={user.accountStatus} /></td>
                     <td>{user.createdAt ? new Date(user.createdAt).toLocaleDateString() : '—'}</td>
-                    <td><button className="admin-table-action" disabled title="User detail is planned for Phase 3">View</button></td>
+                    <td><Link className="admin-table-action" to={`/admin/users/${user.id}`}>View</Link></td>
                   </tr>
                 ))}
               </tbody>

@@ -147,7 +147,7 @@
 .status-active, .status-generated { background: #e3f5ed; color: #176b57; }
 .status-inactive, .status-suspended, .status-missing { background: #fff1d6; color: #825900; }
 .status-archived { background: #eceff1; color: #4f5b62; }
-.admin-table-action { min-height: 36px; padding: 6px 11px; border: 1px solid #cbd8d4; border-radius: 7px; background: #fff; }
+.admin-table-action { display: inline-flex; align-items: center; min-height: 36px; padding: 6px 11px; border: 1px solid #cbd8d4; border-radius: 7px; background: #fff; color: #176b57; text-decoration: none; }
 .admin-table-loading, .admin-state-card { padding: 45px 22px; text-align: center; }
 .admin-pagination { display: flex; align-items: center; justify-content: flex-end; gap: 22px; padding: 14px 16px; border-top: 1px solid #e2ebe8; }
 .admin-pagination label { display: flex; align-items: center; gap: 8px; }
@@ -155,6 +155,36 @@
 .admin-pagination button:disabled { opacity: .4; }
 .admin-visually-hidden { position: absolute!important; width: 1px!important; height: 1px!important; padding: 0!important; margin: -1px!important; overflow: hidden!important; clip: rect(0,0,0,0)!important; white-space: nowrap!important; border: 0!important; }
 .admin-sidebar-backdrop { display: none; }
+
+.admin-back-link { display: inline-flex; align-items: center; gap: 8px; margin-bottom: 16px; color: #176b57; font-weight: 800; text-decoration: none; }
+.admin-detail-hero {
+  display: flex; align-items: center; gap: 18px; padding: 22px;
+  border: 1px solid #d8e5e1; border-radius: 14px; background: #fff;
+}
+.admin-detail-hero h1 { margin: 2px 0 5px; font-size: 1.55rem; }
+.admin-detail-hero p { margin: 0; color: #627971; }
+.admin-eyebrow { margin: 0; color: #668078; font-size: .72rem; font-weight: 800; text-transform: uppercase; letter-spacing: .08em; }
+.admin-detail-avatar { display: grid; flex: 0 0 64px; width: 64px; height: 64px; place-items: center; border-radius: 18px; background: #e1f1ec; color: #176b57; font-size: 1.45rem; }
+.admin-detail-statuses { display: flex; align-items: center; gap: 8px; margin-left: auto; }
+.admin-detail-tabs { display: flex; gap: 5px; margin: 18px 0; padding: 6px; overflow-x: auto; border: 1px solid #d8e5e1; border-radius: 12px; background: #fff; }
+.admin-detail-tabs button { min-height: 42px; padding: 8px 14px; border: 0; border-radius: 8px; background: transparent; color: #526b64; font-weight: 800; white-space: nowrap; cursor: pointer; }
+.admin-detail-tabs button.active { background: #176b57; color: #fff; }
+.admin-detail-grid { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 18px; }
+.admin-detail-card { padding: 22px; border: 1px solid #d8e5e1; border-radius: 14px; background: #fff; box-shadow: 0 5px 18px rgba(22,68,56,.04); }
+.admin-detail-card h2 { margin: 0 0 18px; font-size: 1.15rem; }
+.admin-detail-card dl { margin: 0; }
+.admin-detail-columns { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); column-gap: 28px; }
+.admin-detail-field { display: grid; grid-template-columns: minmax(130px, .8fr) minmax(0, 1.2fr); gap: 15px; padding: 12px 0; border-bottom: 1px solid #e5ecea; }
+.admin-detail-field:last-child { border-bottom: 0; }
+.admin-detail-field dt { color: #627971; font-weight: 700; }
+.admin-detail-field dd { margin: 0; color: #18352e; overflow-wrap: anywhere; }
+.admin-section-warning { margin: -4px 0 18px; padding: 10px 12px; border-left: 4px solid #b47a00; background: #fff7e7; color: #6e4d08; font-weight: 700; }
+.admin-empty-feature { min-height: 240px; text-align: center; }
+.admin-empty-feature > svg { margin: 12px 0; color: #719087; font-size: 2rem; }
+.admin-empty-feature p { color: #526b64; }
+.admin-empty-feature small { color: #71847f; }
+.admin-privacy-note { display: flex; align-items: center; gap: 9px; margin: 18px 0 0; padding: 12px; border-radius: 9px; background: #eef5f3; color: #45635b; }
+.admin-detail-skeleton { min-height: 420px; border-radius: 14px; }
 
 @media (prefers-reduced-motion: reduce) {
   .admin-sidebar, .admin-shell-main, .admin-stat-card { transition: none; }
@@ -191,4 +221,8 @@
   .admin-bar-chart { gap: 6px; }
   .admin-bar-column small { font-size: .66rem; }
   .admin-pagination { justify-content: space-between; gap: 8px; }
+  .admin-detail-hero { align-items: flex-start; flex-wrap: wrap; }
+  .admin-detail-statuses { width: 100%; margin-left: 0; }
+  .admin-detail-grid, .admin-detail-columns { grid-template-columns: 1fr; }
+  .admin-detail-field { grid-template-columns: 1fr; gap: 5px; }
 }

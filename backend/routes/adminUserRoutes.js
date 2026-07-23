@@ -7,5 +7,6 @@ const router = express.Router();
 
 router.use(authenticateAdmin, requireRole('admin', 'super_admin'));
 router.get('/', requirePermission('users.read'), adminUserController.listUsers);
+router.get('/:userId', requirePermission('profiles.read'), adminUserController.getUser);
 
 module.exports = router;
