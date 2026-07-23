@@ -4,7 +4,7 @@ const MedicalProfile = require('../models/MedicalProfile');
 const QRCode = require('../models/QRCode');
 const { calculateCompletion, isProfileComplete } = require('./adminUserQueryService');
 
-const publicUserFields = 'name email role accountStatus isDeleted isVerified createdAt updatedAt lastLoginAt';
+const publicUserFields = 'name email role accountStatus isDeleted isVerified createdAt updatedAt lastLoginAt deletedAt deletionReason';
 
 const getAdminUserDetail = async (userId) => {
   if (!mongoose.Types.ObjectId.isValid(userId)) return null;
@@ -38,6 +38,8 @@ const getAdminUserDetail = async (userId) => {
       createdAt: user.createdAt,
       updatedAt: profile?.updatedAt || user.updatedAt,
       lastLoginAt: user.lastLoginAt,
+      deletedAt: user.deletedAt,
+      deletionReason: user.deletionReason,
       profileCompletion: calculateCompletion(profile),
       profileStatus: isProfileComplete(profile) ? 'complete' : 'incomplete'
     },

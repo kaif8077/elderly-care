@@ -2,6 +2,7 @@ const { listUsers } = require('../services/adminUserQueryService');
 const { getAdminUserDetail } = require('../services/adminUserDetailService');
 const { writeAuditLog } = require('../services/auditService');
 const { updateAccountStatus } = require('../services/adminIdCardService');
+const { archiveUser, restoreUser } = require('../services/adminUserLifecycleService');
 
 exports.listUsers = async (req, res) => {
   try {
@@ -66,5 +67,56 @@ exports.updateStatus = async (req, res) => {
     }
     console.error('Admin account status error:', error.message);
     res.status(500).json({ message: 'Unable to update account status' });
+  }
+};
+
+exports.archive = async (req, res) => {
+  try {
+    const result = await archiveUser({
+      userId: req.params.userId,
+      adminId: req.admin._id,
+      reason: req.body.reason,
+      confirmation: req.body.confirmation
+    });
+    if (!result) return res.status(404).json({ message: 'User not found' });
+
+    await writeAuditLog({
+      req,
+      actor: req.admin,
+      action: 'ADMIN_USER_ARCHIVED',
+      resourceType: 'User',
+      resourceId: result.user._id,
+      affectedUserId: result.user._id,
+      description: 'Admin archived a user account and revoked active access',
+      reason: result.user.deletionReason
+    });
+    res.json({ message: 'User account archived', revokedQrCodes: result.revokedCount });
+  } catch (error) {
+    if (['INVALID_ARCHIVE_REQUEST', 'ALREADY_ARCHIVED'].includes(error.code)) {
+      return res.status(error.code === 'ALREADY_ARCHIVED' ? 409 : 400).json({ message: error.message, code: error.code });
+    }
+    console.error('Admin archive error:', error.message);
+    res.status(500).json({ message: 'Unable to archive user' });
+  }
+};
+
+exports.restore = async (req, res) => {
+  try {
+    const user = await restoreUser({ userId: req.params.userId });
+    if (!user) return res.status(404).json({ message: 'User not found' });
+    await writeAuditLog({
+      req,
+      actor: req.admin,
+      action: 'ADMIN_USER_RESTORED',
+      resourceType: 'User',
+      resourceId: user._id,
+      affectedUserId: user._id,
+      description: 'Admin restored an archived user account'
+    });
+    res.json({ message: 'User account restored', accountStatus: user.accountStatus });
+  } catch (error) {
+    if (error.code === 'NOT_ARCHIVED') return res.status(409).json({ message: error.message, code: error.code });
+    console.error('Admin restore error:', error.message);
+    res.status(500).json({ message: 'Unable to restore user' });
   }
 };

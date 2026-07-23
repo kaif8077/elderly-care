@@ -6,7 +6,8 @@ import '../styles/AdminLayout.css';
 
 const titles = {
   '/admin/dashboard': 'Dashboard',
-  '/admin/users': 'Users'
+  '/admin/users': 'Users',
+  '/admin/audit-logs': 'Audit logs'
 };
 
 const AdminLayout = () => {

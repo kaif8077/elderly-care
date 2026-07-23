@@ -5,6 +5,7 @@ import adminApi from '../../services/adminApi';
 import AdminStatusBadge from '../components/AdminStatusBadge';
 
 const tabs = ['Overview', 'Personal', 'Contact', 'Medical', 'Insurance', 'Reports', 'QR'];
+const archiveReasons = ['Duplicate account', 'User request', 'Test account', 'Incorrect data', 'Inactive account', 'Privacy request', 'Other'];
 const value = (item) => item === null || item === undefined || item === '' ? 'Not provided' : String(item);
 const listValue = (items, other) => {
   const values = [...(items || []), other].filter((item) => item && item !== 'None');
@@ -26,6 +27,8 @@ const AdminUserDetail = () => {
   const [error, setError] = useState('');
   const [statusSaving, setStatusSaving] = useState(false);
   const [actionMessage, setActionMessage] = useState('');
+  const [archiveOpen, setArchiveOpen] = useState(false);
+  const [archiveForm, setArchiveForm] = useState({ reason: '', details: '', confirmation: '' });
 
   const load = useCallback(async () => {
     setLoading(true);
@@ -72,6 +75,40 @@ const AdminUserDetail = () => {
     }
   };
 
+  const archiveAccount = async (event) => {
+    event.preventDefault();
+    const reason = archiveForm.reason === 'Other'
+      ? archiveForm.details.trim()
+      : [archiveForm.reason, archiveForm.details.trim()].filter(Boolean).join(': ');
+    setStatusSaving(true);
+    setActionMessage('');
+    try {
+      await adminApi.delete(`/users/${userId}`, { data: { reason, confirmation: archiveForm.confirmation } });
+      setArchiveOpen(false);
+      setArchiveForm({ reason: '', details: '', confirmation: '' });
+      setActionMessage('Account archived. Sessions and QR access were revoked.');
+      await load();
+    } catch (requestError) {
+      setActionMessage(requestError.response?.data?.message || 'Unable to archive this account.');
+    } finally {
+      setStatusSaving(false);
+    }
+  };
+
+  const restoreAccount = async () => {
+    if (!window.confirm('Restore this archived account? QR access will remain revoked until a new code is generated.')) return;
+    setStatusSaving(true);
+    try {
+      await adminApi.post(`/users/${userId}/restore`);
+      setActionMessage('Account restored. Generate a new QR code if required.');
+      await load();
+    } catch (requestError) {
+      setActionMessage(requestError.response?.data?.message || 'Unable to restore this account.');
+    } finally {
+      setStatusSaving(false);
+    }
+  };
+
   const overview = (
     <div className="admin-detail-grid">
       <section className="admin-detail-card">
@@ -83,6 +120,8 @@ const AdminUserDetail = () => {
           <Field label="Registered">{dateValue(user.createdAt)}</Field>
           <Field label="Last updated">{dateValue(user.updatedAt, true)}</Field>
           <Field label="Last login">{dateValue(user.lastLoginAt, true)}</Field>
+          {user.isDeleted && <Field label="Archived">{dateValue(user.deletedAt, true)}</Field>}
+          {user.isDeleted && <Field label="Archive reason">{value(user.deletionReason)}</Field>}
         </dl>
       </section>
       <section className="admin-detail-card">
@@ -95,11 +134,14 @@ const AdminUserDetail = () => {
         </dl>
         <div className="admin-detail-actions">
           <Link className="admin-primary-button" to={`/admin/id-cards/${userId}`}><FaIdCard /> View ID card</Link>
-          {user.accountStatus === 'active' ? (
+          {user.isDeleted ? (
+            <button className="admin-primary-button" disabled={statusSaving} onClick={restoreAccount}>Restore account</button>
+          ) : user.accountStatus === 'active' ? (
             <button className="admin-danger-button" disabled={statusSaving} onClick={() => changeStatus('inactive')}>Deactivate account</button>
           ) : (
-            <button className="admin-primary-button" disabled={statusSaving || user.isDeleted} onClick={() => changeStatus('active')}>Activate account</button>
+            <button className="admin-primary-button" disabled={statusSaving} onClick={() => changeStatus('active')}>Activate account</button>
           )}
+          {!user.isDeleted && <button className="admin-danger-button" disabled={statusSaving} onClick={() => setArchiveOpen(true)}>Archive user</button>}
         </div>
         {actionMessage && <p className="admin-action-message" role="status">{actionMessage}</p>}
       </section>
@@ -160,6 +202,33 @@ const AdminUserDetail = () => {
       {!profile && !['Overview', 'Reports', 'QR'].includes(activeTab)
         ? <div className="admin-state-card"><h2>No medical profile</h2><p>This user has not submitted medical information.</p></div>
         : sections[activeTab]}
+
+      {archiveOpen && (
+        <div className="admin-modal-backdrop" role="presentation">
+          <section className="admin-confirm-modal" role="dialog" aria-modal="true" aria-labelledby="archive-title">
+            <h2 id="archive-title">Archive {user.name}?</h2>
+            <p>This blocks login, revokes active sessions and QR codes, and hides the account from active-user lists. Medical records are preserved.</p>
+            <form onSubmit={archiveAccount}>
+              <label>Reason
+                <select required value={archiveForm.reason} onChange={(event) => setArchiveForm((current) => ({ ...current, reason: event.target.value }))}>
+                  <option value="">Select a reason</option>
+                  {archiveReasons.map((reason) => <option key={reason}>{reason}</option>)}
+                </select>
+              </label>
+              <label>{archiveForm.reason === 'Other' ? 'Reason details' : 'Additional details (optional)'}
+                <textarea required={archiveForm.reason === 'Other'} maxLength="500" value={archiveForm.details} onChange={(event) => setArchiveForm((current) => ({ ...current, details: event.target.value }))} />
+              </label>
+              <label>Type DELETE to confirm
+                <input autoFocus value={archiveForm.confirmation} onChange={(event) => setArchiveForm((current) => ({ ...current, confirmation: event.target.value }))} />
+              </label>
+              <div className="admin-modal-actions">
+                <button type="button" className="admin-secondary-button" onClick={() => setArchiveOpen(false)} disabled={statusSaving}>Cancel</button>
+                <button type="submit" className="admin-danger-button" disabled={statusSaving || !archiveForm.reason || archiveForm.confirmation !== 'DELETE'}>{statusSaving ? 'Archiving…' : 'Archive user'}</button>
+              </div>
+            </form>
+          </section>
+        </div>
+      )}
     </div>
   );
 };

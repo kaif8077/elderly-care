@@ -14,7 +14,7 @@ const items = [
   { label: 'QR Management', icon: FaQrcode },
   { label: 'Emergency Alerts', icon: FaBell },
   { label: 'Documents', icon: FaClipboardList },
-  { label: 'Audit Logs', icon: FaHistory }
+  { label: 'Audit Logs', to: '/admin/audit-logs', icon: FaHistory, available: true }
 ];
 
 const AdminSidebar = ({ open, collapsed, onClose }) => (

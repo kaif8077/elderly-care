@@ -20,6 +20,8 @@ const { calculateCompletion, isProfileComplete, parseQuery } = require('../servi
 const { getAdminUserDetail } = require('../services/adminUserDetailService');
 const { getCard } = require('../services/adminIdCardService');
 const QRCodeModel = require('../models/QRCode');
+const { parseAuditQuery } = require('../services/adminAuditQueryService');
+const { validateArchiveRequest } = require('../services/adminUserLifecycleService');
 
 test('admin session token contains only expected authorization claims', () => {
   const admin = {
@@ -124,4 +126,14 @@ test('QR records support opaque tokens and revocation metadata', () => {
   assert.ok(paths.revokedAt);
   assert.ok(paths.revokedBy);
   assert.deepEqual(paths.status.enumValues, ['active', 'revoked']);
+});
+
+test('archive validation requires a reason and exact confirmation word', () => {
+  assert.equal(validateArchiveRequest({ reason: 'User request', confirmation: 'DELETE' }), null);
+  assert.match(validateArchiveRequest({ reason: 'User request', confirmation: 'delete' }), /DELETE/);
+  assert.match(validateArchiveRequest({ reason: '', confirmation: 'DELETE' }), /reason/);
+});
+
+test('audit pagination is bounded', () => {
+  assert.deepEqual(parseAuditQuery({ page: '-5', limit: '1000' }), { page: 1, limit: 100 });
 });

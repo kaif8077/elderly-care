@@ -19,6 +19,7 @@ import AdminDashboard from './admin/pages/AdminDashboard';
 import AdminUsers from './admin/pages/AdminUsers';
 import AdminUserDetail from './admin/pages/AdminUserDetail';
 import AdminIdCard from './admin/pages/AdminIdCard';
+import AdminAuditLogs from './admin/pages/AdminAuditLogs';
 import './App.css';
 
 const AppRoutes = () => {
@@ -46,6 +47,7 @@ const AppRoutes = () => {
                     <Route path="users" element={<AdminUsers />} />
                     <Route path="users/:userId" element={<AdminUserDetail />} />
                     <Route path="id-cards/:userId" element={<AdminIdCard />} />
+                    <Route path="audit-logs" element={<AdminAuditLogs />} />
                     <Route path="phase-1" element={<AdminDashboardPlaceholder />} />
                 </Route>
             </Routes>
