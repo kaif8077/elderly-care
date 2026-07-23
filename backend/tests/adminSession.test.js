@@ -16,6 +16,7 @@ const {
   getPermissions
 } = require('../middleware/requirePermission');
 const { configuredOrigins } = require('../middleware/requireTrustedOrigin');
+const { calculateCompletion, isProfileComplete, parseQuery } = require('../services/adminUserQueryService');
 
 test('admin session token contains only expected authorization claims', () => {
   const admin = {
@@ -63,4 +64,44 @@ test('trusted origin configuration normalizes trailing slashes', () => {
     'http://localhost:3000',
     'https://elderlycare.example.com'
   ]);
+});
+
+test('admin user query pagination is bounded and sort fields are allowlisted', () => {
+  assert.deepEqual(parseQuery({ page: '-2', limit: '500', sortBy: 'password', sortOrder: 'asc' }), {
+    page: 1,
+    limit: 50,
+    sortBy: 'createdAt',
+    sortOrder: 1
+  });
+});
+
+test('profile completion is calculated from the minimized directory projection', () => {
+  assert.equal(calculateCompletion(null), 0);
+  assert.equal(calculateCompletion({
+    name: 'Test User',
+    dob: new Date(),
+    gender: 'other',
+    bloodGroup: 'O+',
+    height: 170,
+    weight: 70,
+    phone: '+910000000000',
+    address: 'Test',
+    emergencyContact: 'Contact',
+    emergencyPhone: '+910000000001',
+    dietPreference: 'Vegetarian'
+  }), 100);
+});
+
+test('profile completeness requires emergency-ready contact fields', () => {
+  assert.equal(isProfileComplete(null), false);
+  assert.equal(isProfileComplete({ name: 'Test User' }), false);
+  assert.equal(isProfileComplete({
+    name: 'Test User',
+    dob: new Date(),
+    gender: 'other',
+    phone: '+910000000000',
+    address: 'Test',
+    emergencyContact: 'Contact',
+    emergencyPhone: '+910000000001'
+  }), true);
 });

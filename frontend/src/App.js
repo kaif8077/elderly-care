@@ -14,6 +14,9 @@ import { AdminAuthProvider } from './admin/context/AdminAuthContext';
 import AdminProtectedRoute from './admin/components/AdminProtectedRoute';
 import AdminLogin from './admin/pages/AdminLogin';
 import AdminDashboardPlaceholder from './admin/pages/AdminDashboardPlaceholder';
+import AdminLayout from './admin/layout/AdminLayout';
+import AdminDashboard from './admin/pages/AdminDashboard';
+import AdminUsers from './admin/pages/AdminUsers';
 import './App.css';
 
 const AppRoutes = () => {
@@ -34,13 +37,13 @@ const AppRoutes = () => {
                 <Route path="/services" element={<Services />} />
                 <Route path="/admin/login" element={<AdminLogin />} />
                 <Route
-                    path="/admin/dashboard"
-                    element={(
-                        <AdminProtectedRoute>
-                            <AdminDashboardPlaceholder />
-                        </AdminProtectedRoute>
-                    )}
-                />
+                    path="/admin"
+                    element={<AdminProtectedRoute><AdminLayout /></AdminProtectedRoute>}
+                >
+                    <Route path="dashboard" element={<AdminDashboard />} />
+                    <Route path="users" element={<AdminUsers />} />
+                    <Route path="phase-1" element={<AdminDashboardPlaceholder />} />
+                </Route>
             </Routes>
         </>
     );
