@@ -1,26 +1,34 @@
 const mongoose = require('mongoose');
 
 const otpSchema = new mongoose.Schema({
-    phone: {
+    identifier: {
         type: String,
         required: true,
         index: true
     },
-    otp: {
-        type: String,  // Store as String to avoid number comparison issues
+    purpose: {
+        type: String,
+        enum: ['registration', 'login', 'password_reset', 'scanner'],
+        required: true,
+        index: true
+    },
+    otpHash: {
+        type: String,
         required: true
+    },
+    attempts: {
+        type: Number,
+        default: 0
     },
     expiresAt: {
         type: Date,
         required: true,
-        index: { expires: '15m' }  // Auto-delete after 15 minutes
-    },
-    createdAt: {
-        type: Date,
-        default: Date.now
+        index: { expires: '15m' }
     }
 }, {
-    timestamps: true  // Adds createdAt and updatedAt automatically
+    timestamps: true
 });
+
+otpSchema.index({ identifier: 1, purpose: 1 });
 
 module.exports = mongoose.model('Otp', otpSchema);

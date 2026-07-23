@@ -14,6 +14,7 @@ const Register = () => {
         confirmPassword: '',
         otp: ''
     });
+    const [registrationToken, setRegistrationToken] = useState('');
     const [errors, setErrors] = useState({});
     const [loading, setLoading] = useState(false);
     const [passwordStrength, setPasswordStrength] = useState(0);
@@ -75,24 +76,30 @@ const Register = () => {
         try {
             if (step === 1) {
                 // Send registration request to get OTP
-                const { confirmPassword, ...dataToSend } = formData;
-                await axios.post(`${process.env.REACT_APP_BACKEND_URI}/api/auth/register`, dataToSend);
+                await axios.post(`${process.env.REACT_APP_BACKEND_URI}/api/auth/register`, {
+                    name: formData.name,
+                    email: formData.email
+                });
 
                 toast.success("OTP sent to your email");
                 setStep(2);
             } else if (step === 2) {
                 // Verify OTP
-                await axios.post(`${process.env.REACT_APP_BACKEND_URI}/api/auth/verify-otp`, {
+                const verifyResponse = await axios.post(`${process.env.REACT_APP_BACKEND_URI}/api/auth/verify-otp`, {
                     email: formData.email,
                     otp: formData.otp
                 });
 
+                setRegistrationToken(verifyResponse.data.registrationToken);
                 toast.success("Email verified successfully");
                 setStep(3);
             } else if (step === 3) {
                 // Complete registration
-                const { confirmPassword, otp, ...dataToSend } = formData;
-                const response = await axios.post(`${process.env.REACT_APP_BACKEND_URI}/api/auth/complete-registration`, dataToSend);
+                const response = await axios.post(`${process.env.REACT_APP_BACKEND_URI}/api/auth/complete-registration`, {
+                    name: formData.name,
+                    password: formData.password,
+                    registrationToken
+                });
 
                 localStorage.setItem("token", response.data.token);
                 toast.success("Registration successful! Redirecting...", { autoClose: 2000 });

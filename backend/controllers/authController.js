@@ -1,220 +1,200 @@
 const User = require('../models/User');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
-const crypto = require('crypto');
-const sgMail = require('@sendgrid/mail');
-const Otp = require('../models/Otp'); // Reusing the same OTP model
-sgMail.setApiKey(process.env.SENDGRID_API_KEY);
+const { sendOtpEmail } = require('../services/emailService');
+const { createOtp, normalizeIdentifier, verifyOtp } = require('../services/otpService');
 
-// Generate random OTP
-const generateOTP = () => {
-  return crypto.randomInt(100000, 999999).toString();
+const signUserToken = (user) => jwt.sign(
+  { id: user._id },
+  process.env.JWT_SECRET,
+  { expiresIn: '7d' }
+);
+
+const publicUser = (user) => ({
+  _id: user._id,
+  email: user.email,
+  name: user.name
+});
+
+const sendPurposeOtp = async (email, purpose) => {
+  const otp = await createOtp({ identifier: email, purpose });
+  await sendOtpEmail({ to: email, otp, purpose });
 };
 
-// Store OTPs temporarily (in production, use Redis)
-const otpStore = new Map();
-
 exports.register = async (req, res) => {
-    const { name, email, password } = req.body;
+  const email = normalizeIdentifier(req.body.email);
 
-    try {
-        let user = await User.findOne({ email });
-        if (user) {
-            return res.status(400).json({ message: 'User already exists' });
-        }
-
-        const otp = generateOTP();
-        otpStore.set(email, { otp, verified: false });
-
-        const msg = {
-            to: email,
-            from: process.env.SENDGRID_FROM_EMAIL,
-            subject: 'Verify Your Email',
-            text: `Your verification OTP is: ${otp}`,
-            html: `<p>Your verification OTP is: <strong>${otp}</strong></p>`,
-        };
-
-        await sgMail.send(msg);
-
-        res.status(200).json({ 
-            message: 'OTP sent to email', 
-            email,
-            nextStep: 'verify' 
-        });
-    } catch (error) {
-        console.error(error);
-        res.status(500).json({ message: 'Server error' });
+  try {
+    if (!email) return res.status(400).json({ message: 'Email is required' });
+    if (await User.exists({ email })) {
+      return res.status(400).json({ message: 'User already exists' });
     }
+
+    await sendPurposeOtp(email, 'registration');
+    res.json({ message: 'OTP sent to email', email, nextStep: 'verify' });
+  } catch (error) {
+    console.error('Registration OTP error:', error.message);
+    res.status(500).json({ message: 'Unable to send verification email' });
+  }
 };
 
 exports.verifyOTP = async (req, res) => {
-    const { email, otp } = req.body;
+  try {
+    const result = await verifyOtp({
+      identifier: req.body.email,
+      purpose: 'registration',
+      otp: req.body.otp
+    });
+    if (!result.valid) return res.status(400).json({ message: result.message });
 
-    try {
-        const storedData = otpStore.get(email);
-        
-        if (!storedData || storedData.otp !== otp) {
-            return res.status(400).json({ message: 'Invalid OTP' });
-        }
+    const registrationToken = jwt.sign(
+      { email: normalizeIdentifier(req.body.email), purpose: 'registration' },
+      process.env.JWT_SECRET,
+      { expiresIn: '15m' }
+    );
 
-        otpStore.set(email, { ...storedData, verified: true });
-
-        res.status(200).json({ 
-            message: 'Email verified successfully',
-            email,
-            nextStep: 'complete-registration' 
-        });
-    } catch (error) {
-        console.error(error);
-        res.status(500).json({ message: 'Server error' });
-    }
+    res.json({
+      message: 'Email verified successfully',
+      registrationToken,
+      nextStep: 'complete-registration'
+    });
+  } catch (error) {
+    console.error('Registration verification error:', error.message);
+    res.status(500).json({ message: 'Server error' });
+  }
 };
 
 exports.completeRegistration = async (req, res) => {
-    const { name, email, password } = req.body;
+  const { name, password, registrationToken } = req.body;
 
-    try {
-        const storedData = otpStore.get(email);
-        
-        if (!storedData || !storedData.verified) {
-            return res.status(400).json({ message: 'Email not verified' });
-        }
+  try {
+    const decoded = jwt.verify(registrationToken, process.env.JWT_SECRET);
+    if (decoded.purpose !== 'registration') throw new Error('Invalid token purpose');
 
-        const hashedPassword = await bcrypt.hash(password, 10);
-
-        const user = new User({
-            name,
-            email,
-            password: hashedPassword,
-            isVerified: true
-        });
-
-        await user.save();
-
-        otpStore.delete(email);
-
-        const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET);
-
-        res.status(201).json({ 
-            token, 
-            user: { _id: user._id, email: user.email, name: user.name },
-            message: 'Registration completed successfully' 
-        });
-    } catch (error) {
-        console.error(error);
-        res.status(500).json({ message: 'Server error' });
+    const email = normalizeIdentifier(decoded.email);
+    if (await User.exists({ email })) {
+      return res.status(400).json({ message: 'User already exists' });
     }
+
+    if (!name || !password || password.length < 8) {
+      return res.status(400).json({ message: 'Name and a password of at least 8 characters are required' });
+    }
+
+    const user = await User.create({
+      name: String(name).trim(),
+      email,
+      password: await bcrypt.hash(password, 10),
+      isVerified: true
+    });
+
+    res.status(201).json({
+      token: signUserToken(user),
+      user: publicUser(user),
+      message: 'Registration completed successfully'
+    });
+  } catch (error) {
+    if (error.name === 'JsonWebTokenError' || error.name === 'TokenExpiredError') {
+      return res.status(400).json({ message: 'Registration verification expired. Request a new OTP.' });
+    }
+    console.error('Complete registration error:', error.message);
+    res.status(500).json({ message: 'Server error' });
+  }
 };
 
 exports.login = async (req, res) => {
-    const { email, password } = req.body;
-    try {
-        const user = await User.findOne({ email });
-        if (!user || !(await bcrypt.compare(password, user.password))) {
-            return res.status(401).json({ message: 'Invalid credentials' });
-        }
+  const email = normalizeIdentifier(req.body.email);
 
-        if (!user.isVerified) {
-            return res.status(401).json({ message: 'Email not verified. Please verify your email first.' });
-        }
-
-        const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET);
-        res.json({ token, user: { _id: user._id, email: user.email } });
-    } catch (err) {
-        console.error(err.message);
-        res.status(500).send('Server Error');
+  try {
+    const user = await User.findOne({ email });
+    if (!user || !(await bcrypt.compare(req.body.password || '', user.password))) {
+      return res.status(401).json({ message: 'Invalid credentials' });
     }
+    if (!user.isVerified) {
+      return res.status(401).json({ message: 'Email is not verified' });
+    }
+
+    await sendPurposeOtp(email, 'login');
+    res.json({ message: 'Login OTP sent to your email', email, requiresOtp: true });
+  } catch (error) {
+    console.error('Login error:', error.message);
+    res.status(500).json({ message: 'Unable to send login verification email' });
+  }
+};
+
+exports.verifyLoginOTP = async (req, res) => {
+  const email = normalizeIdentifier(req.body.email);
+
+  try {
+    const result = await verifyOtp({ identifier: email, purpose: 'login', otp: req.body.otp });
+    if (!result.valid) return res.status(400).json({ message: result.message });
+
+    const user = await User.findOne({ email });
+    if (!user) return res.status(401).json({ message: 'Invalid login request' });
+
+    res.json({ token: signUserToken(user), user: publicUser(user) });
+  } catch (error) {
+    console.error('Login verification error:', error.message);
+    res.status(500).json({ message: 'Server error' });
+  }
 };
 
 exports.forgotPassword = async (req, res) => {
-    const { email } = req.body;
+  const email = normalizeIdentifier(req.body.email);
 
-    try {
-        const user = await User.findOne({ email });
-        if (!user) {
-            return res.status(404).json({ message: 'User not found' });
-        }
+  try {
+    const user = await User.findOne({ email });
+    if (!user) return res.status(404).json({ message: 'User not found' });
 
-        // Store OTP in database instead of memory
-        const otp = generateOTP();
-        await Otp.create({
-            phone: email, // Reusing phone field for email
-            otp,
-            expiresAt: new Date(Date.now() + 15*60000)
-        });
-
-        const msg = {
-            to: email,
-            from: process.env.SENDGRID_FROM_EMAIL,
-            subject: 'Password Reset OTP',
-            text: `Your password reset OTP is: ${otp}`,
-            html: `<p>Your password reset OTP is: <strong>${otp}</strong></p>`,
-        };
-
-        await sgMail.send(msg);
-
-        res.status(200).json({ 
-            message: 'OTP sent to email', 
-            email,
-            nextStep: 'verify-reset-otp' 
-        });
-    } catch (error) {
-        console.error(error);
-        res.status(500).json({ message: 'Server error' });
-    }
+    await sendPurposeOtp(email, 'password_reset');
+    res.json({ message: 'OTP sent to email', email, nextStep: 'verify-reset-otp' });
+  } catch (error) {
+    console.error('Password reset OTP error:', error.message);
+    res.status(500).json({ message: 'Unable to send password reset email' });
+  }
 };
 
 exports.verifyResetOTP = async (req, res) => {
-    const { email, otp } = req.body;
+  const email = normalizeIdentifier(req.body.email);
 
-    try {
-        const otpRecord = await Otp.findOne({ 
-            phone: email,
-            otp,
-            expiresAt: { $gt: new Date() }
-        }).sort({ createdAt: -1 });
+  try {
+    const result = await verifyOtp({
+      identifier: email,
+      purpose: 'password_reset',
+      otp: req.body.otp
+    });
+    if (!result.valid) return res.status(400).json({ message: result.message });
 
-        if (!otpRecord) {
-            return res.status(400).json({ message: 'Invalid or expired OTP' });
-        }
-
-        // Mark as verified by creating a temporary token
-        const tempToken = jwt.sign({ email }, process.env.JWT_SECRET, { expiresIn: '15m' });
-        
-        // Delete the OTP
-        await Otp.deleteMany({ phone: email });
-
-        res.status(200).json({ 
-            message: 'OTP verified successfully',
-            email,
-            tempToken,
-            nextStep: 'reset-password' 
-        });
-    } catch (error) {
-        console.error(error);
-        res.status(500).json({ message: 'Server error' });
-    }
+    const tempToken = jwt.sign(
+      { email, purpose: 'password_reset' },
+      process.env.JWT_SECRET,
+      { expiresIn: '15m' }
+    );
+    res.json({ message: 'OTP verified successfully', tempToken, nextStep: 'reset-password' });
+  } catch (error) {
+    console.error('Reset verification error:', error.message);
+    res.status(500).json({ message: 'Server error' });
+  }
 };
 
 exports.resetPassword = async (req, res) => {
-    const { email, newPassword } = req.body; // Remove tempToken from params
-
-    try {
-        const user = await User.findOne({ email });
-        if (!user) {
-            return res.status(404).json({ message: 'User not found' });
-        }
-
-        const hashedPassword = await bcrypt.hash(newPassword, 10);
-        user.password = hashedPassword;
-        await user.save();
-
-        res.status(200).json({ 
-            message: 'Password reset successfully',
-            nextStep: 'login' 
-        });
-    } catch (error) {
-        console.error(error);
-        res.status(500).json({ message: 'Server error' });
+  try {
+    const decoded = jwt.verify(req.body.tempToken, process.env.JWT_SECRET);
+    if (decoded.purpose !== 'password_reset') throw new Error('Invalid token purpose');
+    if (!req.body.newPassword || req.body.newPassword.length < 8) {
+      return res.status(400).json({ message: 'Password must be at least 8 characters' });
     }
+
+    const user = await User.findOne({ email: normalizeIdentifier(decoded.email) });
+    if (!user) return res.status(404).json({ message: 'User not found' });
+
+    user.password = await bcrypt.hash(req.body.newPassword, 10);
+    await user.save();
+    res.json({ message: 'Password reset successfully', nextStep: 'login' });
+  } catch (error) {
+    if (error.name === 'JsonWebTokenError' || error.name === 'TokenExpiredError') {
+      return res.status(401).json({ message: 'Password reset verification is invalid or expired' });
+    }
+    console.error('Password reset error:', error.message);
+    res.status(500).json({ message: 'Server error' });
+  }
 };

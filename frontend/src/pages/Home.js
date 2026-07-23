@@ -10,6 +10,29 @@ const Home = () => {
     const [currentFeatureSlide, setCurrentFeatureSlide] = useState(0);
     const [slidesToShow, setSlidesToShow] = useState(4);
 
+    // Wake the Render backend as soon as a visitor opens the home page.
+    useEffect(() => {
+        const backendUrl = process.env.REACT_APP_BACKEND_URI
+            || 'https://elderly-care-zuq9.onrender.com';
+        const controller = new AbortController();
+        const timeoutId = window.setTimeout(() => controller.abort(), 30000);
+
+        fetch(`${backendUrl.replace(/\/$/, '')}/api`, {
+            method: 'GET',
+            cache: 'no-store',
+            signal: controller.signal
+        })
+            .catch(() => {
+                // The homepage stays usable while a sleeping backend wakes up.
+            })
+            .finally(() => window.clearTimeout(timeoutId));
+
+        return () => {
+            window.clearTimeout(timeoutId);
+            controller.abort();
+        };
+    }, []);
+
     // Banner data (only one banner now)
     const banners = [
         {

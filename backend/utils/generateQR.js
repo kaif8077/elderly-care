@@ -1,11 +1,8 @@
-require('dotenv').config();
+require('dotenv').config({ override: true });
 const QRCode = require('qrcode');
 const fs = require('fs');
 const path = require('path');
-const twilio = require('twilio');
 const { translations } = require('../utils/translationService');
-
-const twilioClient = twilio(process.env.TWILIO_ACCOUNT_SID, process.env.TWILIO_AUTH_TOKEN);
 
 exports.generateQR = async (data) => {
     try {
@@ -495,8 +492,8 @@ exports.formatMedicalProfile = async (profile) => {
                     <div class="error-message" id="nameError"></div>
                 </div>
                 <div>
-                    <input type="tel" id="scannerPhone" placeholder="Your Phone Number (10 digits)" data-translate="yourPhone" required>
-                    <div class="error-message" id="phoneError"></div>
+                    <input type="email" id="scannerEmail" placeholder="Your Email Address" required>
+                    <div class="error-message" id="emailError"></div>
                 </div>
                 <div id="otpSection" style="display: none;">
                     <input type="text" id="otp" placeholder="Enter 6-digit OTP" data-translate="enterOtp" required>
@@ -603,11 +600,10 @@ exports.formatMedicalProfile = async (profile) => {
         // Authentication
         document.getElementById('requestOtpBtn').addEventListener('click', async () => {
             const name = document.getElementById('scannerName').value.trim();
-            let phone = document.getElementById('scannerPhone').value.trim();
-            phone = phone.replace(/\\D/g, '');
+            const email = document.getElementById('scannerEmail').value.trim().toLowerCase();
             
             document.getElementById('nameError').textContent = '';
-            document.getElementById('phoneError').textContent = '';
+            document.getElementById('emailError').textContent = '';
             
             let isValid = true;
             const lang = localStorage.getItem('preferredLanguage') || 'en';
@@ -616,11 +612,11 @@ exports.formatMedicalProfile = async (profile) => {
                 document.getElementById('nameError').textContent = translations[lang]['nameRequired'] || 'Name required';
                 isValid = false;
             }
-            if (!phone) {
-                document.getElementById('phoneError').textContent = translations[lang]['phoneRequired'] || 'Phone required';
+            if (!email) {
+                document.getElementById('emailError').textContent = 'Email required';
                 isValid = false;
-            } else if (phone.length !== 10) {
-                document.getElementById('phoneError').textContent = translations[lang]['phoneDigits'] || 'Enter 10 digits';
+            } else if (!/^\\S+@\\S+\\.\\S+$/.test(email)) {
+                document.getElementById('emailError').textContent = 'Enter a valid email';
                 isValid = false;
             }
             
@@ -630,7 +626,7 @@ exports.formatMedicalProfile = async (profile) => {
                 const response = await fetch(serverIP + '/api/qr/send-otp', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ phone, name }),
+                    body: JSON.stringify({ email, name }),
                 });
                 
                 const data = await response.json();
@@ -643,20 +639,20 @@ exports.formatMedicalProfile = async (profile) => {
                 document.getElementById('verifyOtpBtn').style.display = 'block';
                 document.getElementById('verifyOtpBtn').disabled = false;
             } catch (error) {
-                document.getElementById('phoneError').textContent = error.message;
+                document.getElementById('emailError').textContent = error.message;
             }
         });
         
         document.getElementById('verifyOtpBtn').addEventListener('click', async () => {
             const enteredOtp = document.getElementById('otp').value.trim();
-            const phone = document.getElementById('scannerPhone').value.replace(/\\D/g, '');
+            const email = document.getElementById('scannerEmail').value.trim().toLowerCase();
             const name = document.getElementById('scannerName').value.trim();
             
             try {
                 const response = await fetch(serverIP + '/api/qr/verify-otp', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ phone, otp: enteredOtp }),
+                    body: JSON.stringify({ email, otp: enteredOtp }),
                 });
                 
                 const data = await response.json();
@@ -664,7 +660,7 @@ exports.formatMedicalProfile = async (profile) => {
                 
                 sessionStorage.setItem('scannerAuthenticated', 'true');
                 sessionStorage.setItem('scannerName', name);
-                sessionStorage.setItem('scannerPhone', phone);
+                sessionStorage.setItem('scannerEmail', email);
                 
                 document.getElementById('authContainer').style.display = 'none';
                 document.getElementById('profileContent').style.display = 'block';
@@ -696,7 +692,7 @@ exports.formatMedicalProfile = async (profile) => {
                 const emergencyContactNum = "${escapeHtml(safeProfile.emergencyPhone)}";
                 const profileName = "${escapeHtml(safeProfile.name)}";
                 const scannerName = sessionStorage.getItem('scannerName') || 'Unknown Scanner';
-                const scannerPhone = sessionStorage.getItem('scannerPhone') || 'Unknown Phone';
+                const scannerEmail = sessionStorage.getItem('scannerEmail') || 'Unknown Email';
                 
 
                 if (!emergencyContactNum || emergencyContactNum === 'N/A') {
@@ -704,15 +700,12 @@ exports.formatMedicalProfile = async (profile) => {
                      return;
                 }
                 
-                let apiNumber = emergencyContactNum.replace(/\s/g, '');
-
-                const message = "ALERT: " + profileName + " " + scannerName + ": " + scannerPhone + " " + (latitude && longitude ? "maps.google.com/?q=" + latitude + "," + longitude : "");
+                const message = "ALERT: " + profileName + " - reported by " + scannerName + " (" + scannerEmail + ")";
                 
-                const smsResponse = await fetch(serverIP + '/api/send-sms', {
+                const alertResponse = await fetch(serverIP + '/api/send-sms', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
-                        to: apiNumber,  
                         body: message,
                         latitude: latitude || null,
                         longitude: longitude || null,
@@ -720,10 +713,10 @@ exports.formatMedicalProfile = async (profile) => {
                     }),
                 });
                 
-                const responseData = await smsResponse.json();
-                if (!smsResponse.ok) throw new Error(responseData.message || 'Failed to send SMS');
+                const responseData = await alertResponse.json();
+                if (!alertResponse.ok) throw new Error(responseData.message || 'Failed to send emergency email');
                 
-                alert("Emergency alert sent successfully " + apiNumber + "!");
+                alert("Emergency alert sent successfully by email.");
             } catch (error) {
                 alert("Failed to send: " + error.message);
             }

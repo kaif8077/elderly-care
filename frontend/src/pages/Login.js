@@ -12,6 +12,8 @@ const Login = () => {
         password: ''
     });
     const [loading, setLoading] = useState(false);
+    const [loginStep, setLoginStep] = useState(1);
+    const [loginOtp, setLoginOtp] = useState('');
     const [showPassword, setShowPassword] = useState(false);
     const [isForgotPassword, setIsForgotPassword] = useState(false);
     const [resetStep, setResetStep] = useState(1);
@@ -81,7 +83,12 @@ const Login = () => {
         setLoading(true);
 
         try {
-            const response = await axios.post(`${process.env.REACT_APP_BACKEND_URI}/api/auth/login`, formData);
+            const response = loginStep === 1
+                ? await axios.post(`${process.env.REACT_APP_BACKEND_URI}/api/auth/login`, formData)
+                : await axios.post(`${process.env.REACT_APP_BACKEND_URI}/api/auth/verify-login-otp`, {
+                    email: formData.email,
+                    otp: loginOtp
+                });
 
             if (response.data?.token && response.data?.user) {
                 localStorage.setItem("token", response.data.token);
@@ -92,6 +99,9 @@ const Login = () => {
                 });
 
                 setTimeout(() => navigate('/dashboard'), 1500);
+            } else if (response.data?.requiresOtp) {
+                setLoginStep(2);
+                toast.success("OTP sent to your email");
             }
         } catch (error) {
             toast.error(error.response?.data?.message || "Login failed");
@@ -175,7 +185,7 @@ const Login = () => {
                         </div>
 
                         <form onSubmit={handleLogin}>
-                            <div className="form-group">
+                            {loginStep === 1 && <div className="form-group">
                                 <label htmlFor="login-email">Email Address</label>
                                 <input
                                     type="email"
@@ -185,9 +195,9 @@ const Login = () => {
                                     onChange={handleChange}
                                     required
                                 />
-                            </div>
+                            </div>}
 
-                            <div className="form-group">
+                            {loginStep === 1 ? <div className="form-group">
                                 <label htmlFor="login-password">Password</label>
                                 <div className="password-input-container">
                                     <input
@@ -214,14 +224,34 @@ const Login = () => {
                                 >
                                     Forgot Password?
                                 </button>
-                            </div>
+                            </div> : (
+                                <div className="form-group">
+                                    <label htmlFor="login-otp">Enter 6-digit OTP</label>
+                                    <input
+                                        type="text"
+                                        inputMode="numeric"
+                                        id="login-otp"
+                                        value={loginOtp}
+                                        onChange={(event) => setLoginOtp(event.target.value.replace(/\D/g, ''))}
+                                        maxLength="6"
+                                        required
+                                    />
+                                    <button
+                                        type="button"
+                                        className="forgot-password-btn"
+                                        onClick={() => setLoginStep(1)}
+                                    >
+                                        Use different credentials
+                                    </button>
+                                </div>
+                            )}
 
                             <button type="submit" disabled={loading} className="submit-btn">
                                 {loading ? (
                                     <>
                                         <span className="spinner" aria-hidden="true"></span> Logging In...
                                     </>
-                                ) : 'Login'}
+                                ) : loginStep === 1 ? 'Send Login OTP' : 'Verify and Login'}
                             </button>
 
                             <div className="auth-footer">

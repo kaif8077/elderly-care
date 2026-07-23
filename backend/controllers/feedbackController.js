@@ -1,67 +1,51 @@
 const Feedback = require('../models/Feedback');
-const sgMail = require('@sendgrid/mail');
-sgMail.setApiKey(process.env.SENDGRID_API_KEY);
+const { escapeHtml, sendEmail } = require('../services/emailService');
 
 exports.submitFeedback = async (req, res) => {
   try {
-    const { name, email, rating, comments } = req.body;
-    
-    // Create new feedback
-    const newFeedback = await Feedback.create({
-      name,
-      email,
-      rating: parseInt(rating),
-      comments
-    });
+    const { name, email, comments } = req.body;
+    const rating = Number(req.body.rating);
+    await Feedback.create({ name, email, rating, comments });
 
-    // Send confirmation email
-    const ratingStars = '⭐'.repeat(rating) + '☆'.repeat(5 - rating);
-    const emailContent = {
-      to: email,
-      from: {
-        email: process.env.SENDGRID_FROM_EMAIL,
-        name: 'No Reply - ElderlyCare Team'
-      },
-      subject: 'Thank you for your feedback',
-      html: `
-        <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
-          <h2 style="color: #2c3e50;">Hello ${name},</h2>
-          <p>Thank you for taking the time to share your feedback with us.</p>
-          
-          <div style="background-color: #f8f9fa; padding: 15px; border-left: 4px solid #3498db; margin: 20px 0;">
-            <p><strong>Your Rating:</strong> ${ratingStars}</p>
-            <p><strong>Your Comments:</strong></p>
-            <p>${comments}</p>
-          </div>
-          
-          <p>We value your input and will use it to improve our services.</p>
-          <p style="margin-top: 30px;">Best regards,</p>
-          <p><strong>The ElderlyCare Team</strong></p>
-        </div>
-      `
-    };
+    await Promise.all([
+      sendEmail({
+        to: email,
+        subject: 'Thank you for your ElderlyCare feedback',
+        replyTo: process.env.ADMIN_EMAIL,
+        text: `Hello ${name},\n\nThank you for your ${rating}/5 rating and feedback.\n\nElderlyCare Team`,
+        html: `
+          <div style="font-family:Arial,sans-serif;max-width:600px;margin:auto">
+            <h2>Hello ${escapeHtml(name)},</h2>
+            <p>Thank you for your ${escapeHtml(rating)}/5 rating and feedback.</p>
+            <blockquote style="background:#f8f9fa;padding:15px;border-left:4px solid #3498db">
+              ${escapeHtml(comments)}
+            </blockquote>
+            <p>ElderlyCare Team</p>
+          </div>`
+      }),
+      process.env.ADMIN_EMAIL ? sendEmail({
+        to: process.env.ADMIN_EMAIL,
+        subject: `New ElderlyCare feedback: ${rating}/5`,
+        replyTo: email,
+        text: `Name: ${name}\nEmail: ${email}\nRating: ${rating}/5\n\n${comments}`,
+        html: `
+          <h2>New feedback submission</h2>
+          <p><strong>Name:</strong> ${escapeHtml(name)}</p>
+          <p><strong>Email:</strong> ${escapeHtml(email)}</p>
+          <p><strong>Rating:</strong> ${escapeHtml(rating)}/5</p>
+          <p>${escapeHtml(comments)}</p>`
+      }) : Promise.resolve()
+    ]);
 
-    await sgMail.send(emailContent);
-
-    res.status(201).json({ 
-      success: true,
-      message: 'Thank you for your feedback! A confirmation email has been sent.'
-    });
-
+    res.status(201).json({ success: true, message: 'Thank you for your feedback!' });
   } catch (error) {
-    console.error('Feedback submission error:', error);
-    
+    console.error('Feedback submission error:', error.message);
     if (error.name === 'ValidationError') {
-      const messages = Object.values(error.errors).map(val => val.message);
       return res.status(400).json({
         success: false,
-        message: messages.join(', ')
+        message: Object.values(error.errors).map((value) => value.message).join(', ')
       });
     }
-
-    res.status(500).json({
-      success: false,
-      message: 'Server error'
-    });
+    res.status(500).json({ success: false, message: 'Unable to submit feedback' });
   }
 };

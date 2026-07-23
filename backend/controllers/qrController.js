@@ -1,13 +1,9 @@
-require('dotenv').config();
+require('dotenv').config({ override: true });
 const QRCode = require('../models/QRCode');
 const { generateQR, formatMedicalProfile } = require('../utils/generateQR');
 const MedicalProfile = require('../models/MedicalProfile');
-const twilio = require('twilio');
-const Otp = require('../models/Otp');
-
-const accountSid = process.env.TWILIO_ACCOUNT_SID;
-const authToken = process.env.TWILIO_AUTH_TOKEN;
-const twilioClient = twilio(accountSid, authToken);
+const { sendOtpEmail } = require('../services/emailService');
+const { createOtp, normalizeIdentifier, verifyOtp } = require('../services/otpService');
 
 // PROFILE PAGE SERVING - MAIN FUNCTION
 exports.serveProfilePage = async (req, res) => {
@@ -221,35 +217,15 @@ exports.testSpecificUser = async (req, res) => {
 // OTP FUNCTIONS
 exports.sendScannerOtp = async (req, res) => {
     try {
-        console.log('Received OTP request for:', req.body.phone);
-        
-        const phoneNumber = req.body.phone.replace(/\D/g, '');
-        const formattedPhone = `+91${phoneNumber}`;
-
-        const otp = Math.floor(100000 + Math.random() * 900000).toString();
-        const expiresAt = new Date(Date.now() + 15*60000);
-
-        console.log('Generated OTP:', {otp, expiresAt, forPhone: formattedPhone});
-
-        const otpRecord = await Otp.create({
-            phone: formattedPhone,
-            otp,
-            expiresAt
-        });
-
-        console.log('OTP saved to DB with ID:', otpRecord._id);
-
-        await twilioClient.messages.create({
-            body: `Your OTP is: ${otp}`,
-            from: process.env.TWILIO_PHONE_NUMBER,
-            to: formattedPhone
-        });
-
-        console.log(`OTP for ${formattedPhone}: ${otp}`);
+        const email = normalizeIdentifier(req.body.email);
+        if (!email || !/^\S+@\S+\.\S+$/.test(email)) {
+            return res.status(400).json({ success: false, message: 'A valid email is required' });
+        }
+        const otp = await createOtp({ identifier: email, purpose: 'scanner' });
+        await sendOtpEmail({ to: email, otp, purpose: 'scanner' });
         res.json({ 
             success: true, 
-            message: 'OTP sent successfully',
-            debugOtp: otp
+            message: 'OTP sent successfully'
         });
 
     } catch (error) {
@@ -264,43 +240,14 @@ exports.sendScannerOtp = async (req, res) => {
 
 exports.verifyScannerOtp = async (req, res) => {
     try {
-        console.log('Verification attempt:', req.body);
-        
-        const phone = req.body.phone.replace(/\D/g, '');
-        const formattedPhone = `+91${phone}`;
-        const otp = req.body.otp;
-
-        const otpRecord = await Otp.findOne({
-            phone: formattedPhone
-        }).sort({ createdAt: -1 });
-
-        console.log('Found OTP record:', otpRecord);
-
-        if (!otpRecord) {
-            return res.status(400).json({ 
-                success: false, 
-                message: 'No OTP found for this number' 
-            });
+        const result = await verifyOtp({
+            identifier: req.body.email,
+            purpose: 'scanner',
+            otp: req.body.otp
+        });
+        if (!result.valid) {
+            return res.status(400).json({ success: false, message: result.message });
         }
-
-        if (otpRecord.otp !== otp) {
-            return res.status(400).json({ 
-                success: false, 
-                message: 'Invalid OTP' 
-            });
-        }
-
-        if (otpRecord.expiresAt < new Date()) {
-            await Otp.deleteOne({ _id: otpRecord._id });
-            return res.status(400).json({ 
-                success: false, 
-                message: 'OTP has expired' 
-            });
-        }
-
-        await Otp.deleteOne({ _id: otpRecord._id });
-        
-        console.log('Successful verification for:', formattedPhone);
         res.json({ 
             success: true, 
             message: 'OTP verified successfully'

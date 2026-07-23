@@ -1,4 +1,4 @@
-require('dotenv').config();
+require('dotenv').config({ override: true });
 const RecommendationCache = require('../models/RecommendationCache');
 
 // Free AI APIs - Multiple options
