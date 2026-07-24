@@ -1,128 +1,87 @@
-#  ElderlyCare – AI-Powered Senior Health Management Platform
+# ElderlyCare
 
-ElderlyCare is a full-stack MERN web application designed to assist senior citizens, caregivers, and medical responders by providing AI-powered health suggestions, real-time emergency support, and smart medical profile management.
+ElderlyCare is a MERN application for private medical profiles, revocable emergency QR cards, emergency-summary reports, Resend OTP/email notifications, geolocation sharing, and role-protected administration.
 
-This platform enhances the quality of life for elderly individuals by ensuring timely medical intervention, instant access to critical information, and proactive personalized care.
+## Requirements
 
----
+- Node.js 20 or newer
+- MongoDB 6 or MongoDB Atlas
+- A Resend account and verified sender for production email
 
-##  Features Overview
+## Backend setup
 
-###  **Smart Medical Profiles**
-- Secure storage of medical history, allergies, medications, and emergency contacts.
-- Auto-generated patient profiles for quick access.
-- Easy updates with authenticated access.
-
-###  **QR Code Emergency System**
-- Unique QR code for each patient.
-- Scanning the QR code reveals vital health details.
-- Auto-send location alerts to caregivers during emergencies.
-
-###  **AI-Powered Health Intelligence**
-- Personalized diet & lifestyle recommendations.
-- First-aid instructions based on medical conditions.
-- Proactive health suggestions (AI-assisted).
-
-###  **Real-Time Emergency Support**
-- Live GPS location tracking.
-- SMS and Email alerts using Twilio & SendGrid.
-- Quick response coordination for caregivers and medical staff.
-
----
-
-##  Technology Stack
-
-### **Frontend**
-- React.js
-- QR Scanner Library
-
-### **Backend**
-- Node.js
-- Express.js
-- MongoDB (Atlas)
-- Mongoose
-- JWT Authentication
-
-### **Third-Party Integrations**
-- Twilio (SMS)
-- SendGrid (Email)
-- HuggingFace API (AI Suggestions)
-
-### **Developer Tools**
-- Git & GitHub
-- VS Code
-- Postman
-- MongoDB Atlas
-
----
-
-##  Installation & Setup
-
-### **Prerequisites**
-Make sure you have:
-
-- Node.js (v16+)
-- MongoDB Atlas account
-- Twilio account
-- SendGrid account
-
----
-
-##  Backend Setup
-
-Navigate to the backend folder:
-```
+```powershell
 cd backend
 npm install
-```
-Create a .env file inside /backend:
-```bash
-# Database
-MONGO_URI="your_mongodb_connection_string"
-
-# JWT Authentication
-JWT_SECRET="your_secure_jwt_secret"
-
-# Twilio SMS
-TWILIO_ACCOUNT_SID="your_twilio_sid"
-TWILIO_AUTH_TOKEN="your_twilio_token"
-TWILIO_PHONE_NUMBER="+1234567890"
-
-# SendGrid Email
-SENDGRID_API_KEY="your_sendgrid_api_key"
-SENDGRID_FROM_EMAIL="noreply@elderlycare.com"
-
-# HuggingFace AI API
-HF_API_KEY="your_api_key"
-
-RENDER_BACKEND_URL="https://example.onrender.com"
-
-```
-
-
-Start backend:
-```
+Copy-Item .env.example .env
+npm run seed:admin
 npm start
 ```
-##  Frontend Setup
 
-Navigate to the frontend:
+Required backend environment variables:
+
+```env
+MONGO_URI=mongodb_connection_string
+JWT_SECRET=long_random_user_secret
+ADMIN_JWT_SECRET=different_long_random_admin_secret
+FRONTEND_URL=http://localhost:3000
+RENDER_BACKEND_URL=http://localhost:5000
+RESEND_API_KEY=resend_api_key
+RESEND_FROM_EMAIL=onboarding@resend.dev
+SYSTEM_NOTIFICATION_EMAIL=notification_recipient@example.com
+ADMIN_EMAIL=elderlycare@gmail.com
+ADMIN_PASSWORD=replace_before_production
 ```
+
+`ADMIN_PASSWORD` is used only by `npm run seed:admin`. Change the development password before production. Never commit `.env`.
+
+## Frontend setup
+
+Create `frontend/.env`:
+
+```env
+REACT_APP_BACKEND_URI=http://localhost:5000
+```
+
+Then run:
+
+```powershell
 cd frontend
 npm install
-```
-Create a .env file inside /frontend:
-```
-BACKEND_URI = "http://localhost:5000"
-
-```
-Start frontend:
-```
 npm start
 ```
 
- Access the App
+## Verification
 
-Frontend running on port 3000
+From the repository root:
 
-Backend running on port 5000
+```powershell
+npm test
+npm run build
+npm run audit:production
+```
+
+The backend test command runs every file under `backend/tests`. The frontend production build includes lint checks.
+
+## Deployment
+
+For Render, use `npm install` as the backend build command and `npm start` as the start command. Configure the exact deployed frontend origin in `FRONTEND_URL` without a path. Multiple trusted origins may be comma-separated.
+
+Health check endpoint:
+
+```text
+GET /api/health
+```
+
+It returns HTTP 200 only when MongoDB is connected; otherwise it returns HTTP 503 with a limited degraded status.
+
+For a separate static frontend deployment, set `REACT_APP_BACKEND_URI` during its build. Cross-origin admin sessions require HTTPS; the backend automatically uses secure, cross-site, partitioned admin cookies when frontend and backend origins differ.
+
+## Privacy and security notes
+
+- QR codes contain random revocable bearer tokens, not MongoDB IDs or medical records.
+- Public QR responses use an explicit emergency-field allowlist.
+- Profile photographs are stored in MongoDB GridFS and require authenticated access.
+- Historical reports store immutable snapshots and authenticated PDFs.
+- Disabled, archived, or deleted accounts cannot use protected APIs.
+- The project does not claim legal or healthcare-regulatory compliance without an independent professional audit.

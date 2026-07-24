@@ -11,3 +11,5 @@ code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
     monospace;
 }
+
+html{font-size:16px;scroll-behavior:smooth}body{line-height:1.5;color:#172b28}button,a,input,select,textarea{font:inherit}button,a{touch-action:manipulation}:focus-visible{outline:3px solid #f0a500;outline-offset:3px}button:disabled{cursor:not-allowed}@media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}*,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important;scroll-behavior:auto!important}}

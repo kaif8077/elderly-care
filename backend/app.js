@@ -1,5 +1,6 @@
 require('dotenv').config({ override: true });
 const express = require('express');
+const mongoose = require('mongoose');
 const connectDB = require('./config/db');
 const authRoutes = require('./routes/authRoutes');
 const medicalRoutes = require('./routes/medicalRoutes');
@@ -17,6 +18,7 @@ const adminAuditRoutes = require('./routes/adminAuditRoutes');
 const adminReportRoutes = require('./routes/adminReportRoutes');
 const cors = require('cors');
 const securityHeaders = require('./middleware/securityHeaders');
+const { configuredOrigins } = require('./middleware/requireTrustedOrigin');
 const app = express();
 
 // Connect to the database
@@ -24,15 +26,30 @@ connectDB();
 
 // Middleware
 app.use(cors({
-    origin: process.env.FRONTEND_URL || 'http://localhost:3000',
+    origin: (origin, done) => {
+        if (!origin) return done(null, true);
+        const normalized = String(origin).replace(/\/$/, '');
+        return configuredOrigins().includes(normalized)
+            ? done(null, true)
+            : done(new Error('Origin is not allowed by CORS'));
+    },
     methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE'],
     allowedHeaders: ['Content-Type', 'Authorization'],
-    credentials: true
+    credentials: true,
+    maxAge: 600
 }));
 app.disable('x-powered-by');
 app.use(securityHeaders);
 app.use(express.json());
 
+app.get('/api/health', (req, res) => {
+    const databaseReady = mongoose.connection.readyState === 1;
+    return res.status(databaseReady ? 200 : 503).json({
+        status: databaseReady ? 'healthy' : 'degraded',
+        database: databaseReady ? 'connected' : 'unavailable',
+        timestamp: new Date().toISOString()
+    });
+});
 // API Routes
 app.use('/api/auth', authRoutes);
 app.use('/api/admin/auth', adminAuthRoutes);
