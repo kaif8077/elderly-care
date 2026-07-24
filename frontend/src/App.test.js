@@ -80,3 +80,17 @@ test('home page uses responsive Ant Design sections without legacy CSS', () => {
   expect(source).not.toContain("Home.css");
   expect(fs.existsSync(path.join(__dirname, 'pages', 'Home.css'))).toBe(false);
 });
+
+test('public information pages use Ant Design without legacy page CSS', () => {
+  const pages = ['About', 'Services', 'Contact'];
+  pages.forEach((page) => {
+    const source = fs.readFileSync(path.join(__dirname, 'pages', `${page}.js`), 'utf8');
+    expect(source).toContain("from 'antd'");
+    expect(source).not.toContain(`${page}.css`);
+    expect(fs.existsSync(path.join(__dirname, 'pages', `${page}.css`))).toBe(false);
+  });
+  const contact = fs.readFileSync(path.join(__dirname, 'pages', 'Contact.js'), 'utf8');
+  expect(contact).toContain('submitContactForm');
+  expect(contact).toContain('submitFeedbackForm');
+  expect(contact).toContain('<Rate />');
+});

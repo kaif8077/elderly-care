@@ -1,351 +1,141 @@
-import React, { useState } from 'react';
-// import { Link } from 'react-router-dom';
+import { useState } from 'react';
+import {
+  Alert, Button, Card, Col, Flex, Form, Input, Layout, Rate, Row, Space,
+  Typography, message
+} from 'antd';
+import {
+  EnvironmentOutlined, MailOutlined, MessageOutlined, PhoneOutlined,
+  SendOutlined, StarOutlined
+} from '@ant-design/icons';
 import { submitContactForm } from '../services/contactService';
 import { submitFeedbackForm } from '../services/feedbackService';
-import '../pages/Contact.css';
-import aboutHero from '../assests/about-hero.jpg';
+
+const { Content, Footer } = Layout;
+const { Title, Paragraph, Text, Link } = Typography;
 
 const Contact = () => {
-  // Contact form state
-  const [contact, setContact] = useState({
-    name: '',
-    email: '',
-    message: ''
-  });
-
-  // Feedback form state
-  const [feedback, setFeedback] = useState({
-    name: '',
-    email: '',
-    rating: '',
-    comments: ''
-  });
-
-  // Loading states
-  const [isSubmittingContact, setIsSubmittingContact] = useState(false);
-  const [isSubmittingFeedback, setIsSubmittingFeedback] = useState(false);
-
-  // Error states
+  const [contactForm] = Form.useForm();
+  const [feedbackForm] = Form.useForm();
+  const [contactLoading, setContactLoading] = useState(false);
+  const [feedbackLoading, setFeedbackLoading] = useState(false);
   const [contactError, setContactError] = useState('');
   const [feedbackError, setFeedbackError] = useState('');
 
-  // Handle contact form changes
-  const handleContactChange = (e) => {
-    const { name, value } = e.target;
-    setContact(prev => ({
-      ...prev,
-      [name]: value
-    }));
+  const submitContact = async (values) => {
+    setContactLoading(true);
     setContactError('');
-  };
-
-  // Handle feedback form changes
-  const handleFeedbackChange = (e) => {
-    const { name, value } = e.target;
-    setFeedback(prev => ({
-      ...prev,
-      [name]: value
-    }));
-    setFeedbackError('');
-  };
-
-  // Validate form function
-  const validateForm = (formData, formType) => {
-    const errors = {};
-
-    if (!formData.name.trim()) errors.name = 'Name is required';
-
-    if (!formData.email.match(/^\S+@\S+\.\S+$/)) {
-      errors.email = 'Valid email required';
-    }
-
-    if (formType === 'contact') {
-      if (!formData.message.trim()) {
-        errors.message = 'Message is required';
-      } else if (formData.message.trim().length < 10) {
-        errors.message = 'Message must be at least 10 characters';
-      }
-    }
-
-    if (formType === 'feedback') {
-      if (!formData.rating) {
-        errors.rating = 'Please select a rating';
-      }
-      if (!formData.comments.trim()) {
-        errors.comments = 'Comments are required';
-      } else if (formData.comments.trim().length < 10) {
-        errors.comments = 'Comments must be at least 10 characters';
-      }
-    }
-
-    return errors;
-  };
-
-  // Handle contact form submission
-  // In your Contact component
-  const handleContactSubmit = async (e) => {
-    e.preventDefault();
-
-    const errors = validateForm(contact, 'contact');
-    if (Object.keys(errors).length > 0) {
-      setContactError(Object.values(errors).join(', '));
-      return;
-    }
-
-    setIsSubmittingContact(true);
-    setContactError('');
-
     try {
-      await submitContactForm(contact);
-
-      // Enhanced success message
-      alert(`
-      Thank you, ${contact.name}!
-      Your message has been sent successfully.
-      We've sent a confirmation to ${contact.email}.
-    `);
-
-      setContact({ name: '', email: '', message: '' });
+      const response = await submitContactForm(values);
+      message.success(response.message || 'Your message has been received.');
+      contactForm.resetFields();
     } catch (error) {
-      setContactError(error.message || 'Failed to send message. Please try again later.');
+      setContactError(error.message || 'Unable to send your message.');
     } finally {
-      setIsSubmittingContact(false);
+      setContactLoading(false);
     }
   };
 
-  // Handle feedback form submission
-  const handleFeedbackSubmit = async (e) => {
-    e.preventDefault();
-
-    const errors = validateForm(feedback, 'feedback');
-    if (Object.keys(errors).length > 0) {
-      setFeedbackError(Object.values(errors).join(', '));
-      return;
-    }
-
-    setIsSubmittingFeedback(true);
+  const submitFeedback = async (values) => {
+    setFeedbackLoading(true);
     setFeedbackError('');
-
     try {
-      const response = await submitFeedbackForm(feedback);
-      alert(response.message);
-      setFeedback({ name: '', email: '', rating: '', comments: '' });
+      const response = await submitFeedbackForm(values);
+      message.success(response.message || 'Thank you for your feedback.');
+      feedbackForm.resetFields();
     } catch (error) {
-      setFeedbackError(error.message || 'Failed to submit feedback');
+      setFeedbackError(error.message || 'Unable to submit your feedback.');
     } finally {
-      setIsSubmittingFeedback(false);
+      setFeedbackLoading(false);
     }
   };
+
+  const contactMethods = [
+    {
+      icon: <PhoneOutlined />,
+      title: 'Phone',
+      description: 'Call during normal business hours',
+      content: <Link href="tel:+918528576249">+91 8528576249</Link>
+    },
+    {
+      icon: <MailOutlined />,
+      title: 'Email',
+      description: 'Send product and support questions',
+      content: <Link href="mailto:mohdkaif90275@gmail.com">mohdkaif90275@gmail.com</Link>
+    },
+    {
+      icon: <EnvironmentOutlined />,
+      title: 'Project location',
+      description: 'MIT College, Moradabad',
+      content: <Link href="https://maps.app.goo.gl/mVbpZJ9dhpVq8Xtf9" target="_blank" rel="noreferrer">Open map</Link>
+    }
+  ];
 
   return (
-    <div className="contact-page">
-      {/* Hero Banner */}
-      <div
-        className="contact-hero"
-        style={{ backgroundImage: `url(${aboutHero})`, backgroundSize: 'cover', backgroundPosition: 'center' }}
-      >
-        <div className="hero-overlay">
-          <h1>Contact Us</h1>
-          <p>We're here to help you with all your senior care needs</p>
-        </div>
-      </div>
+    <Layout>
+      <Content>
+        <Flex vertical align="center" gap={12} style={{ padding: 'clamp(40px, 8vw, 88px) 16px', background: '#0066ff', color: '#fff' }}>
+          <MessageOutlined style={{ fontSize: 42 }} />
+          <Title style={{ margin: 0, color: '#fff', textAlign: 'center' }}>Contact ElderlyCare</Title>
+          <Paragraph style={{ margin: 0, color: '#fff', textAlign: 'center', maxWidth: 720, fontSize: 18 }}>
+            Ask a product question, report a problem, or share feedback about your ElderlyCare experience.
+          </Paragraph>
+        </Flex>
 
-      {/* Contact Information Section */}
-      <section className="section-contact-info">
-        <div className="container">
-          <div className="contact-grid">
-            <div className="contact-method">
-              <div className="contact-emoji">📞</div>
-              <h3>Phone Support</h3>
-              <p>Available during business hours</p>
-              <p className="contact-detail">
-                <a href="tel:+918528576249">+91 8528576249</a>
-              </p>
-            </div>
+        <Flex vertical gap={28} style={{ width: 'min(1200px, calc(100% - 32px))', margin: '48px auto' }}>
+          <Row gutter={[20, 20]}>
+            {contactMethods.map((method) => (
+              <Col xs={24} md={8} key={method.title}>
+                <Card hoverable style={{ height: '100%' }}>
+                  <Space direction="vertical" size={12}>
+                    <Button type="primary" shape="circle" size="large" icon={method.icon} />
+                    <Title level={4} style={{ margin: 0 }}>{method.title}</Title>
+                    <Text type="secondary">{method.description}</Text>
+                    {method.content}
+                  </Space>
+                </Card>
+              </Col>
+            ))}
+          </Row>
 
-            <div className="contact-method">
-              <div className="contact-emoji">✉️</div>
-              <h3>Email Us</h3>
-              <p>Typically respond within 24 hours</p>
-              <p className="contact-detail">
-                <a href="mailto:mohdkaif90275@gmail.com">mohdkaif90275@gmail.com</a>
-              </p>
-            </div>
+          <Row gutter={[24, 24]}>
+            <Col xs={24} lg={12}>
+              <Card title={<Space><SendOutlined />Send us a message</Space>} style={{ height: '100%' }}>
+                <Paragraph type="secondary">Use this form for support questions or to report an application problem.</Paragraph>
+                {contactError && <Alert type="error" showIcon message={contactError} closable onClose={() => setContactError('')} style={{ marginBottom: 18 }} />}
+                <Form form={contactForm} layout="vertical" requiredMark onFinish={submitContact}>
+                  <Form.Item name="name" label="Full name" rules={[{ required: true, message: 'Enter your full name' }]}><Input placeholder="Enter your full name" /></Form.Item>
+                  <Form.Item name="email" label="Email address" rules={[{ required: true, message: 'Enter your email address' }, { type: 'email', message: 'Enter a valid email address' }]}><Input placeholder="Enter your email address" /></Form.Item>
+                  <Form.Item name="message" label="Message" rules={[{ required: true, message: 'Enter your message' }, { min: 10, message: 'Use at least 10 characters' }]}><Input.TextArea rows={5} showCount maxLength={2000} placeholder="Describe your question or problem" /></Form.Item>
+                  <Button type="primary" htmlType="submit" block icon={<SendOutlined />} loading={contactLoading}>Send message</Button>
+                </Form>
+              </Card>
+            </Col>
 
-            <div className="contact-method">
-              <div className="contact-emoji">🏢</div>
-              <h3>Visit Us</h3>
-              <p>Our headquarters in Moradabad</p>
-              <p className="contact-detail">
-                <a
-                  href="https://maps.app.goo.gl/mVbpZJ9dhpVq8Xtf9"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                >
-                  MIT College, Moradabad
-                </a>
-              </p>
-            </div>
-          </div>
-        </div>
-      </section>
+            <Col xs={24} lg={12}>
+              <Card title={<Space><StarOutlined />Share feedback</Space>} style={{ height: '100%' }}>
+                <Paragraph type="secondary">Tell us what is useful and what should be improved.</Paragraph>
+                {feedbackError && <Alert type="error" showIcon message={feedbackError} closable onClose={() => setFeedbackError('')} style={{ marginBottom: 18 }} />}
+                <Form form={feedbackForm} layout="vertical" requiredMark onFinish={submitFeedback}>
+                  <Form.Item name="name" label="Full name" rules={[{ required: true, message: 'Enter your full name' }]}><Input placeholder="Enter your full name" /></Form.Item>
+                  <Form.Item name="email" label="Email address" rules={[{ required: true, message: 'Enter your email address' }, { type: 'email', message: 'Enter a valid email address' }]}><Input placeholder="Enter your email address" /></Form.Item>
+                  <Form.Item name="rating" label="Rating" rules={[{ required: true, message: 'Select a rating' }]}><Rate /></Form.Item>
+                  <Form.Item name="comments" label="Comments" rules={[{ required: true, message: 'Enter your comments' }, { min: 10, message: 'Use at least 10 characters' }]}><Input.TextArea rows={5} showCount maxLength={2000} placeholder="Share your experience with ElderlyCare" /></Form.Item>
+                  <Button type="primary" htmlType="submit" block icon={<StarOutlined />} loading={feedbackLoading}>Submit feedback</Button>
+                </Form>
+              </Card>
+            </Col>
+          </Row>
 
-      {/* Contact Form + Feedback Form Section */}
-      <section className="section-forms">
-        <div className="container">
-          <div className="forms-container">
-            {/* Contact Form - Left Side */}
-            <div className="contact-form-container">
-              <h2>Send Us a Message</h2>
-              <p className="form-intro">Have questions? Our team will get back to you shortly.</p>
-              <form className="contact-form" onSubmit={handleContactSubmit}>
-                <div className="form-group">
-                  <label htmlFor="name">Full Name*</label>
-                  <input
-                    type="text"
-                    id="name"
-                    name="name"
-                    value={contact.name}
-                    onChange={handleContactChange}
-                    placeholder="Your name"
-                    required
-                  />
-                </div>
-
-                <div className="form-group">
-                  <label htmlFor="email">Email Address*</label>
-                  <input
-                    type="email"
-                    id="email"
-                    name="email"
-                    value={contact.email}
-                    onChange={handleContactChange}
-                    placeholder="your@email.com"
-                    required
-                  />
-                </div>
-
-                <div className="form-group">
-                  <label htmlFor="message">Your Message* (Minimum 10 characters)</label>
-                  <textarea
-                    id="message"
-                    name="message"
-                    value={contact.message}
-                    onChange={handleContactChange}
-                    rows="5"
-                    placeholder="How can we assist you today?"
-                    minLength=""
-                    required
-                  ></textarea>
-                </div>
-
-                {contactError && (
-                  <div className="error-message">
-                    {contactError.split(', ').map((err, i) => (
-                      <div key={i}>{err}</div>
-                    ))}
-                  </div>
-                )}
-
-                <button
-                  type="submit"
-                  className="submit-button"
-                  disabled={isSubmittingContact}
-                >
-                  {isSubmittingContact ? 'Sending...' : 'Send Message'}
-                </button>
-              </form>
-            </div>
-
-            {/* Feedback Form - Right Side */}
-            <div className="feedback-form-container">
-              <h2>Share Your Feedback</h2>
-              <p className="form-intro">We value your experience with us</p>
-              <form className="feedback-form" onSubmit={handleFeedbackSubmit}>
-                <div className="form-group">
-                  <label htmlFor="feedback-name">Your Name*</label>
-                  <input
-                    type="text"
-                    id="feedback-name"
-                    name="name"
-                    value={feedback.name}
-                    onChange={handleFeedbackChange}
-                    placeholder="Your name"
-                    required
-                  />
-                </div>
-
-                <div className="form-group">
-                  <label htmlFor="feedback-email">Email Address*</label>
-                  <input
-                    type="email"
-                    id="feedback-email"
-                    name="email"
-                    value={feedback.email}
-                    onChange={handleFeedbackChange}
-                    placeholder="your@email.com"
-                    required
-                  />
-                </div>
-
-                <div className="form-group">
-                  <label htmlFor="feedback-rating">Your Rating*</label>
-                  <select
-                    id="feedback-rating"
-                    name="rating"
-                    value={feedback.rating}
-                    onChange={handleFeedbackChange}
-                    required
-                  >
-                    <option value="">Select rating</option>
-                    <option value="5">⭐⭐⭐⭐⭐ (Excellent)</option>
-                    <option value="4">⭐⭐⭐⭐ (Very Good)</option>
-                    <option value="3">⭐⭐⭐ (Good)</option>
-                    <option value="2">⭐⭐ (Fair)</option>
-                    <option value="1">⭐ (Poor)</option>
-                  </select>
-                </div>
-
-                <div className="form-group">
-                  <label htmlFor="feedback-comments">Comments* (Minimum 10 characters)</label>
-                  <textarea
-                    id="feedback-comments"
-                    name="comments"
-                    value={feedback.comments}
-                    onChange={handleFeedbackChange}
-                    rows="2"
-                    placeholder="Share your experience..."
-                    minLength=""
-                    required
-                  ></textarea>
-                </div>
-
-                {feedbackError && (
-                  <div className="error-message">
-                    {feedbackError.split(', ').map((err, i) => (
-                      <div key={i}>{err}</div>
-                    ))}
-                  </div>
-                )}
-
-                <button
-                  type="submit"
-                  className="submit-button"
-                  disabled={isSubmittingFeedback}
-                >
-                  {isSubmittingFeedback ? 'Submitting...' : 'Submit Feedback'}
-                </button>
-              </form>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Footer Section */}
-      <footer className="footer-section">
-        <p>&copy; {new Date().getFullYear()} ElderlyCare. All rights reserved.</p>
-      </footer>
-    </div>
+          <Alert
+            type="warning"
+            showIcon
+            message="Do not use this page for an active medical emergency"
+            description="Call your local emergency service or the person’s listed emergency contact when immediate assistance is required."
+          />
+        </Flex>
+      </Content>
+      <Footer style={{ textAlign: 'center' }}>© {new Date().getFullYear()} ElderlyCare</Footer>
+    </Layout>
   );
 };
 
