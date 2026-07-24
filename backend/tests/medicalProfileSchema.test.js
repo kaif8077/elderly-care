@@ -1,5 +1,7 @@
 const test = require('node:test');
 const assert = require('node:assert/strict');
+const fs = require('node:fs');
+const path = require('node:path');
 const MedicalProfile = require('../models/MedicalProfile');
 const { normalizeProfileData } = require('../controllers/medicalController');
 
@@ -47,4 +49,12 @@ test('JSON profile updates discard browser fake paths for photographs', () => {
     profilePhoto: 'C:\\fakepath\\signature.jpg'
   }, '507f1f77bcf86cd799439011');
   assert.equal(Object.hasOwn(normalized, 'profilePhoto'), false);
+});
+
+test('draft section saves use atomic updates for legacy profile compatibility', () => {
+  const source = fs.readFileSync(path.join(__dirname, '..', 'controllers', 'medicalController.js'), 'utf8');
+  assert.match(source, /existingProfile && !req\.body\.finalize/);
+  assert.match(source, /findByIdAndUpdate/);
+  assert.match(source, /runValidators: true/);
+  assert.match(source, /PROFILE_SAVE_FAILED/);
 });

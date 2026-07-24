@@ -54,6 +54,24 @@ exports.createProfile = async (req, res) => {
             profileData.elderlyCareId = candidate;
         }
 
+        // A section save must not revalidate unrelated legacy fields. Atomic updates
+        // validate only the submitted section while preserving all other sections.
+        if (existingProfile && !req.body.finalize) {
+            if (!existingProfile.elderlyCareId) {
+                let candidate;
+                do {
+                    candidate = createElderlyCareId();
+                } while (await MedicalProfile.exists({ elderlyCareId: candidate }));
+                profileData.elderlyCareId = candidate;
+            }
+            const profile = await MedicalProfile.findByIdAndUpdate(
+                existingProfile._id,
+                { $set: profileData },
+                { new: true, runValidators: true, context: 'query' }
+            );
+            return res.status(200).json({ message: 'Profile section saved', profile });
+        }
+
         const profile = existingProfile || new MedicalProfile();
         Object.assign(profile, profileData);
         if (req.body.finalize) {
@@ -81,10 +99,19 @@ exports.createProfile = async (req, res) => {
             profile
         });
     } catch (error) {
-        console.error('Error creating medical profile:', error);
+        console.error('Error creating medical profile:', {
+            name: error.name,
+            code: error.code,
+            message: error.message,
+            fields: Object.keys(error.errors || {})
+        });
         const isValidation = error.name === 'ValidationError' || error.name === 'CastError';
-        res.status(isValidation ? 400 : 500).json({
-            message: isValidation ? 'Please correct the medical profile fields.' : 'Error creating medical profile',
+        const isDuplicate = error.code === 11000;
+        res.status(isValidation || isDuplicate ? 400 : 500).json({
+            message: isValidation
+                ? 'Please correct the medical profile fields.'
+                : isDuplicate ? 'A profile identifier conflict occurred. Please retry.' : 'Unable to save the medical profile right now.',
+            code: isValidation ? 'PROFILE_VALIDATION_FAILED' : isDuplicate ? 'PROFILE_ID_CONFLICT' : 'PROFILE_SAVE_FAILED',
             fields: isValidation
                 ? Object.fromEntries(Object.entries(error.errors || {}).map(([key, value]) => [key, value.message]))
                 : undefined
