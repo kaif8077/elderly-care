@@ -25,6 +25,12 @@ const medicalProfileSchema = new mongoose.Schema({
     insuranceProvider: { type: String },
     insuranceProviderOther: { type: String },
     policyNumber: { type: String },
+    profilePhoto: {
+        fileId: { type: mongoose.Schema.Types.ObjectId, default: null },
+        contentType: { type: String, enum: ['image/jpeg', 'image/png', 'image/webp'] },
+        bytes: { type: Number, min: 1, max: 3145728 },
+        uploadedAt: { type: Date }
+    },
     qrCodeImage: { type: String, default: null }
 }, { timestamps: true });
 

@@ -13,6 +13,8 @@ const Profile = () => {
     const [qrCode, setQrCode] = useState('');
     const [isLoading, setIsLoading] = useState(true);
     const idCardRef = useRef(null);
+    const [photoUrl, setPhotoUrl] = useState('');
+    const [photoBusy, setPhotoBusy] = useState(false);
 
     useEffect(() => {
         const fetchData = async () => {
@@ -32,6 +34,12 @@ const Profile = () => {
 
                 setMedicalProfile(medicalResponse.data);
                 setQrCode(qrResponse.data.qrCode.data);
+                if (medicalResponse.data.profilePhoto) {
+                    const photoResponse = await axios.get(`${process.env.REACT_APP_BACKEND_URI}/api/medical/${user._id}/photo`, {
+                        headers: { Authorization: `Bearer ${token}` }, responseType: 'blob'
+                    });
+                    setPhotoUrl(URL.createObjectURL(photoResponse.data));
+                }
             } catch (error) {
                 toast.error('Failed to load profile data');
             } finally {
@@ -44,6 +52,52 @@ const Profile = () => {
         }
     }, [user]);
 
+    const uploadPhoto = async (event) => {
+        const file = event.target.files?.[0];
+        event.target.value = '';
+        if (!file) return;
+        if (!['image/jpeg', 'image/png', 'image/webp'].includes(file.type) || file.size > 3 * 1024 * 1024) {
+            toast.error('Choose a JPEG, PNG, or WebP image up to 3 MB.');
+            return;
+        }
+        setPhotoBusy(true);
+        try {
+            const body = new FormData();
+            body.append('photo', file);
+            const token = localStorage.getItem('token');
+            await axios.post(`${process.env.REACT_APP_BACKEND_URI}/api/medical/${user._id}/photo`, body, {
+                headers: { Authorization: `Bearer ${token}` }
+            });
+            const photoResponse = await axios.get(`${process.env.REACT_APP_BACKEND_URI}/api/medical/${user._id}/photo`, {
+                headers: { Authorization: `Bearer ${token}` }, responseType: 'blob'
+            });
+            if (photoUrl) URL.revokeObjectURL(photoUrl);
+            setPhotoUrl(URL.createObjectURL(photoResponse.data));
+            toast.success('Profile photograph updated.');
+        } catch (error) {
+            toast.error(error.response?.data?.message || 'Unable to upload photograph.');
+        } finally {
+            setPhotoBusy(false);
+        }
+    };
+
+    const removePhoto = async () => {
+        if (!window.confirm('Remove your profile photograph?')) return;
+        setPhotoBusy(true);
+        try {
+            const token = localStorage.getItem('token');
+            await axios.delete(`${process.env.REACT_APP_BACKEND_URI}/api/medical/${user._id}/photo`, {
+                headers: { Authorization: `Bearer ${token}` }
+            });
+            if (photoUrl) URL.revokeObjectURL(photoUrl);
+            setPhotoUrl('');
+            toast.success('Profile photograph removed.');
+        } catch (error) {
+            toast.error(error.response?.data?.message || 'Unable to remove photograph.');
+        } finally {
+            setPhotoBusy(false);
+        }
+    };
     const downloadIDCard = async () => {
         if (!idCardRef.current || !medicalProfile) return;
 
@@ -95,6 +149,22 @@ const Profile = () => {
                 <div className="profile-header">
                     <h1 className="profile-title">Welcome, {medicalProfile?.name || 'User'}</h1>
                 </div>
+                <section className="profile-photo-panel" aria-labelledby="profile-photo-title">
+                    <div className="profile-photo-preview">
+                        {photoUrl ? <img src={photoUrl} alt={`${medicalProfile?.name || 'User'} profile`} /> : <span aria-hidden="true">{medicalProfile?.name?.charAt(0)?.toUpperCase() || 'U'}</span>}
+                    </div>
+                    <div>
+                        <h2 id="profile-photo-title">Profile photograph</h2>
+                        <p>JPEG, PNG, or WebP. Maximum 3 MB. Stored privately and available only through authenticated access.</p>
+                        <div className="profile-photo-actions">
+                            <label className="profile-photo-upload">
+                                {photoBusy ? 'Working...' : photoUrl ? 'Replace photograph' : 'Upload photograph'}
+                                <input type="file" accept="image/jpeg,image/png,image/webp" onChange={uploadPhoto} disabled={photoBusy} />
+                            </label>
+                            {photoUrl && <button type="button" onClick={removePhoto} disabled={photoBusy}>Remove</button>}
+                        </div>
+                    </div>
+                </section>
 
                 <div className="profile-section">
                     <h2 className="section-title">Personal Information</h2>

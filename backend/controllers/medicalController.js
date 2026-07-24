@@ -25,8 +25,8 @@ exports.createProfile = async (req, res) => {
 
         // Create profile data
         const profileData = {
-            userId: req.user.id,
             ...req.body,
+            userId: req.user.id,
             dob: new Date(req.body.dob),
             height,
             weight: Number(req.body.weight),
@@ -76,9 +76,16 @@ exports.getMedicalProfile = async (req, res) => {
         }
 
         // Format response
+        const { profilePhoto, ...safeProfile } = medicalProfile;
         const response = {
-            ...medicalProfile,
-            dob: medicalProfile.dob.toISOString().split('T')[0] // Format date as YYYY-MM-DD
+            ...safeProfile,
+            dob: medicalProfile.dob.toISOString().split('T')[0],
+            profilePhoto: profilePhoto?.fileId ? {
+                contentType: profilePhoto.contentType,
+                bytes: profilePhoto.bytes,
+                uploadedAt: profilePhoto.uploadedAt,
+                url: '/api/medical/' + userId + '/photo'
+            } : null
         };
 
         res.status(200).json(response);
