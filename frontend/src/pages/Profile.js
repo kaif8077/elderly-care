@@ -1,7 +1,7 @@
 import React, { useCallback, useContext, useEffect, useState } from 'react';
 import axios from 'axios';
 import {
-  Alert, Avatar, Button, Card, Col, Descriptions, Empty, Row,
+  Alert, Avatar, Button, Card, Col, Descriptions, Empty, Modal, Row,
   Skeleton, Space, Switch, Tag, Typography
 } from 'antd';
 import {
@@ -26,6 +26,8 @@ const Profile = () => {
   const [loading, setLoading] = useState(true);
   const [photoUrl, setPhotoUrl] = useState('');
   const [showReports, setShowReports] = useState(true);
+  const [latestReport, setLatestReport] = useState(null);
+  const [reportOpen, setReportOpen] = useState(false);
 
   const loadPhoto = useCallback(async (token) => {
     const response = await axios.get(`${apiBase}/api/medical/${user._id}/photo`, {
@@ -49,6 +51,14 @@ const Profile = () => {
         });
         if (!active) return;
         setProfile(medical.data);
+        try {
+          const report = await axios.get(`${apiBase}/api/medical-reports/latest`, {
+            headers: { Authorization: `Bearer ${token}` }
+          });
+          if (active) setLatestReport(report.data.report);
+        } catch (reportError) {
+          if (reportError.response?.status !== 404) toast.error('Unable to load the latest medical report.');
+        }
         if (medical.data.profilePhoto) await loadPhoto(token);
         try {
           const qr = await axios.get(`${apiBase}/api/qr/${user._id}`, {
@@ -141,7 +151,7 @@ const Profile = () => {
       <Card
         className="care-section-card"
         title={<Space><FileTextOutlined />Reports and recommendations</Space>}
-        extra={<Space><Text>Show</Text><Switch checked={showReports} onChange={setShowReports} /></Space>}
+        extra={<Space wrap>{latestReport && <Button onClick={() => setReportOpen(true)}>Preview latest report</Button>}<Text>Show</Text><Switch checked={showReports} onChange={setShowReports} /></Space>}
       >
         {showReports
           ? <Recommendations />
@@ -151,6 +161,37 @@ const Profile = () => {
       <Card className="care-section-card" title={<Space><IdcardOutlined />Emergency ID card</Space>}>
         <UserIdCard profile={profile} qrCode={qrCode} photoUrl={photoUrl} />
       </Card>
+
+      <Modal
+        title="Emergency Medical Summary"
+        open={reportOpen}
+        onCancel={() => setReportOpen(false)}
+        footer={<Button type="primary" href="/reports">Open reports page</Button>}
+        width={720}
+      >
+        {latestReport ? (
+          <Space direction="vertical" size={18} style={{ width: '100%' }}>
+            <Alert
+              type="warning"
+              showIcon
+              message={`Blood group: ${latestReport.snapshotData?.personal?.bloodGroup || profile.bloodGroup || 'Unknown'}`}
+              description={`Allergies: ${show(latestReport.snapshotData?.medical?.allergies)}`}
+            />
+            <Descriptions
+              bordered
+              size="small"
+              column={{ xs: 1, sm: 2 }}
+              items={[
+                { key: 'name', label: 'Name', children: latestReport.snapshotData?.personal?.name || profile.name },
+                { key: 'version', label: 'Report version', children: latestReport.reportVersion },
+                { key: 'conditions', label: 'Known conditions', children: show(latestReport.snapshotData?.medical?.medicalHistory) },
+                { key: 'medications', label: 'Medications', children: show(latestReport.snapshotData?.medical?.medications) }
+              ]}
+            />
+            <Text type="secondary">This emergency summary is not a replacement for professional medical advice.</Text>
+          </Space>
+        ) : <Empty description="No medical report has been generated yet." />}
+      </Modal>
     </main>
   );
 };

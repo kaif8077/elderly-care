@@ -1,15 +1,284 @@
-import React,{useContext,useMemo,useState} from 'react';
-import axios from 'axios';import {toast} from 'react-toastify';
-import {Alert,Button,Checkbox,Col,DatePicker,Divider,Form,Input,InputNumber,Row,Select,Space,Steps,Switch,Typography,Upload} from 'antd';
-import {LeftOutlined,RightOutlined,SaveOutlined,UploadOutlined} from '@ant-design/icons';
-import {AuthContext} from '../context/AuthContext';
-const {Title,Text,Paragraph}=Typography;
-const initial={name:'',dob:'',gender:'',bloodGroup:'',height:'',weight:'',dietPreference:'',phone:'+91',emergencyContact:'',emergencyPhone:'+91',address:'',medicalHistory:[],allergies:[],medications:[],currentSymptoms:[],hasInsurance:false,insuranceProvider:'',policyNumber:'',preferredLanguage:'',mobilityStatus:'',fallRisk:false,doctorName:'',doctorPhone:'',preferredHospital:''};
-const choices={medicalHistory:['Diabetes','Hypertension','Asthma','Heart Disease','Stroke','Kidney Disease'],allergies:['Penicillin','Aspirin','Food','Dust','Pollen','Latex'],medications:['Metformin','Amlodipine','Insulin','Aspirin','Warfarin','Inhalers'],currentSymptoms:['Dizziness','Chest Pain','Fatigue','Shortness of Breath','Swelling','Joint Pain']};
-const stepItems=['Personal','Contact & emergency','Medical','Insurance & review'].map(title=>({title}));
-const MedicalForm=({onSubmissionSuccess})=>{const[form]=Form.useForm();const[step,setStep]=useState(0);const[saving,setSaving]=useState(false);const[photo,setPhoto]=useState(null);const[values,setValues]=useState(initial);const{user}=useContext(AuthContext);const age=useMemo(()=>values.dob?Math.max(0,new Date().getFullYear()-new Date(values.dob).getFullYear()):null,[values.dob]);const validateAndNext=async()=>{const fields=step===0?['name','dob','gender','height','weight','dietPreference']:['phone','emergencyContact','emergencyPhone','address'];try{await form.validateFields(fields);setStep(v=>v+1);}catch{toast.error('Complete the required fields before continuing.')}};const submit=async()=>{setSaving(true);try{const raw=await form.validateFields();const data={...initial,...raw,dob:raw.dob?.format?.('YYYY-MM-DD')||raw.dob};const token=localStorage.getItem('token');await axios.post(`${process.env.REACT_APP_BACKEND_URI}/api/medical`,data,{headers:{Authorization:`Bearer ${token}`}});if(photo&&user){const body=new FormData();body.append('photo',photo);await axios.post(`${process.env.REACT_APP_BACKEND_URI}/api/medical/${user._id}/photo`,body,{headers:{Authorization:`Bearer ${token}`}});}toast.success('Medical profile saved successfully.');onSubmissionSuccess?.();}catch(e){if(e.errorFields)toast.error('Review the highlighted fields.');else toast.error(e.response?.data?.message||'Unable to save medical profile.');}finally{setSaving(false)}};const common={labelCol:{span:24},wrapperCol:{span:24}};return <section><Row justify="space-between" align="top" gutter={[16,16]}><Col><Text className="care-eyebrow">HEALTH PROFILE</Text><Title level={2} style={{margin:'6px 0'}}>Medical information</Title><Paragraph type="secondary">Complete one short section at a time, then review before saving.</Paragraph></Col><Col><Text strong>{step+1} of 4</Text></Col></Row><Steps current={step} items={stepItems} responsive style={{margin:'18px 0 30px'}}/><Form {...common} form={form} layout="vertical" initialValues={initial} onValuesChange={(_,all)=>setValues(all)} requiredMark="optional">
-{step===0&&<><Title level={4}>Personal information</Title><Row gutter={16}><Col span={24}><Form.Item label="Profile photograph" extra="JPEG, PNG or WebP, maximum 3 MB"><Upload beforeUpload={file=>{if(!['image/jpeg','image/png','image/webp'].includes(file.type)||file.size>3*1024*1024){toast.error('Choose a JPEG, PNG or WebP image up to 3 MB.');return Upload.LIST_IGNORE;}setPhoto(file);return false;}} maxCount={1} accept="image/jpeg,image/png,image/webp"><Button icon={<UploadOutlined/>}>Choose photograph</Button></Upload></Form.Item></Col><Col xs={24} md={12}><Form.Item name="name" label="Full name" rules={[{required:true}]}><Input placeholder="Enter full name"/></Form.Item></Col><Col xs={24} md={12}><Form.Item name="dob" label="Date of birth" rules={[{required:true}]} extra={age!==null?`Approximate age: ${age}`:''}><DatePicker placeholder="Select date of birth" style={{width:'100%'}}/></Form.Item></Col><Col xs={24} sm={12} md={8}><Form.Item name="gender" label="Gender" rules={[{required:true}]}><Select placeholder="Select gender" options={['male','female','other'].map(value=>({value,label:value[0].toUpperCase()+value.slice(1)}))}/></Form.Item></Col><Col xs={24} sm={12} md={8}><Form.Item name="bloodGroup" label="Blood group"><Select allowClear placeholder="Select blood group" options={['A+','A-','B+','B-','AB+','AB-','O+','O-'].map(value=>({value,label:value}))}/></Form.Item></Col><Col xs={12} md={4}><Form.Item name="height" label="Height (cm)" rules={[{required:true}]}><InputNumber placeholder="Height" min={100} max={250} style={{width:'100%'}}/></Form.Item></Col><Col xs={12} md={4}><Form.Item name="weight" label="Weight (kg)" rules={[{required:true}]}><InputNumber placeholder="Weight" min={25} max={250} style={{width:'100%'}}/></Form.Item></Col><Col xs={24} md={8}><Form.Item name="preferredLanguage" label="Preferred language"><Input placeholder="e.g. Hindi or English"/></Form.Item></Col><Col xs={24} md={8}><Form.Item name="mobilityStatus" label="Mobility status"><Select allowClear placeholder="Select mobility status" options={[['independent','Independent'],['walking_aid','Walking aid'],['wheelchair','Wheelchair'],['bed_assistance','Bed assistance']].map(([value,label])=>({value,label}))}/></Form.Item></Col><Col xs={24} md={8}><Form.Item name="dietPreference" label="Diet preference" rules={[{required:true}]}><Select placeholder="Select diet preference" options={['Vegetarian','Non-Vegetarian','Vegan','Eggetarian'].map(value=>({value,label:value}))}/></Form.Item></Col></Row></>}
-{step===1&&<><Title level={4}>Contact and emergency</Title><Alert showIcon type="info" message="Emergency contact details may be used when someone scans your active emergency QR." style={{marginBottom:20}}/><Row gutter={16}><Col xs={24} md={12}><Form.Item name="phone" label="Primary phone" rules={[{required:true}]}><Input type="tel" placeholder="Enter primary phone"/></Form.Item></Col><Col xs={24} md={12}><Form.Item name="emergencyContact" label="Emergency contact name" rules={[{required:true}]}><Input placeholder="Enter emergency contact name"/></Form.Item></Col><Col xs={24} md={12}><Form.Item name="emergencyPhone" label="Emergency phone" rules={[{required:true}]}><Input type="tel" placeholder="Enter emergency phone"/></Form.Item></Col><Col span={24}><Form.Item name="address" label="Residential address" rules={[{required:true}]}><Input.TextArea rows={3} placeholder="Enter residential address"/></Form.Item></Col></Row></>}
-{step===2&&<><Title level={4}>Medical information</Title>{Object.entries(choices).map(([field,options])=><Form.Item key={field} name={field} label={({medicalHistory:'Known conditions',allergies:'Allergies',medications:'Current medications',currentSymptoms:'Current symptoms'})[field]}><Checkbox.Group options={options}/></Form.Item>)}<Divider/><Row gutter={16}><Col xs={24} md={8}><Form.Item name="doctorName" label="Treating doctor"><Input placeholder="Enter doctor name"/></Form.Item></Col><Col xs={24} md={8}><Form.Item name="doctorPhone" label="Doctor phone"><Input type="tel" placeholder="Enter doctor phone"/></Form.Item></Col><Col xs={24} md={8}><Form.Item name="preferredHospital" label="Preferred hospital"><Input placeholder="Enter preferred hospital"/></Form.Item></Col><Col span={24}><Form.Item name="fallRisk" label="Fall risk" valuePropName="checked"><Switch checkedChildren="Yes" unCheckedChildren="No"/></Form.Item></Col></Row></>}
-{step===3&&<><Title level={4}>Insurance and review</Title><Form.Item name="hasInsurance" label="Health insurance" valuePropName="checked"><Switch checkedChildren="Active" unCheckedChildren="None"/></Form.Item>{values.hasInsurance&&<Row gutter={16}><Col xs={24} md={12}><Form.Item name="insuranceProvider" label="Insurance provider"><Input placeholder="Enter insurance provider"/></Form.Item></Col><Col xs={24} md={12}><Form.Item name="policyNumber" label="Policy number"><Input placeholder="Enter policy number"/></Form.Item></Col></Row>}<Alert type="success" showIcon message="Review summary" description={`${values.name||'Name not entered'} · ${values.bloodGroup||'Blood group unknown'} · ${(values.medicalHistory||[]).length} conditions · ${(values.allergies||[]).length} allergies`}/></>}
-<Divider/><Space style={{display:'flex',justifyContent:'flex-end'}}>{step>0&&<Button icon={<LeftOutlined/>} onClick={()=>setStep(v=>v-1)}>Previous</Button>}{step<3?<Button type="primary" icon={<RightOutlined/>} onClick={validateAndNext}>Save & continue</Button>:<Button type="primary" icon={<SaveOutlined/>} loading={saving} onClick={submit}>Save medical profile</Button>}</Space></Form></section>};export default MedicalForm;
+import React, { useContext, useEffect, useMemo, useState } from 'react';
+import dayjs from 'dayjs';
+import { toast } from 'react-toastify';
+import {
+  Alert, Button, Card, Col, DatePicker, Divider, Form, Image, Input, InputNumber,
+  Row, Select, Space, Steps, Switch, Typography, Upload
+} from 'antd';
+import {
+  DeleteOutlined, LeftOutlined, PlusOutlined, RightOutlined, SaveOutlined,
+  UploadOutlined
+} from '@ant-design/icons';
+import { AuthContext } from '../context/AuthContext';
+import api from '../services/api';
+
+const { Title, Text, Paragraph } = Typography;
+const languages = [
+  'English', 'Hindi', 'Bengali', 'Marathi', 'Telugu',
+  'Tamil', 'Gujarati', 'Urdu', 'Kannada', 'Malayalam', 'Other'
+];
+const medicalOptions = {
+  medicalHistory: ['Diabetes', 'Hypertension', 'Asthma', 'Heart Disease', 'Stroke', 'Kidney Disease'],
+  allergies: ['Penicillin', 'Aspirin', 'Food allergy', 'Dust', 'Pollen', 'Latex'],
+  medications: ['Metformin', 'Amlodipine', 'Insulin', 'Aspirin', 'Warfarin', 'Inhaler'],
+  currentSymptoms: ['Dizziness', 'Chest pain', 'Fatigue', 'Shortness of breath', 'Swelling', 'Joint pain']
+};
+const labels = {
+  medicalHistory: 'Known conditions',
+  allergies: 'Allergies',
+  medications: 'Current medications',
+  currentSymptoms: 'Current symptoms'
+};
+const initialValues = {
+  firstName: '', lastName: '', dob: null, gender: undefined, bloodGroup: undefined,
+  height: null, weight: null, preferredLanguage: [], otherLanguage: '',
+  mobilityStatus: undefined, dietPreference: undefined, maritalStatus: undefined,
+  phone: '', address: '', emergencyContacts: [{ name: '', phone: '', relationship: '' }],
+  medicalHistory: [], allergies: [], medications: [], currentSymptoms: [],
+  doctorName: '', doctorPhone: '', preferredHospital: '', fallRisk: false,
+  hasInsurance: false, insuranceProvider: '', policyNumber: '', reviewConfirmed: false
+};
+const stepItems = ['Personal information', 'Address & contacts', 'Medical information', 'Review'].map((title) => ({ title }));
+const required = (message) => [{ required: true, message }];
+
+const MedicalForm = ({ onSubmissionSuccess }) => {
+  const [form] = Form.useForm();
+  const { user } = useContext(AuthContext);
+  const [step, setStep] = useState(0);
+  const [saving, setSaving] = useState(false);
+  const [profile, setProfile] = useState(null);
+  const [photo, setPhoto] = useState(null);
+  const [photoPreview, setPhotoPreview] = useState('');
+  const values = Form.useWatch([], form) || initialValues;
+
+  const fullName = useMemo(
+    () => [values.firstName, values.lastName].filter(Boolean).join(' '),
+    [values.firstName, values.lastName]
+  );
+
+  useEffect(() => {
+    if (!user?._id) return;
+    api.get(`/api/medical/${user._id}`).then(({ data }) => {
+      const loaded = {
+        ...initialValues,
+        ...data,
+        dob: data.dob ? dayjs(data.dob) : null,
+        preferredLanguage: Array.isArray(data.preferredLanguage)
+          ? data.preferredLanguage
+          : data.preferredLanguage ? [data.preferredLanguage] : [],
+        emergencyContacts: data.emergencyContacts?.length
+          ? data.emergencyContacts
+          : [{ name: data.emergencyContact || '', phone: data.emergencyPhone || '', relationship: data.emergencyRelationship || '' }]
+      };
+      form.setFieldsValue(loaded);
+      setProfile(data);
+      if (data.profilePhoto) {
+        api.get(`/api/medical/${user._id}/photo`, { responseType: 'blob' })
+          .then((response) => setPhotoPreview(URL.createObjectURL(response.data)))
+          .catch(() => {});
+      }
+    }).catch((error) => {
+      if (error.response?.status !== 404) toast.error('Unable to load your saved profile.');
+    });
+  }, [form, user]);
+
+  useEffect(() => () => {
+    if (photoPreview?.startsWith('blob:')) URL.revokeObjectURL(photoPreview);
+  }, [photoPreview]);
+
+  const stepFields = [
+    ['firstName', 'lastName', 'dob', 'gender', 'bloodGroup', 'height', 'weight', 'preferredLanguage', 'mobilityStatus', 'dietPreference', 'maritalStatus'],
+    ['phone', 'address', 'emergencyContacts'],
+    ['medicalHistory', 'allergies', 'medications', 'currentSymptoms'],
+    ['reviewConfirmed']
+  ];
+
+  const serialize = (raw, finalize = false) => {
+    const { reviewConfirmed, ...data } = raw;
+    return {
+      ...data,
+      dob: raw.dob?.format?.('YYYY-MM-DD') || raw.dob,
+      finalize
+    };
+  };
+
+  const savePhoto = async () => {
+    if (!photo || !user?._id) return;
+    const body = new FormData();
+    body.append('photo', photo);
+    await api.post(`/api/medical/${user._id}/photo`, body, {
+      headers: { 'Content-Type': 'multipart/form-data' }
+    });
+    setProfile((current) => ({ ...(current || {}), profilePhoto: { uploadedAt: new Date().toISOString() } }));
+  };
+
+  const saveStep = async (nextStep) => {
+    setSaving(true);
+    try {
+      await form.validateFields(stepFields[step]);
+      if (step === 0 && !photo && !profile?.profilePhoto) {
+        form.setFields([{ name: 'profilePhoto', errors: ['Profile photograph is required'] }]);
+        throw new Error('PHOTO_REQUIRED');
+      }
+      const { data } = await api.post('/api/medical', serialize(form.getFieldsValue(true)));
+      if (step === 0) await savePhoto();
+      setProfile(data.profile);
+      toast.success(`${stepItems[step].title} saved`);
+      setStep(nextStep);
+    } catch (error) {
+      if (error.errorFields || error.message === 'PHOTO_REQUIRED') {
+        toast.error('Complete the mandatory fields before continuing.');
+      } else {
+        toast.error(error.response?.data?.message || 'Unable to save this section.');
+      }
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const submit = async () => {
+    setSaving(true);
+    try {
+      await form.validateFields();
+      const { data } = await api.post('/api/medical', serialize(form.getFieldsValue(true), true));
+      setProfile(data.profile);
+      toast.success('Medical profile saved successfully.');
+      onSubmissionSuccess?.(data.profile);
+    } catch (error) {
+      toast.error(error.response?.data?.message || 'Review the highlighted mandatory fields.');
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const photoFile = (file) => {
+    if (!['image/jpeg', 'image/png', 'image/webp'].includes(file.type) || file.size > 3 * 1024 * 1024) {
+      toast.error('Choose a JPEG, PNG or WebP photograph up to 3 MB.');
+      return Upload.LIST_IGNORE;
+    }
+    if (photoPreview?.startsWith('blob:')) URL.revokeObjectURL(photoPreview);
+    setPhoto(file);
+    setPhotoPreview(URL.createObjectURL(file));
+    form.setFields([{ name: 'profilePhoto', errors: [] }]);
+    return false;
+  };
+
+  return (
+    <section className="medical-form">
+      <Row justify="space-between" align="top" gutter={[16, 16]}>
+        <Col>
+          <Text className="care-eyebrow">HEALTH PROFILE</Text>
+          <Title level={2} style={{ margin: '6px 0' }}>Medical information</Title>
+          <Paragraph type="secondary">Each step is saved securely before you continue.</Paragraph>
+        </Col>
+        <Col><Text strong>{step + 1} of 4</Text></Col>
+      </Row>
+      <Steps current={step} items={stepItems} responsive style={{ margin: '18px 0 30px' }} />
+
+      <Form form={form} layout="vertical" initialValues={initialValues} requiredMark>
+        {step === 0 && (
+          <>
+            <Title level={4}>Personal details</Title>
+            <Form.Item name="profilePhoto" label="Profile photograph" required>
+              <Space align="center" wrap>
+                {photoPreview && <Image width={78} height={88} src={photoPreview} preview={false} style={{ objectFit: 'cover', borderRadius: 8 }} />}
+                <Upload beforeUpload={photoFile} maxCount={1} showUploadList={false} accept="image/jpeg,image/png,image/webp">
+                  <Button icon={<UploadOutlined />}>{photoPreview ? 'Replace photograph' : 'Choose photograph'}</Button>
+                </Upload>
+                <Text type="secondary">JPEG, PNG or WebP · maximum 3 MB</Text>
+              </Space>
+            </Form.Item>
+            <Row gutter={16}>
+              <Col xs={24} md={12}><Form.Item name="firstName" label="First name" rules={required('Enter first name')}><Input placeholder="Enter first name" /></Form.Item></Col>
+              <Col xs={24} md={12}><Form.Item name="lastName" label="Last name" rules={required('Enter last name')}><Input placeholder="Enter last name" /></Form.Item></Col>
+              <Col xs={24} sm={12} lg={6}><Form.Item name="gender" label="Gender" rules={required('Select gender')}><Select placeholder="Select gender" options={['male', 'female', 'other'].map((value) => ({ value, label: value[0].toUpperCase() + value.slice(1) }))} /></Form.Item></Col>
+              <Col xs={24} sm={12} lg={6}><Form.Item name="bloodGroup" label="Blood group" rules={required('Select blood group')}><Select placeholder="Select blood group" options={['A+', 'A-', 'B+', 'B-', 'AB+', 'AB-', 'O+', 'O-'].map((value) => ({ value, label: value }))} /></Form.Item></Col>
+              <Col xs={12} lg={6}><Form.Item name="height" label="Height (cm)" rules={required('Enter height')}><InputNumber placeholder="Enter height" min={80} max={250} style={{ width: '100%' }} /></Form.Item></Col>
+              <Col xs={12} lg={6}><Form.Item name="weight" label="Weight (kg)" rules={required('Enter weight')}><InputNumber placeholder="Enter weight" min={20} max={300} style={{ width: '100%' }} /></Form.Item></Col>
+              <Col xs={24} md={12}><Form.Item name="dob" label="Date of birth" rules={required('Select date of birth')}><DatePicker placeholder="Select date of birth" disabledDate={(date) => date && date.isAfter(dayjs(), 'day')} style={{ width: '100%' }} /></Form.Item></Col>
+              <Col xs={24} md={12}><Form.Item name="preferredLanguage" label="Languages" rules={required('Select at least one language')}><Select mode="multiple" placeholder="Select languages" options={languages.map((value) => ({ value, label: value }))} /></Form.Item></Col>
+              {values.preferredLanguage?.includes('Other') && <Col span={24}><Form.Item name="otherLanguage" label="Other language" rules={required('Enter the other language')}><Input placeholder="Type another language" /></Form.Item></Col>}
+              <Col xs={24} md={8}><Form.Item name="mobilityStatus" label="Mobility" rules={required('Select mobility')}><Select placeholder="Select mobility" options={[['independent', 'Independent'], ['walking_aid', 'Walking aid'], ['wheelchair', 'Wheelchair'], ['bed_assistance', 'Bed assistance']].map(([value, label]) => ({ value, label }))} /></Form.Item></Col>
+              <Col xs={24} md={8}><Form.Item name="dietPreference" label="Diet preference" rules={required('Select diet preference')}><Select placeholder="Select diet preference" options={['Vegetarian', 'Non-Vegetarian', 'Vegan', 'Eggetarian'].map((value) => ({ value, label: value }))} /></Form.Item></Col>
+              <Col xs={24} md={8}><Form.Item name="maritalStatus" label="Marital status" rules={required('Select marital status')}><Select placeholder="Select marital status" options={['single', 'married', 'widowed', 'divorced', 'separated'].map((value) => ({ value, label: value[0].toUpperCase() + value.slice(1) }))} /></Form.Item></Col>
+            </Row>
+          </>
+        )}
+
+        {step === 1 && (
+          <>
+            <Title level={4}>Address and emergency contacts</Title>
+            <Alert showIcon type="info" message="Add at least one complete emergency contact. You can add more contacts when needed." style={{ marginBottom: 20 }} />
+            <Row gutter={16}>
+              <Col xs={24} md={8}><Form.Item name="phone" label="Contact number" rules={required('Enter contact number')}><Input type="tel" placeholder="Enter contact number" /></Form.Item></Col>
+              <Col xs={24} md={16}><Form.Item name="address" label="Residential address" rules={required('Enter residential address')}><Input placeholder="Enter complete residential address" /></Form.Item></Col>
+            </Row>
+            <Form.List name="emergencyContacts">
+              {(fields, { add, remove }) => (
+                <Space direction="vertical" size={14} style={{ width: '100%' }}>
+                  {fields.map((field, index) => (
+                    <Card size="small" title={`Emergency contact ${index + 1}`} key={field.key} extra={fields.length > 1 && <Button type="text" danger icon={<DeleteOutlined />} onClick={() => remove(field.name)}>Remove</Button>}>
+                      <Row gutter={16}>
+                        <Col xs={24} md={8}><Form.Item {...field} name={[field.name, 'name']} label="Contact name" rules={required('Enter contact name')}><Input placeholder="Enter emergency contact name" /></Form.Item></Col>
+                        <Col xs={24} md={8}><Form.Item {...field} name={[field.name, 'phone']} label="Contact number" rules={required('Enter contact number')}><Input type="tel" placeholder="Enter emergency contact number" /></Form.Item></Col>
+                        <Col xs={24} md={8}><Form.Item {...field} name={[field.name, 'relationship']} label="Relationship" rules={required('Enter relationship')}><Input placeholder="e.g. Son, daughter or spouse" /></Form.Item></Col>
+                      </Row>
+                    </Card>
+                  ))}
+                  <Button type="dashed" block icon={<PlusOutlined />} onClick={() => add({ name: '', phone: '', relationship: '' })}>Add another emergency contact</Button>
+                </Space>
+              )}
+            </Form.List>
+          </>
+        )}
+
+        {step === 2 && (
+          <>
+            <Title level={4}>Medical information</Title>
+            <Paragraph type="secondary">Select an option or type a new value and press Enter.</Paragraph>
+            <Row gutter={16}>
+              {Object.entries(medicalOptions).map(([field, options]) => (
+                <Col xs={24} md={12} key={field}>
+                  <Form.Item name={field} label={labels[field]}>
+                    <Select mode="tags" tokenSeparators={[',']} placeholder={`Select or type ${labels[field].toLowerCase()}`} options={options.map((value) => ({ value, label: value }))} />
+                  </Form.Item>
+                </Col>
+              ))}
+              <Col xs={24} md={8}><Form.Item name="doctorName" label="Treating doctor"><Input placeholder="Enter treating doctor name" /></Form.Item></Col>
+              <Col xs={24} md={8}><Form.Item name="doctorPhone" label="Doctor phone"><Input placeholder="Enter doctor phone number" /></Form.Item></Col>
+              <Col xs={24} md={8}><Form.Item name="preferredHospital" label="Preferred hospital"><Input placeholder="Enter preferred hospital" /></Form.Item></Col>
+              <Col xs={24} md={8}><Form.Item name="fallRisk" label="Fall risk" valuePropName="checked"><Switch checkedChildren="Yes" unCheckedChildren="No" /></Form.Item></Col>
+            </Row>
+          </>
+        )}
+
+        {step === 3 && (
+          <>
+            <Title level={4}>Review summary</Title>
+            <Card size="small">
+              <Row gutter={[18, 18]}>
+                <Col xs={24} md={8}><Text type="secondary">Name</Text><div><Text strong>{fullName || 'Not entered'}</Text></div></Col>
+                <Col xs={24} md={8}><Text type="secondary">Blood group</Text><div><Text strong>{values.bloodGroup || 'Not selected'}</Text></div></Col>
+                <Col xs={24} md={8}><Text type="secondary">Known conditions</Text><div><Text strong>{values.medicalHistory?.join(', ') || 'None entered'}</Text></div></Col>
+                <Col span={24}><Text type="secondary">Emergency contacts</Text><div><Text strong>{values.emergencyContacts?.map((contact) => `${contact.name} (${contact.relationship})`).join(', ') || 'Not entered'}</Text></div></Col>
+              </Row>
+            </Card>
+            <Form.Item name="reviewConfirmed" valuePropName="checked" rules={[{ validator: (_, checked) => checked ? Promise.resolve() : Promise.reject(new Error('Confirm the summary before saving')) }]} style={{ marginTop: 18 }}>
+              <Switch /> <Text style={{ marginLeft: 10 }}>I reviewed these details and confirm they are correct.</Text>
+            </Form.Item>
+          </>
+        )}
+
+        <Divider />
+        <Space style={{ display: 'flex', justifyContent: 'flex-end' }} wrap>
+          {step > 0 && <Button icon={<LeftOutlined />} onClick={() => setStep((value) => value - 1)}>Previous</Button>}
+          {step < 3
+            ? <Button type="primary" icon={<RightOutlined />} loading={saving} onClick={() => saveStep(step + 1)}>Save & continue</Button>
+            : <Button type="primary" icon={<SaveOutlined />} loading={saving} onClick={submit}>Save medical profile</Button>}
+        </Space>
+      </Form>
+    </section>
+  );
+};
+
+export default MedicalForm;

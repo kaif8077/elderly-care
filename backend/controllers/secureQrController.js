@@ -17,7 +17,7 @@ const calculateAge = (dob) => {
 
 const emergencyProjection = (profile, qr) => ({
   qrId: String(qr._id),
-  elderlyCareId: `EC-${String(profile.userId).slice(-8).toUpperCase()}`,
+  elderlyCareId: profile.elderlyCareId || `EC-${String(profile.userId).slice(-8).toUpperCase()}`,
   name: profile.name,
   approximateAge: calculateAge(profile.dob),
   bloodGroup: profile.bloodGroup || 'Unknown',
@@ -25,7 +25,14 @@ const emergencyProjection = (profile, qr) => ({
   majorConditions: [...(profile.medicalHistory || []), profile.medicalHistoryOther].filter(Boolean),
   criticalMedications: [...(profile.medications || []), profile.medicationsOther].filter(Boolean),
   emergencyInstruction: 'Contact the listed guardian and local emergency services when immediate help is needed.',
-  emergencyContacts: [{ name: profile.emergencyContact, phone: profile.emergencyPhone, priority: 1 }],
+  emergencyContacts: profile.emergencyContacts?.length
+    ? profile.emergencyContacts.map((contact, index) => ({
+        name: contact.name,
+        phone: contact.phone,
+        relationship: contact.relationship,
+        priority: index + 1
+      }))
+    : [{ name: profile.emergencyContact, phone: profile.emergencyPhone, relationship: profile.emergencyRelationship, priority: 1 }],
   lastUpdatedAt: profile.updatedAt
 });
 
