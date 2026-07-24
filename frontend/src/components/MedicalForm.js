@@ -49,7 +49,7 @@ const MedicalForm = ({ onSubmissionSuccess }) => {
   const [profile, setProfile] = useState(null);
   const [photo, setPhoto] = useState(null);
   const [photoPreview, setPhotoPreview] = useState('');
-  const values = Form.useWatch([], form) || initialValues;
+  const [values, setValues] = useState(initialValues);
 
   const fullName = useMemo(
     () => [values.firstName, values.lastName].filter(Boolean).join(' '),
@@ -71,6 +71,7 @@ const MedicalForm = ({ onSubmissionSuccess }) => {
           : [{ name: data.emergencyContact || '', phone: data.emergencyPhone || '', relationship: data.emergencyRelationship || '' }]
       };
       form.setFieldsValue(loaded);
+      setValues(loaded);
       setProfile(data);
       if (data.profilePhoto) {
         api.get(`/api/medical/${user._id}/photo`, { responseType: 'blob' })
@@ -151,7 +152,18 @@ const MedicalForm = ({ onSubmissionSuccess }) => {
       toast.success('Medical profile saved successfully.');
       onSubmissionSuccess?.(data.profile);
     } catch (error) {
-      toast.error(error.response?.data?.message || 'Review the highlighted mandatory fields.');
+      if (error.errorFields?.length) {
+        const firstError = error.errorFields[0]?.errors?.[0];
+        toast.error(firstError || 'Review the highlighted mandatory fields.');
+      } else {
+        const response = error.response?.data;
+        const fields = Array.isArray(response?.fields)
+          ? response.fields.join(', ')
+          : response?.fields && typeof response.fields === 'object'
+            ? Object.keys(response.fields).join(', ')
+            : '';
+        toast.error(`${response?.message || 'Unable to save the medical profile.'}${fields ? ` Missing or invalid: ${fields}.` : ''}`);
+      }
     } finally {
       setSaving(false);
     }
@@ -181,7 +193,13 @@ const MedicalForm = ({ onSubmissionSuccess }) => {
       </Row>
       <Steps current={step} items={stepItems} responsive style={{ margin: '18px 0 30px' }} />
 
-      <Form form={form} layout="vertical" initialValues={initialValues} requiredMark>
+      <Form
+        form={form}
+        layout="vertical"
+        initialValues={initialValues}
+        requiredMark
+        onValuesChange={() => setValues(form.getFieldsValue(true))}
+      >
         {step === 0 && (
           <>
             <Title level={4}>Personal details</Title>
