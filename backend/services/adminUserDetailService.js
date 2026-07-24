@@ -2,6 +2,7 @@ const mongoose = require('mongoose');
 const User = require('../models/User');
 const MedicalProfile = require('../models/MedicalProfile');
 const QRCode = require('../models/QRCode');
+const MedicalReport = require('../models/MedicalReport');
 const { calculateCompletion, isProfileComplete } = require('./adminUserQueryService');
 
 const publicUserFields = 'name email role accountStatus isDeleted isVerified createdAt updatedAt lastLoginAt deletedAt deletionReason';
@@ -16,12 +17,14 @@ const getAdminUserDetail = async (userId) => {
 
   if (!user) return null;
 
-  const [profile, qrCount, revokedQrCount, latestQr] = await Promise.all([
+  const [profile, qrCount, revokedQrCount, latestQr, reports] = await Promise.all([
     MedicalProfile.findOne({ userId }).sort({ createdAt: -1 }).lean(),
     QRCode.countDocuments({ userId }),
     QRCode.countDocuments({ userId, status: 'revoked' }),
     QRCode.findOne({ userId, status: 'active', token: { $exists: true, $ne: null } })
-      .sort({ createdAt: -1 }).select('_id createdAt updatedAt').lean()
+      .sort({ createdAt: -1 }).select('_id createdAt updatedAt').lean(),
+    MedicalReport.find({ userId }).sort({ reportVersion: -1 })
+      .select('-snapshotData -pdfUrl').limit(20).lean()
   ]);
 
   return {
@@ -91,10 +94,10 @@ const getAdminUserDetail = async (userId) => {
       revocationSupported: false
     },
     reports: {
-      available: false,
-      latest: null,
-      history: [],
-      message: 'Saved medical reports are not implemented in the current repository.'
+      available: reports.length > 0,
+      latest: reports.find((report) => report.isLatest && !report.isArchived) || null,
+      history: reports,
+      message: reports.length ? null : 'No saved medical reports have been generated.'
     }
   };
 };

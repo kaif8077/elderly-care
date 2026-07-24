@@ -9,7 +9,7 @@ const items = [
   { label: 'Dashboard', to: '/admin/dashboard', icon: FaSlidersH, available: true },
   { label: 'Users', to: '/admin/users', icon: FaUsers, available: true },
   { label: 'Medical Profiles', icon: FaHospitalUser },
-  { label: 'Reports', icon: FaFileMedical },
+  { label: 'Reports', to: '/admin/reports', icon: FaFileMedical, available: true },
   { label: 'ID Cards', icon: FaIdCard },
   { label: 'QR Management', icon: FaQrcode },
   { label: 'Emergency Alerts', icon: FaBell },
