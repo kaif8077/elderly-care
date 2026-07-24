@@ -3,7 +3,7 @@
   --primary: #0066ff;
   --primary-light: #e6f0ff;
   --secondary: #ff6b00;
-  --error: #ff4444;
+  --error: #ff6b00;
   --text: #333;
   --text-light: #666;
   --border: #e0e0e0;
@@ -416,19 +416,19 @@ body {
 }
 
 .password-requirements li:before {
-  content: '✓';
+  content: 'Ã¢Å“â€œ';
   position: absolute;
   left: 0;
-  color: green;
+  color: #0066ff;
 }
 
 .password-requirements li.invalid:before {
-  content: '✗';
+  content: 'Ã¢Å“â€”';
   color: red;
 }
 
 .password-requirements li.valid {
-  color: green;
+  color: #0066ff;
 }
 
 .password-requirements li.invalid {

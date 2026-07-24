@@ -1,7 +1,121 @@
-/* eslint-disable react-hooks/exhaustive-deps */
-import React,{useEffect,useState} from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import axios from 'axios';
-import {FaDownload,FaHeartbeat,FaHistory,FaSyncAlt} from 'react-icons/fa';
+import {
+  Alert, Button, Card, Empty, List, Skeleton, Space, Tag, Typography
+} from 'antd';
+import {
+  DownloadOutlined, HeartOutlined, HistoryOutlined, ReloadOutlined
+} from '@ant-design/icons';
 import './Recommendations.css';
-const base=process.env.REACT_APP_BACKEND_URI;
-const Recommendations=()=>{const[items,setItems]=useState([]);const[loading,setLoading]=useState(true);const[working,setWorking]=useState(false);const[error,setError]=useState('');const token=localStorage.getItem('token');const load=async()=>{setLoading(true);try{const{data}=await axios.get(`${base}/api/recommendations/health`,{headers:{Authorization:`Bearer ${token}`}});setItems(data.recommendations||[]);setError('');}catch(e){setError(e.response?.data?.message||'Unable to load recommendations.');}finally{setLoading(false)}};useEffect(()=>{load();},[]);const generate=async()=>{setWorking(true);try{await axios.post(`${base}/api/recommendations/health`,{},{headers:{Authorization:`Bearer ${token}`}});await load();}catch(e){setError(e.response?.data?.message||'Complete your medical profile first.');}finally{setWorking(false)}};const download=async(id)=>{const r=await axios.get(`${base}/api/recommendations/health/${id}/download`,{headers:{Authorization:`Bearer ${token}`},responseType:'blob'});const a=document.createElement('a');a.href=URL.createObjectURL(r.data);a.download=`health-recommendation-${id}.pdf`;a.click();URL.revokeObjectURL(a.href)};const latest=items[0];return <section className="recommendations-container"><header className="recommendations-header"><div><span>PERSONALIZED WELLNESS</span><h2><FaHeartbeat/> Health recommendations</h2><p>Saved guidance based on your latest medical profile.</p></div><button onClick={generate} disabled={working}><FaSyncAlt/> {working?'Generating...':'Generate new'}</button></header>{error&&<div className="recommendations-error">{error}</div>}{loading?<div className="recommendations-loading">Loading saved recommendations...</div>:latest?<><article className="recommendation-report"><div className="recommendation-report-meta"><strong>Latest recommendation</strong><span>{new Date(latest.generatedAt).toLocaleString()}</span><button onClick={()=>download(latest._id)}><FaDownload/> Download PDF</button></div><pre>{latest.content}</pre><p className="recommendation-disclaimer">General wellness information only. Consult a qualified healthcare professional before changing treatment, medicines, diet, or exercise.</p></article>{items.length>1&&<div className="recommendation-history"><h3><FaHistory/> Previous recommendations</h3>{items.slice(1).map(x=><div key={x._id}><span>{new Date(x.generatedAt).toLocaleString()}</span><button onClick={()=>download(x._id)}><FaDownload/> PDF</button></div>)}</div>}</>:<div className="recommendations-empty"><FaHeartbeat/><h3>No saved recommendations</h3><p>Complete your medical profile, then generate your first wellness plan.</p></div>}</section>};export default Recommendations;
+
+const { Paragraph, Text, Title } = Typography;
+const base = process.env.REACT_APP_BACKEND_URI || 'http://localhost:5000';
+
+const Recommendations = () => {
+  const [items, setItems] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [working, setWorking] = useState(false);
+  const [error, setError] = useState('');
+  const token = localStorage.getItem('token');
+  const headers = { Authorization: `Bearer ${token}` };
+
+  const load = useCallback(async () => {
+    if (!token) return;
+    setLoading(true);
+    try {
+      const { data } = await axios.get(`${base}/api/recommendations/health`, { headers });
+      setItems(data.recommendations || []);
+      setError('');
+    } catch (requestError) {
+      setError(requestError.response?.data?.message || 'Unable to load recommendations.');
+    } finally {
+      setLoading(false);
+    }
+  // The token is the current browser session.
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [token]);
+
+  useEffect(() => { load(); }, [load]);
+
+  const generate = async () => {
+    setWorking(true);
+    setError('');
+    try {
+      await axios.post(`${base}/api/recommendations/health`, {}, { headers });
+      await load();
+    } catch (requestError) {
+      setError(requestError.response?.data?.message || 'Complete your medical profile first.');
+    } finally {
+      setWorking(false);
+    }
+  };
+
+  const download = async (id) => {
+    try {
+      const response = await axios.get(`${base}/api/recommendations/health/${id}/download`, {
+        headers,
+        responseType: 'blob'
+      });
+      const url = URL.createObjectURL(response.data);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = `health-recommendation-${id}.pdf`;
+      link.click();
+      URL.revokeObjectURL(url);
+    } catch (requestError) {
+      setError('Unable to download this recommendation PDF.');
+    }
+  };
+
+  const latest = items[0];
+  return (
+    <section>
+      <Space align="start" style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 18 }}>
+        <div>
+          <Text className="care-eyebrow">PERSONALIZED WELLNESS</Text>
+          <Title level={3} style={{ margin: '5px 0' }}><HeartOutlined /> Necessary health guidance</Title>
+          <Paragraph type="secondary" style={{ margin: 0 }}>A short list based on your latest medical profile.</Paragraph>
+        </div>
+        <Button type="primary" icon={<ReloadOutlined />} onClick={generate} loading={working}>Generate new</Button>
+      </Space>
+
+      {error && <Alert type="error" showIcon message={error} closable onClose={() => setError('')} />}
+      {loading ? <Skeleton active paragraph={{ rows: 5 }} /> : latest ? (
+        <>
+          <Card
+            size="small"
+            title={<Space><Tag color="blue">Latest</Tag><Text>{new Date(latest.generatedAt).toLocaleString()}</Text></Space>}
+            extra={<Button icon={<DownloadOutlined />} onClick={() => download(latest._id)}>PDF</Button>}
+          >
+            <div className="recommendation-content">{latest.content}</div>
+            <Alert
+              style={{ marginTop: 16 }}
+              type="warning"
+              showIcon
+              message="General wellness guidance only"
+              description="Consult a qualified healthcare professional before changing treatment, medicines, diet, or exercise."
+            />
+          </Card>
+          {items.length > 1 && (
+            <Card size="small" title={<Space><HistoryOutlined />Previous recommendations</Space>} style={{ marginTop: 14 }}>
+              <List
+                dataSource={items.slice(1)}
+                renderItem={(item) => (
+                  <List.Item actions={[<Button type="link" icon={<DownloadOutlined />} onClick={() => download(item._id)}>PDF</Button>]}>
+                    {new Date(item.generatedAt).toLocaleString()}
+                  </List.Item>
+                )}
+              />
+            </Card>
+          )}
+        </>
+      ) : (
+        <Empty description="Complete your medical profile, then generate your first recommendation.">
+          <Button type="primary" onClick={generate} loading={working}>Generate recommendation</Button>
+        </Empty>
+      )}
+    </section>
+  );
+};
+
+export default Recommendations;

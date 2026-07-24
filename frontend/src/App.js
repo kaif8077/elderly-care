@@ -5,6 +5,7 @@ import Navbar from './components/Navbar';
 import Home from './pages/Home';
 import Login from './pages/Login';
 import Register from './pages/Register';
+import ForgotPassword from './pages/ForgotPassword';
 import Profile from './pages/Profile';
 import Dashboard from './pages/Dashboard';
 import MedicalReports from './pages/MedicalReports';
@@ -23,6 +24,7 @@ import AdminUserDetail from './admin/pages/AdminUserDetail';
 import AdminIdCard from './admin/pages/AdminIdCard';
 import AdminAuditLogs from './admin/pages/AdminAuditLogs';
 import AdminReports from './admin/pages/AdminReports';
+import ProtectedRoute from './components/ProtectedRoute';
 import './App.css';
 
 const AppRoutes = () => {
@@ -38,10 +40,11 @@ const AppRoutes = () => {
                 <Route path="/about" element={<About />} />  
                 <Route path="/login" element={<Login />} />
                 <Route path="/register" element={<Register />} />
+                <Route path="/forgot-password" element={<ForgotPassword />} />
                 <Route path="/contact" element={<Contact />} />
-                <Route path="/profile" element={<Profile />} />
-                <Route path="/dashboard" element={<Dashboard />} />
-                <Route path="/reports" element={<MedicalReports />} />
+                <Route path="/profile" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
+                <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
+                <Route path="/reports" element={<ProtectedRoute><MedicalReports /></ProtectedRoute>} />
                 <Route path="/emergency/:token" element={<EmergencyProfile />} />
                 <Route path="/services" element={<Services />} />
                 <Route path="/admin/login" element={<AdminLogin />} />
@@ -64,7 +67,7 @@ const AppRoutes = () => {
 
 const App = () => {
     return (
-        <Router>
+        <Router future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
             <AdminAuthProvider>
                 <AppRoutes />
             </AdminAuthProvider>
