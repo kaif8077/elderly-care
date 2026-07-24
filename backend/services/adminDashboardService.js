@@ -1,6 +1,7 @@
 const User = require('../models/User');
 const MedicalProfile = require('../models/MedicalProfile');
 const QRCode = require('../models/QRCode');
+const EmergencyAlert = require('../models/EmergencyAlert');
 
 const regularUsers = {
   role: { $nin: ['admin', 'super_admin'] },
@@ -124,7 +125,9 @@ const getDashboardStatistics = async () => {
     registeredThisMonth,
     profileStats,
     qrStats,
-    registrationsByMonth
+    registrationsByMonth,
+    alertsToday,
+    unresolvedAlerts
   ] = await Promise.all([
     User.countDocuments(regularUsers),
     User.countDocuments({ ...regularUsers, accountStatus: 'active' }),
@@ -134,7 +137,9 @@ const getDashboardStatistics = async () => {
     User.countDocuments({ ...regularUsers, createdAt: { $gte: startOfMonth() } }),
     getProfileStatistics(),
     getQrStatistics(),
-    getMonthlyRegistrations()
+    getMonthlyRegistrations(),
+    EmergencyAlert.countDocuments({ createdAt: { $gte: startOfDay() } }),
+    EmergencyAlert.countDocuments({ status: { $nin: ['resolved', 'false_alarm'] } })
   ]);
 
   return {
@@ -159,7 +164,7 @@ const getDashboardStatistics = async () => {
       capability: 'revocable_tokens'
     },
     reports: { total: null, capability: 'not_implemented' },
-    emergencyAlerts: { today: null, unresolved: null, capability: 'not_implemented' },
+    emergencyAlerts: { today: alertsToday, unresolved: unresolvedAlerts, capability: 'email_activation' },
     idCards: { total: null, capability: 'not_implemented' },
     registrationsByMonth,
     refreshedAt: new Date().toISOString()

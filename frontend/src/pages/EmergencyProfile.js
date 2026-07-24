@@ -1,7 +1,7 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import {
-  FaExclamationTriangle, FaHospital, FaLocationArrow, FaPhoneAlt,
+  FaBell, FaExclamationTriangle, FaHospital, FaLocationArrow, FaPhoneAlt,
   FaSms, FaUserShield
 } from 'react-icons/fa';
 import api from '../services/api';
@@ -14,6 +14,7 @@ const EmergencyProfile = () => {
   const { token } = useParams();
   const [profile, setProfile] = useState(null);
   const [state, setState] = useState({ loading: true, error: '' });
+  const [alertState, setAlertState] = useState({ sending: false, message: '', error: false });
   const primary = profile?.emergencyContacts?.[0];
 
   useEffect(() => {
@@ -42,6 +43,20 @@ const EmergencyProfile = () => {
     return `sms:${primary.phone}?body=${encodeURIComponent(message)}`;
   }, [primary, profile]);
 
+  const sendSecureAlert = async () => {
+    if (!window.confirm('Notify the verified account owner that this emergency QR was activated? No location or medical details will be emailed.')) return;
+    setAlertState({ sending: true, message: '', error: false });
+    try {
+      const { data } = await api.post(`/api/emergency-alerts/public/${encodeURIComponent(token)}`, {});
+      setAlertState({ sending: false, message: data.message, error: false });
+    } catch (error) {
+      setAlertState({
+        sending: false,
+        message: error.response?.data?.message || 'Unable to send the alert. Please call the contact directly.',
+        error: true
+      });
+    }
+  };
   const shareLocation = () => {
     if (!navigator.geolocation || !primary?.phone) return;
     navigator.geolocation.getCurrentPosition(({ coords }) => {
@@ -55,7 +70,7 @@ const EmergencyProfile = () => {
   };
 
   if (state.loading) {
-    return <main className="emergency-shell" aria-busy="true"><div className="emergency-state">Loading emergency information…</div></main>;
+    return <main className="emergency-shell" aria-busy="true"><div className="emergency-state">Loading emergency information...</div></main>;
   }
   if (state.error) {
     return <main className="emergency-shell"><div className="emergency-state emergency-error"><FaExclamationTriangle /><h1>Emergency profile unavailable</h1><p>{state.error}</p></div></main>;
@@ -67,7 +82,7 @@ const EmergencyProfile = () => {
         <span className="emergency-brand"><FaUserShield /> ElderlyCare</span>
         <span className="emergency-status">Active emergency card</span>
         <h1>{profile.name}</h1>
-        <p>{profile.elderlyCareId}{profile.approximateAge !== null ? ` · Approx. age ${profile.approximateAge}` : ''}</p>
+        <p>{profile.elderlyCareId}{profile.approximateAge !== null ? ` - Approx. age ${profile.approximateAge}` : ''}</p>
       </header>
 
       <section className="critical-panel" aria-labelledby="critical-title">
@@ -87,10 +102,13 @@ const EmergencyProfile = () => {
 
       <section className="emergency-actions" aria-label="Emergency actions">
         {primary?.phone && <a className="action action-primary" href={`tel:${primary.phone}`}><FaPhoneAlt /> Call {primary.name || 'primary contact'}</a>}
+        <button className="action action-alert" type="button" onClick={sendSecureAlert} disabled={alertState.sending}><FaBell /> {alertState.sending ? 'Sending alert...' : 'Send secure alert'}</button>
         {smsLink && <a className="action" href={smsLink}><FaSms /> Open emergency SMS</a>}
         {primary?.phone && <button className="action" type="button" onClick={shareLocation}><FaLocationArrow /> Share current location</button>}
         <a className="action" href="https://www.google.com/maps/search/hospital+near+me" target="_blank" rel="noreferrer"><FaHospital /> Find nearby hospital</a>
       </section>
+
+      {alertState.message && <div className={`alert-result ${alertState.error ? 'alert-result-error' : ''}`} role="status">{alertState.message}</div>}
 
       <section className="emergency-contact-card">
         <h2>Emergency contact</h2>

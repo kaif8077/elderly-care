@@ -8,6 +8,7 @@ const qrRoutes = require('./routes/qrRoutes');
 const locationRoutes = require('./routes/locationRoutes');
 const smsRoutes = require('./routes/smsRoutes');
 const recommendationRoutes = require('./routes/recommendationRoutes');
+const emergencyAlertRoutes = require('./routes/emergencyAlertRoutes');
 const adminAuthRoutes = require('./routes/adminAuthRoutes');
 const adminDashboardRoutes = require('./routes/adminDashboardRoutes');
 const adminUserRoutes = require('./routes/adminUserRoutes');
@@ -46,6 +47,7 @@ app.use('/api/qr', qrRoutes);
 app.use('/api/location', locationRoutes);
 app.use('/api/send-sms', smsRoutes);
 app.use('/api/recommendations', recommendationRoutes);
+app.use('/api/emergency-alerts', emergencyAlertRoutes);
 app.use('/api/contact', require('./routes/contactRoutes'));
 app.use('/api/feedback', require('./routes/feedbackRoutes'));
 
