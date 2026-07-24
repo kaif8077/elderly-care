@@ -11,7 +11,12 @@ const elderlyCareTheme = {
   components: {
     Button: { fontWeight: 700, primaryShadow: 'none', defaultHoverColor: '#ff6b00', defaultHoverBorderColor: '#ff6b00' }, Card: { headerBg: '#ffffff' },
     Layout: { bodyBg: '#f3f7f5', headerBg: '#ffffff', siderBg: '#0066ff' },
-    Menu: { darkItemBg: '#0066ff', darkItemSelectedBg: '#ffffff', darkItemSelectedColor: '#0066ff', darkItemHoverBg: '#ff6b00' },
+    Menu: {
+      itemColor: '#1f2937', itemHoverColor: '#ff6b00', itemSelectedColor: '#0066ff',
+      horizontalItemHoverColor: '#ff6b00', horizontalItemSelectedColor: '#0066ff',
+      darkItemBg: '#0066ff', darkItemSelectedBg: '#ffffff',
+      darkItemSelectedColor: '#0066ff', darkItemHoverBg: '#ff6b00'
+    },
     Table: { headerBg: '#f3f6fc', headerColor: '#1f2937' }
   }
 };

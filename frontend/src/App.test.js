@@ -70,3 +70,13 @@ test('main navigation uses Ant Design without the legacy hard CSS', () => {
   expect(source).not.toContain("Navbar.css");
   expect(fs.existsSync(path.join(__dirname, 'components', 'Navbar.css'))).toBe(false);
 });
+
+test('home page uses responsive Ant Design sections without legacy CSS', () => {
+  const source = fs.readFileSync(path.join(__dirname, 'pages', 'Home.js'), 'utf8');
+  expect(source).toContain('THE PROBLEM WE SOLVE');
+  expect(source).toContain('How ElderlyCare helps');
+  expect(source).toContain('<Collapse');
+  expect(source).toContain('<Row');
+  expect(source).not.toContain("Home.css");
+  expect(fs.existsSync(path.join(__dirname, 'pages', 'Home.css'))).toBe(false);
+});
