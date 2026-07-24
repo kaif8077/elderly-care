@@ -85,8 +85,9 @@ const generateQr = async ({ userId, adminId }) => {
   );
 
   const token = crypto.randomBytes(32).toString('base64url');
-  const baseUrl = String(process.env.RENDER_BACKEND_URL || 'http://localhost:5000').replace(/\/+$/, '');
-  const profileUrl = `${baseUrl}/api/qr/access/${token}`;
+  const frontendUrl = String(process.env.FRONTEND_URL || 'http://localhost:3000')
+    .split(',')[0].trim().replace(/\/+$/, '');
+  const profileUrl = `${frontendUrl}/emergency/${token}`;
   const data = await QRCodeGenerator.toDataURL(profileUrl, { errorCorrectionLevel: 'H', width: 640, margin: 3 });
   const qr = await QRCode.create({ userId, data, token, profileUrl, status: 'active', generatedBy: adminId });
 

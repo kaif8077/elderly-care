@@ -8,6 +8,7 @@ import Register from './pages/Register';
 import Profile from './pages/Profile';
 import Dashboard from './pages/Dashboard';
 import MedicalReports from './pages/MedicalReports';
+import EmergencyProfile from './pages/EmergencyProfile';
 import About from './pages/About'; 
 import Services from './pages/Services';
 import Contact from './pages/Contact';
@@ -27,10 +28,11 @@ import './App.css';
 const AppRoutes = () => {
     const location = useLocation();
     const isAdminRoute = location.pathname.startsWith('/admin');
+    const isEmergencyRoute = location.pathname.startsWith('/emergency/');
 
     return (
         <>
-            {!isAdminRoute && <Navbar />}
+            {!isAdminRoute && !isEmergencyRoute && <Navbar />}
             <Routes>
                 <Route path="/" element={<Home />} />
                 <Route path="/about" element={<About />} />  
@@ -40,6 +42,7 @@ const AppRoutes = () => {
                 <Route path="/profile" element={<Profile />} />
                 <Route path="/dashboard" element={<Dashboard />} />
                 <Route path="/reports" element={<MedicalReports />} />
+                <Route path="/emergency/:token" element={<EmergencyProfile />} />
                 <Route path="/services" element={<Services />} />
                 <Route path="/admin/login" element={<AdminLogin />} />
                 <Route

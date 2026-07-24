@@ -10,6 +10,7 @@ const router = express.Router();
 
 // MAIN ROUTES
 router.get('/access/:token', secureQrController.serveTokenAccess);
+router.get('/public/:token', secureQrController.getPublicEmergencyProfile);
 router.get('/:userId', authMiddleware, secureQrController.getQRCode);
 router.post('/', authMiddleware, secureQrController.createQRCode);
 

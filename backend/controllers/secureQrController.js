@@ -1,6 +1,33 @@
 const QRCode = require('../models/QRCode');
 const User = require('../models/User');
+const MedicalProfile = require('../models/MedicalProfile');
 const { generateQr } = require('../services/adminIdCardService');
+
+const calculateAge = (dob) => {
+  if (!dob) return null;
+  const birth = new Date(dob);
+  if (Number.isNaN(birth.getTime())) return null;
+  const today = new Date();
+  let age = today.getUTCFullYear() - birth.getUTCFullYear();
+  const beforeBirthday = today.getUTCMonth() < birth.getUTCMonth()
+    || (today.getUTCMonth() === birth.getUTCMonth() && today.getUTCDate() < birth.getUTCDate());
+  if (beforeBirthday) age -= 1;
+  return age >= 0 && age <= 130 ? age : null;
+};
+
+const emergencyProjection = (profile, qr) => ({
+  qrId: String(qr._id),
+  elderlyCareId: `EC-${String(profile.userId).slice(-8).toUpperCase()}`,
+  name: profile.name,
+  approximateAge: calculateAge(profile.dob),
+  bloodGroup: profile.bloodGroup || 'Unknown',
+  severeAllergies: [...(profile.allergies || []), profile.allergiesOther].filter(Boolean),
+  majorConditions: [...(profile.medicalHistory || []), profile.medicalHistoryOther].filter(Boolean),
+  criticalMedications: [...(profile.medications || []), profile.medicationsOther].filter(Boolean),
+  emergencyInstruction: 'Contact the listed guardian and local emergency services when immediate help is needed.',
+  emergencyContacts: [{ name: profile.emergencyContact, phone: profile.emergencyPhone, priority: 1 }],
+  lastUpdatedAt: profile.updatedAt
+});
 
 exports.createQRCode = async (req, res) => {
   const userId = req.body.userId;
@@ -45,16 +72,32 @@ exports.serveLegacyLink = (req, res) => {
 
 exports.serveTokenAccess = async (req, res) => {
   try {
-    const qr = await QRCode.findOne({ token: req.params.token }).select('userId status').lean();
-    if (!qr || qr.status !== 'active') {
-      return res.status(410).send('This emergency QR code is invalid or has been revoked.');
-    }
+    const qr = await QRCode.findOne({ token: req.params.token }).select('_id userId status').lean();
+    if (!qr || qr.status !== 'active') return res.status(410).send('This emergency QR code is invalid or has been revoked.');
     const user = await User.findById(qr.userId).select('accountStatus isDeleted').lean();
-    if (!user || user.accountStatus !== 'active' || user.isDeleted) {
-      return res.status(410).send('This emergency QR code is no longer active.');
-    }
-    return res.status(503).send('Secure emergency profile access is being upgraded. Please use the emergency contact printed on the card.');
+    if (!user || user.accountStatus !== 'active' || user.isDeleted) return res.status(410).send('This emergency QR code is no longer active.');
+    const frontend = String(process.env.FRONTEND_URL || 'http://localhost:3000').split(',')[0].trim().replace(/\/+$/, '');
+    return res.redirect(302, `${frontend}/emergency/${encodeURIComponent(req.params.token)}`);
   } catch (error) {
     return res.status(500).send('Unable to validate this emergency QR code.');
   }
 };
+
+exports.getPublicEmergencyProfile = async (req, res) => {
+  try {
+    const qr = await QRCode.findOne({ token: req.params.token }).select('_id userId status updatedAt').lean();
+    if (!qr || qr.status !== 'active') return res.status(410).json({ message: 'This emergency QR code is invalid or has been revoked.', code: 'QR_ACCESS_REVOKED' });
+    const [user, profile] = await Promise.all([
+      User.findById(qr.userId).select('accountStatus isDeleted').lean(),
+      MedicalProfile.findOne({ userId: qr.userId }).sort({ createdAt: -1 }).lean()
+    ]);
+    if (!user || user.accountStatus !== 'active' || user.isDeleted || !profile) return res.status(410).json({ message: 'This emergency profile is no longer available.', code: 'EMERGENCY_PROFILE_INACTIVE' });
+    res.set('Cache-Control', 'no-store, private');
+    return res.json({ emergencyProfile: emergencyProjection(profile, qr) });
+  } catch (error) {
+    return res.status(500).json({ message: 'Unable to load the emergency profile.', code: 'EMERGENCY_PROFILE_ERROR' });
+  }
+};
+
+exports.calculateAge = calculateAge;
+exports.emergencyProjection = emergencyProjection;
