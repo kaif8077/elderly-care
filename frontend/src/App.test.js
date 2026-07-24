@@ -47,6 +47,8 @@ test('medical profile form saves steps and supports structured emergency contact
   expect(source).toContain('mode="tags"');
   expect(source).toContain('Profile photograph is required');
   expect(source).toContain('reviewConfirmed');
+  expect(source).toContain('const { reviewConfirmed, profilePhoto, ...clean }');
+  expect(source).toContain('stepFields[step]');
 });
 
 test('dashboard uses a full-width QR flow without legacy quick-action cards', () => {

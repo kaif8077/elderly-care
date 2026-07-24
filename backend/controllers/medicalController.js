@@ -32,6 +32,9 @@ const normalizeProfileData = (body, userId) => {
     }
     delete data.heightUnit;
     delete data.finalize;
+    // Photographs are accepted only by the validated multipart upload endpoint.
+    // Never let a browser fake-path or arbitrary JSON replace stored photo metadata.
+    delete data.profilePhoto;
     return data;
 };
 
@@ -206,3 +209,5 @@ exports.getQRCode = async (req, res) => {
         });
     }
 };
+
+exports.normalizeProfileData = normalizeProfileData;

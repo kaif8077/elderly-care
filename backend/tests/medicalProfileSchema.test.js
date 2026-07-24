@@ -1,6 +1,7 @@
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const MedicalProfile = require('../models/MedicalProfile');
+const { normalizeProfileData } = require('../controllers/medicalController');
 
 test('medical profile accepts the new structured personal and emergency fields', async () => {
   const profile = new MedicalProfile({
@@ -37,4 +38,13 @@ test('blood group remains mandatory for emergency readiness', async () => {
     dietPreference: 'Vegetarian'
   });
   await assert.rejects(profile.validate(), /bloodGroup/);
+});
+
+test('JSON profile updates discard browser fake paths for photographs', () => {
+  const normalized = normalizeProfileData({
+    firstName: 'Asha',
+    lastName: 'Sharma',
+    profilePhoto: 'C:\\fakepath\\signature.jpg'
+  }, '507f1f77bcf86cd799439011');
+  assert.equal(Object.hasOwn(normalized, 'profilePhoto'), false);
 });

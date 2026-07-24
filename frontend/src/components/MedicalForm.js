@@ -93,11 +93,14 @@ const MedicalForm = ({ onSubmissionSuccess }) => {
     ['reviewConfirmed']
   ];
 
-  const serialize = (raw, finalize = false) => {
-    const { reviewConfirmed, ...data } = raw;
+  const serialize = (raw, finalize = false, fields = null) => {
+    const { reviewConfirmed, profilePhoto, ...clean } = raw;
+    const data = fields
+      ? Object.fromEntries(fields.filter((field) => field !== 'profilePhoto').map((field) => [field, clean[field]]))
+      : clean;
     return {
       ...data,
-      dob: raw.dob?.format?.('YYYY-MM-DD') || raw.dob,
+      ...(data.dob ? { dob: data.dob?.format?.('YYYY-MM-DD') || data.dob } : {}),
       finalize
     };
   };
@@ -120,7 +123,10 @@ const MedicalForm = ({ onSubmissionSuccess }) => {
         form.setFields([{ name: 'profilePhoto', errors: ['Profile photograph is required'] }]);
         throw new Error('PHOTO_REQUIRED');
       }
-      const { data } = await api.post('/api/medical', serialize(form.getFieldsValue(true)));
+      const { data } = await api.post(
+        '/api/medical',
+        serialize(form.getFieldsValue(true), false, stepFields[step])
+      );
       if (step === 0) await savePhoto();
       setProfile(data.profile);
       toast.success(`${stepItems[step].title} saved`);
