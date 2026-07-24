@@ -1,8 +1,10 @@
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
-import { FaChevronLeft, FaChevronRight, FaSearch, FaSyncAlt } from 'react-icons/fa';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
+import { Alert, Button, Card, Empty, Input, Select, Space, Table, Tag, Typography } from 'antd';
+import { ReloadOutlined, SearchOutlined } from '@ant-design/icons';
 import adminApi from '../../services/adminApi';
-import AdminStatusBadge from '../components/AdminStatusBadge';
+
+const { Text } = Typography;
 
 const AdminAuditLogs = () => {
   const [searchParams, setSearchParams] = useSearchParams();
@@ -14,8 +16,8 @@ const AdminAuditLogs = () => {
 
   const updateQuery = (updates) => {
     const next = new URLSearchParams(searchParams);
-    Object.entries(updates).forEach(([key, item]) => item ? next.set(key, item) : next.delete(key));
-    if (!Object.prototype.hasOwnProperty.call(updates, 'page')) next.set('page', '1');
+    Object.entries(updates).forEach(([key, value]) => value ? next.set(key, value) : next.delete(key));
+    if (!Object.hasOwn(updates, 'page')) next.set('page', '1');
     setSearchParams(next);
   };
 
@@ -23,8 +25,7 @@ const AdminAuditLogs = () => {
     setLoading(true);
     setError('');
     try {
-      const response = await adminApi.get('/audit-logs', { params: query });
-      setData(response.data);
+      setData((await adminApi.get('/audit-logs', { params: query })).data);
     } catch (requestError) {
       setError(requestError.response?.data?.message || 'Unable to load audit logs.');
     } finally {
@@ -34,55 +35,49 @@ const AdminAuditLogs = () => {
 
   useEffect(() => { load(); }, [load]);
 
+  const columns = [
+    { title: 'Date', dataIndex: 'createdAt', key: 'createdAt', width: 180, render: (value) => new Date(value).toLocaleString() },
+    { title: 'Admin', key: 'actor', width: 210, render: (_, log) => <div><Text strong>{log.actor?.name || 'System'}</Text><br /><Text type="secondary">{log.actor?.email || log.actorRole || 'Unknown'}</Text></div> },
+    { title: 'Action', dataIndex: 'action', key: 'action', render: (value) => String(value).replaceAll('_', ' ') },
+    { title: 'Resource', key: 'resource', render: (_, log) => <div>{log.resourceType}<br /><Text type="secondary">{log.resourceId || '—'}</Text></div> },
+    { title: 'Result', dataIndex: 'success', key: 'success', render: (value) => <Tag color={value ? 'blue' : 'orange'}>{value ? 'Succeeded' : 'Failed'}</Tag> },
+    { title: 'Reason / description', key: 'description', width: 300, render: (_, log) => log.reason || log.description || '—' }
+  ];
+
   return (
-    <div className="admin-audit-page">
-      <div className="admin-page-actions">
-        <div><p>Security and administrative activity. Medical records, passwords, and tokens are not stored here.</p><small>{data.pagination.total} matching events</small></div>
-        <button className="admin-secondary-button" onClick={load} disabled={loading}><FaSyncAlt /> Refresh</button>
-      </div>
-      <section className="admin-filter-panel admin-audit-filters" aria-label="Audit filters">
-        <form className="admin-user-search" onSubmit={(event) => { event.preventDefault(); updateQuery({ search: search.trim() }); }}>
-          <FaSearch aria-hidden="true" /><label className="admin-visually-hidden" htmlFor="audit-search">Search audit logs</label>
-          <input id="audit-search" value={search} onChange={(event) => setSearch(event.target.value)} placeholder="Action, resource, or reason" />
-          <button>Search</button>
-        </form>
-        <label>Result
-          <select value={query.success || ''} onChange={(event) => updateQuery({ success: event.target.value })}>
-            <option value="">All results</option><option value="true">Succeeded</option><option value="false">Failed</option>
-          </select>
-        </label>
-        <label>Rows
-          <select value={query.limit || '20'} onChange={(event) => updateQuery({ limit: event.target.value })}>
-            <option value="10">10</option><option value="20">20</option><option value="50">50</option><option value="100">100</option>
-          </select>
-        </label>
-      </section>
-      <section className="admin-table-panel" aria-busy={loading}>
-        {loading ? <div className="admin-table-loading">Loading audit events…</div>
-          : error ? <div className="admin-state-card" role="alert"><h2>Audit logs unavailable</h2><p>{error}</p></div>
-            : !data.logs.length ? <div className="admin-state-card"><h2>No audit events found</h2><p>Try changing the current filters.</p></div>
-              : <div className="admin-table-scroll"><table className="admin-data-table admin-audit-table">
-                <caption className="admin-visually-hidden">Administrative audit events</caption>
-                <thead><tr><th scope="col">Date</th><th scope="col">Admin</th><th scope="col">Action</th><th scope="col">Resource</th><th scope="col">Affected user</th><th scope="col">Result</th><th scope="col">Reason / description</th></tr></thead>
-                <tbody>{data.logs.map((log) => <tr key={log.id}>
-                  <td>{new Date(log.createdAt).toLocaleString()}</td>
-                  <td>{log.actor?.name || 'System'}<small>{log.actor?.email || log.actorRole || 'Unknown'}</small></td>
-                  <td><strong>{log.action.replaceAll('_', ' ')}</strong></td>
-                  <td>{log.resourceType}<small>{log.resourceId || '—'}</small></td>
-                  <td>{log.affectedUser?.name || '—'}<small>{log.affectedUser?.email || ''}</small></td>
-                  <td><AdminStatusBadge status={log.success ? 'success' : 'failed'} /></td>
-                  <td>{log.reason || log.description}<small>{log.ipReference ? `IP ref: ${log.ipReference}` : ''}</small></td>
-                </tr>)}</tbody>
-              </table></div>}
-        <div className="admin-pagination">
-          <span>Page {data.pagination.page} of {data.pagination.pages}</span>
-          <div>
-            <button aria-label="Previous page" disabled={loading || data.pagination.page <= 1} onClick={() => updateQuery({ page: String(data.pagination.page - 1) })}><FaChevronLeft /></button>
-            <button aria-label="Next page" disabled={loading || data.pagination.page >= data.pagination.pages} onClick={() => updateQuery({ page: String(data.pagination.page + 1) })}><FaChevronRight /></button>
-          </div>
-        </div>
-      </section>
-    </div>
+    <Space direction="vertical" size={18} style={{ width: '100%' }}>
+      <Alert type="info" showIcon message="Administrative activity" description="Passwords, tokens, and complete medical records are not stored in audit logs." />
+      {error && <Alert type="error" showIcon message={error} action={<Button onClick={load}>Retry</Button>} />}
+      <Card>
+        <Space wrap>
+          <Space.Compact>
+            <Input value={search} onChange={(event) => setSearch(event.target.value)} onPressEnter={() => updateQuery({ search: search.trim() })} prefix={<SearchOutlined />} placeholder="Action, resource, or reason" allowClear />
+            <Button type="primary" onClick={() => updateQuery({ search: search.trim() })}>Search</Button>
+          </Space.Compact>
+          <Select allowClear value={query.success} onChange={(value) => updateQuery({ success: value })} placeholder="Result" style={{ width: 140 }} options={[{ value: 'true', label: 'Succeeded' }, { value: 'false', label: 'Failed' }]} />
+          <Button icon={<ReloadOutlined />} onClick={load}>Refresh</Button>
+        </Space>
+      </Card>
+      <Card>
+        <Table
+          rowKey="id"
+          loading={loading}
+          columns={columns}
+          dataSource={data.logs}
+          scroll={{ x: 1050 }}
+          locale={{ emptyText: <Empty description="No audit events found" /> }}
+          pagination={{
+            current: data.pagination.page,
+            pageSize: data.pagination.limit,
+            total: data.pagination.total,
+            showSizeChanger: true,
+            pageSizeOptions: [10, 20, 50, 100],
+            showTotal: (total) => `${total} events`,
+            onChange: (page, limit) => updateQuery({ page: String(page), limit: String(limit) })
+          }}
+        />
+      </Card>
+    </Space>
   );
 };
 

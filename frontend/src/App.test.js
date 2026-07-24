@@ -124,3 +124,18 @@ test('secondary public pages use the single about hero and About omits the team 
   expect(services).toContain('selectedKeys={[activeId]}');
   expect(services).toContain('activeService.image');
 });
+
+test('admin navigation exposes only the requested five modules', () => {
+  const sidebar = fs.readFileSync(path.join(__dirname, 'admin', 'components', 'AdminSidebar.js'), 'utf8');
+  ['Dashboard', 'Users', 'Audit Logs', 'Feedback', 'Contact Us'].forEach((label) => expect(sidebar).toContain(`label: '${label}'`));
+  ['Medical Profiles', 'Reports', 'ID Cards', 'QR Management', 'Emergency Alerts', 'Documents'].forEach((label) => expect(sidebar).not.toContain(`label: '${label}'`));
+  const app = fs.readFileSync(path.join(__dirname, 'App.js'), 'utf8');
+  expect(app).toContain('path="contacts"');
+  expect(app).toContain('path="feedback"');
+  ['AdminUsers', 'AdminAuditLogs'].forEach((page) => {
+    const source = fs.readFileSync(path.join(__dirname, 'admin', 'pages', `${page}.js`), 'utf8');
+    expect(source).toContain('<Table');
+    expect(source).toContain("from 'antd'");
+    expect(source).not.toContain('<table');
+  });
+});
