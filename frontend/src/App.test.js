@@ -60,3 +60,13 @@ test('dashboard uses a full-width QR flow without legacy quick-action cards', ()
   expect(source).not.toContain('const actions=');
   expect(source).not.toContain('Emergency ID card');
 });
+
+test('main navigation uses Ant Design without the legacy hard CSS', () => {
+  const source = fs.readFileSync(path.join(__dirname, 'components', 'Navbar.js'), 'utf8');
+  expect(source).toContain('Header');
+  expect(source).toContain('Drawer');
+  expect(source).toContain('Dropdown');
+  expect(source).toContain('Menu');
+  expect(source).not.toContain("Navbar.css");
+  expect(fs.existsSync(path.join(__dirname, 'components', 'Navbar.css'))).toBe(false);
+});

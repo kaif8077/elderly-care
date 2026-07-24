@@ -1,201 +1,139 @@
-import React, { useContext, useState, useEffect, useRef } from 'react';
+import React, { useContext, useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
+import {
+  Avatar, Button, Drawer, Dropdown, Flex, Grid, Image, Layout, Menu, Space, Typography, message
+} from 'antd';
+import {
+  AppstoreOutlined, ContactsOutlined, HomeOutlined, InfoCircleOutlined,
+  LoginOutlined, LogoutOutlined, MenuOutlined, ProfileOutlined,
+  UserAddOutlined, UserOutlined
+} from '@ant-design/icons';
 import { AuthContext } from '../context/AuthContext';
-import '../components/Navbar.css';
-import { ToastContainer, toast } from 'react-toastify';
-import 'react-toastify/dist/ReactToastify.css';
 import logoImage from '../assests/logo.png';
-import { FaUserCircle, FaBars, FaTimes, FaChevronDown, FaChevronUp } from 'react-icons/fa';
+
+const { Header } = Layout;
+const { Text } = Typography;
+const { useBreakpoint } = Grid;
+
+const publicItems = [
+  { key: '/', icon: <HomeOutlined />, label: 'Home' },
+  { key: '/about', icon: <InfoCircleOutlined />, label: 'About Us' },
+  { key: '/services', icon: <AppstoreOutlined />, label: 'Services' },
+  { key: '/contact', icon: <ContactsOutlined />, label: 'Contact Us' }
+];
 
 const Navbar = () => {
-    const { user, logout } = useContext(AuthContext);
-    const location = useLocation();
-    const navigate = useNavigate();
-    const [dropdownOpen, setDropdownOpen] = useState(false);
-    const [authDropdownOpen, setAuthDropdownOpen] = useState(false);
-    const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-    const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
-    const dropdownRef = useRef(null);
-    const authDropdownRef = useRef(null);
+  const { user, logout } = useContext(AuthContext);
+  const location = useLocation();
+  const navigate = useNavigate();
+  const screens = useBreakpoint();
+  const [drawerOpen, setDrawerOpen] = useState(false);
+  const desktop = screens.md;
 
-    // Handle window resize
-    useEffect(() => {
-        const handleResize = () => {
-            setIsMobile(window.innerWidth < 768);
-            if (window.innerWidth >= 768) {
-                setMobileMenuOpen(false);
-            }
-        };
+  const selectedKey = publicItems.some(({ key }) => key === location.pathname)
+    ? location.pathname
+    : '';
 
-        window.addEventListener('resize', handleResize);
-        return () => window.removeEventListener('resize', handleResize);
-    }, []);
+  const openRoute = ({ key }) => {
+    navigate(key);
+    setDrawerOpen(false);
+  };
 
-    // Close dropdowns when clicking outside
-    useEffect(() => {
-        const handleClickOutside = (e) => {
-            if (dropdownRef.current && !dropdownRef.current.contains(e.target)) {
-                setDropdownOpen(false);
-            }
-            if (authDropdownRef.current && !authDropdownRef.current.contains(e.target)) {
-                setAuthDropdownOpen(false);
-            }
-        };
-        document.addEventListener('mousedown', handleClickOutside);
-        return () => document.removeEventListener('mousedown', handleClickOutside);
-    }, []);
+  const handleLogout = () => {
+    logout();
+    message.success('You have successfully logged out.');
+    setDrawerOpen(false);
+    navigate('/', { replace: true });
+  };
 
-    const handleLogout = () => {
-        logout();
-        toast.success("You have successfully logged out!");
-        setTimeout(() => {
-            window.location.href = '/';
-        }, 2000);
-    };
+  const accountItems = user
+    ? [
+        { key: '/profile', icon: <ProfileOutlined />, label: 'My Profile' },
+        { key: '/dashboard', icon: <AppstoreOutlined />, label: 'Dashboard' },
+        { type: 'divider' },
+        { key: 'logout', icon: <LogoutOutlined />, label: 'Logout', danger: true }
+      ]
+    : [
+        { key: '/login', icon: <LoginOutlined />, label: 'Login' },
+        { key: '/register', icon: <UserAddOutlined />, label: 'Register' }
+      ];
 
-    const handleHomeClick = () => {
-        if (location.pathname !== '/') {
-            navigate('/');
+  const accountClick = ({ key }) => {
+    if (key === 'logout') handleLogout();
+    else openRoute({ key });
+  };
+
+  return (
+    <Header
+      aria-label="Primary navigation"
+      style={{
+        position: 'sticky',
+        top: 0,
+        zIndex: 1000,
+        width: '100%',
+        paddingInline: desktop ? 32 : 16,
+        background: '#fff',
+        borderBottom: '1px solid #d8dee9'
+      }}
+    >
+      <Flex align="center" justify="space-between" gap={20}>
+        <Link to="/" aria-label="ElderlyCare home">
+          <Image src={logoImage} alt="ElderlyCare" preview={false} height={52} />
+        </Link>
+
+        {desktop ? (
+          <>
+            <Menu
+              mode="horizontal"
+              selectedKeys={[selectedKey]}
+              items={publicItems}
+              onClick={openRoute}
+              style={{ flex: 1, justifyContent: 'center', minWidth: 0, borderBottom: 0 }}
+            />
+            <Dropdown menu={{ items: accountItems, onClick: accountClick }} trigger={['click']} placement="bottomRight">
+              <Button type="text" icon={<Avatar size="small" icon={<UserOutlined />} />}>
+                {user?.name || 'Account'}
+              </Button>
+            </Dropdown>
+          </>
+        ) : (
+          <Button
+            type="text"
+            icon={<MenuOutlined />}
+            aria-label="Open navigation menu"
+            onClick={() => setDrawerOpen(true)}
+          />
+        )}
+      </Flex>
+
+      <Drawer
+        title={
+          <Space>
+            <Avatar src="/favicon.png" shape="square" />
+            <Text strong>ElderlyCare</Text>
+          </Space>
         }
-        setMobileMenuOpen(false);
-    };
-
-    const toggleMobileMenu = () => {
-        setMobileMenuOpen(!mobileMenuOpen);
-        // Close other dropdowns when mobile menu toggles
-        setDropdownOpen(false);
-        setAuthDropdownOpen(false);
-    };
-
-    const closeAllMenus = () => {
-        setMobileMenuOpen(false);
-        setDropdownOpen(false);
-        setAuthDropdownOpen(false);
-    };
-
-    return (
-        <nav className="navbar">
-            <ToastContainer position="top-right" />
-
-            {/* Logo on the left */}
-            <div className="logo">
-                <Link to="/" onClick={handleHomeClick}>
-                    <img src={logoImage} alt="Company Logo" className="logo-image" />
-                </Link>
-            </div>
-
-            {/* Mobile menu button */}
-            <div className="mobile-menu-btn" onClick={toggleMobileMenu}>
-                {mobileMenuOpen ? (
-                    <FaTimes size={24} className="menu-icon" />
-                ) : (
-                    <FaBars size={24} className="menu-icon" />
-                )}
-            </div>
-
-            {/* Navigation links in the center (desktop) */}
-            <div className={`nav-links ${mobileMenuOpen ? 'mobile-open' : ''}`}>
-                <Link
-                    to="/"
-                    className={`nav-link ${location.pathname === '/' ? 'active' : ''}`}
-                    onClick={closeAllMenus}
-                >
-                    Home
-                </Link>
-                <Link
-                    to="/about"
-                    className={`nav-link ${location.pathname === '/about' ? 'active' : ''}`}
-                    onClick={closeAllMenus}
-                >
-                    About Us
-                </Link>
-                <Link
-                    to="/services"
-                    className={`nav-link ${location.pathname === '/services' ? 'active' : ''}`}
-                    onClick={closeAllMenus}
-                >
-                    Services
-                </Link>
-                <Link
-                    to="/contact"
-                    className={`nav-link ${location.pathname === '/contact' ? 'active' : ''}`}
-                    onClick={closeAllMenus}
-                >
-                    Contact Us
-                </Link>
-            </div>
-
-            {/* Auth section on the right */}
-            <div className={`auth-section ${mobileMenuOpen ? 'mobile-open' : ''}`}>
-                {user ? (
-                    <div className="user-dropdown" ref={dropdownRef}>
-                        <div
-                            className="user-info"
-                            onClick={() => setDropdownOpen(!dropdownOpen)}
-                        >
-                            <FaUserCircle className="user-icon" size={24} />
-                            {!isMobile && <span className="user-text">{user.name || 'My Account'}</span>}
-                            {dropdownOpen ? <FaChevronUp size={14} /> : <FaChevronDown size={14} />}
-                        </div>
-                        {dropdownOpen && (
-                            <div className="dropdown-menu">
-                                <Link
-                                    to="/profile"
-                                    className={`dropdown-item ${location.pathname === '/profile' ? 'active' : ''}`}
-                                    onClick={closeAllMenus}
-                                >
-                                    My Profile
-                                </Link>
-                                <Link
-                                    to="/dashboard"
-                                    className={`dropdown-item ${location.pathname === '/dashboard' ? 'active' : ''}`}
-                                    onClick={closeAllMenus}
-                                >
-                                    Dashboard
-                                </Link>
-                                <div className="dropdown-divider"></div>
-                                <div
-                                    className="dropdown-item logout"
-                                    onClick={handleLogout}
-                                >
-                                    Logout
-                                </div>
-                            </div>
-                        )}
-                    </div>
-                ) : (
-                    <div className="auth-dropdown" ref={authDropdownRef}>
-                        <div
-                            className="auth-toggle"
-                            onClick={() => setAuthDropdownOpen(!authDropdownOpen)}
-                        >
-                            <FaUserCircle className="user-icon" size={24} />
-                            {!isMobile && <span className="auth-text">Account</span>}
-                            {authDropdownOpen ? <FaChevronUp size={14} /> : <FaChevronDown size={14} />}
-                        </div>
-                        {authDropdownOpen && (
-                            <div className="dropdown-menu">
-                                <Link
-                                    to="/login"
-                                    className={`dropdown-item ${location.pathname === '/login' ? 'active' : ''}`}
-                                    onClick={closeAllMenus}
-                                >
-                                    Login
-                                </Link>
-                                <Link
-                                    to="/register"
-                                    className={`dropdown-item ${location.pathname === '/register' ? 'active' : ''}`}
-                                    onClick={closeAllMenus}
-                                >
-                                    Register
-                                </Link>
-                            </div>
-                        )}
-                    </div>
-                )}
-            </div>
-        </nav>
-    );
+        placement="right"
+        width={300}
+        open={drawerOpen}
+        onClose={() => setDrawerOpen(false)}
+      >
+        <Menu
+          mode="inline"
+          selectedKeys={[selectedKey || location.pathname]}
+          items={publicItems}
+          onClick={openRoute}
+        />
+        <Menu
+          mode="inline"
+          selectedKeys={[location.pathname]}
+          items={accountItems}
+          onClick={accountClick}
+          style={{ marginTop: 16 }}
+        />
+      </Drawer>
+    </Header>
+  );
 };
 
 export default Navbar;
