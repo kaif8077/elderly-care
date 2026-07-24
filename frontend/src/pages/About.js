@@ -25,7 +25,7 @@ const About = () => {
             <h2>Who We Are</h2>
             <p style={{ textAlign: 'justify' }}>
               ElderlyCare is a platform designed to simplify healthcare management for seniors. Developed in 2025, it allows users to fill out medical forms, which generate personalized recommendations based on their health profile. Additionally, the platform creates a unique QR code-based ID card, also known as a vCard. By scanning this QR code, caregivers and medical professionals can access detailed medical information about the senior, improving care coordination and response time.</p>
-            <p style={{ textAlign: 'justify' }}>In case of emergencies, ElderlyCare provides an emergency alert system that enables users to send immediate alerts with their location, ensuring a swift response when needed. The platform’s user-friendly features aim to enhance the independence, well-being, and security of aging individuals, helping them live with dignity and access the support they need at any time.</p>
+            <p style={{ textAlign: 'justify' }}>In case of emergencies, ElderlyCare provides an emergency alert system that enables users to send immediate alerts with their location, ensuring a swift response when needed. The platformâ€™s user-friendly features aim to enhance the independence, well-being, and security of aging individuals, helping them live with dignity and access the support they need at any time.</p>
           </div>
           <div className="about-image">
             <img
@@ -83,7 +83,7 @@ const About = () => {
                 role: "Project Mentor",
                 description: "Guides technical implementation with academic expertise",
                 initials: "VK",
-                color: "#6c5ce7"
+                color: "#0066ff"
               },
               {
                 name: "Mohammad Kaif",

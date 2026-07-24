@@ -61,7 +61,7 @@ const AdminIdCard = () => {
     if (!cardRef.current || !data?.card) return;
     setWorking(true);
     try {
-      const canvas = await html2canvas(cardRef.current, { scale: 4, backgroundColor: '#eef4f2', useCORS: true });
+      const canvas = await html2canvas(cardRef.current, { scale: 4, backgroundColor: '#f3f6fc', useCORS: true });
       const link = document.createElement('a');
       link.download = `${data.card.elderlyCareId}-front-back.png`;
       link.href = canvas.toDataURL('image/png');

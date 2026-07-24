@@ -126,6 +126,17 @@ exports.login = async (req, res) => {
   }
 };
 
+exports.me = async (req, res) => {
+  try {
+    const user = await User.findById(req.user.id).select('_id email name').lean();
+    if (!user) return res.status(404).json({ message: 'User not found' });
+    return res.json({ user: publicUser(user) });
+  } catch (error) {
+    console.error('User session restore error:', error.message);
+    return res.status(500).json({ message: 'Unable to restore account session' });
+  }
+};
+
 exports.verifyLoginOTP = async (req, res) => {
   const email = normalizeIdentifier(req.body.email);
 

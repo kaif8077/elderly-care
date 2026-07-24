@@ -8,7 +8,7 @@ const HF_API_KEY = process.env.HF_API_KEY || 'your_hugging_face_token';
 const generateHealthRecommendations = async (profile) => {
     try {
         // Check cache first
-        const cacheKey = `health_${crypto.createHash('sha256').update(JSON.stringify(profile.toObject ? profile.toObject() : profile)).digest('hex')}`;
+        const cacheKey = `health_v2_${crypto.createHash('sha256').update(JSON.stringify(profile.toObject ? profile.toObject() : profile)).digest('hex')}`;
         const cached = await RecommendationCache.findOne({ cacheKey: cacheKey });
         if (cached && (Date.now() - cached.createdAt.getTime()) < 24 * 60 * 60 * 1000) {
             return cached.value;
@@ -17,7 +17,7 @@ const generateHealthRecommendations = async (profile) => {
         const age = calculateAge(profile.dob);
         const bmi = calculateBMI(profile.height, profile.weight);
         
-        const prompt = `Act as a cautious senior-wellness planning assistant. Create practical, personalized, non-diagnostic guidance for:
+        const prompt = `Act as a cautious senior-wellness assistant. Return only the most necessary, personalized guidance for this older adult.
 
 PATIENT DEMOGRAPHICS:
 Full Name: ${profile.name || 'Not specified'}
@@ -60,7 +60,12 @@ Energy Levels: ${profile.energyLevels || 'Not specified'}
 Recent Lab Results: ${profile.labResults || 'Not specified'}
 Vital Signs: ${profile.vitalSigns || 'Not specified'}
 
-Return clear sections for priorities, daily routine, nutrition, safe activity, medication discussion points, fall prevention, warning signs, and doctor follow-up. Avoid diagnosing, prescribing, guaranteed claims, or changing medicines. State when professional medical advice is required.`;
+Use no more than 8 short bullet points divided into:
+1. Top priorities (maximum 3)
+2. Daily safety and wellness (maximum 3)
+3. When to contact a doctor or emergency services (maximum 2)
+
+Mention only issues supported by the supplied profile. Do not diagnose, prescribe medicines or supplements, provide exact treatment targets, or recommend changing medication. Do not repeat the full medical profile.`;
 
         // Try multiple free AI APIs with fallback
         let aiRecommendations = null;
@@ -71,7 +76,7 @@ Return clear sections for priorities, daily routine, nutrition, safe activity, m
         }
         
         // If Hugging Face fails, use fallback immediately
-        let recommendations = aiRecommendations || getFallbackHealthRecommendations(profile);
+        let recommendations = aiRecommendations || getConciseHealthRecommendations(profile);
 
         // Cache the result
         const cacheEntry = new RecommendationCache({
@@ -86,7 +91,7 @@ Return clear sections for priorities, daily routine, nutrition, safe activity, m
 
     } catch (error) {
         console.error('Error generating health recommendations:', error);
-        return getFallbackHealthRecommendations(profile);
+        return getConciseHealthRecommendations(profile);
     }
 };
 
@@ -206,6 +211,54 @@ const hasCondition = (conditions, keywords) => {
     if (!conditions || conditions.length === 0) return false;
     const conditionStr = Array.isArray(conditions) ? conditions.join(' ') : String(conditions);
     return keywords.some(keyword => conditionStr.toLowerCase().includes(keyword.toLowerCase()));
+};
+
+const getConciseHealthRecommendations = (profile) => {
+    const conditions = Array.isArray(profile.medicalHistory) ? profile.medicalHistory : [];
+    const allergies = Array.isArray(profile.allergies) ? profile.allergies : [];
+    const medications = Array.isArray(profile.medications) ? profile.medications : [];
+    const symptoms = Array.isArray(profile.currentSymptoms) ? profile.currentSymptoms : [];
+    const priorities = [];
+    const daily = [];
+    const urgent = [];
+
+    if (symptoms.length) {
+        priorities.push(`Discuss current symptoms (${symptoms.slice(0, 3).join(', ')}) with the treating doctor, especially if new or worsening.`);
+    }
+    if (medications.length) {
+        priorities.push('Keep an updated medicine list and ask a doctor or pharmacist to review it; do not stop or change medicines without advice.');
+    }
+    if (allergies.length) {
+        priorities.push(`Keep these allergies clearly visible to caregivers and clinicians: ${allergies.slice(0, 4).join(', ')}.`);
+    }
+    if (conditions.length && priorities.length < 3) {
+        priorities.push(`Arrange routine follow-up for: ${conditions.slice(0, 3).join(', ')}.`);
+    }
+    if (!priorities.length) {
+        priorities.push('Schedule routine health reviews and keep the medical profile current.');
+    }
+
+    if (profile.fallRisk || ['walking_aid', 'wheelchair', 'bed_assistance'].includes(profile.mobilityStatus)) {
+        daily.push('Reduce fall hazards, use the prescribed mobility aid, and keep frequently used items within easy reach.');
+    }
+    daily.push('Choose regular balanced meals and fluids that follow existing doctor-provided dietary restrictions.');
+    daily.push('Use gentle activity appropriate to current mobility and stop if pain, dizziness, chest discomfort, or unusual breathlessness occurs.');
+
+    urgent.push('Seek urgent medical help for chest pain, severe breathing difficulty, fainting, sudden weakness, new confusion, or uncontrolled bleeding.');
+    urgent.push(`Emergency contact: ${profile.emergencyContact || 'not provided'}${profile.emergencyPhone ? ` (${profile.emergencyPhone})` : ''}.`);
+
+    return [
+        'NECESSARY HEALTH RECOMMENDATIONS',
+        '',
+        'Top priorities',
+        ...priorities.slice(0, 3).map((item) => `• ${item}`),
+        '',
+        'Daily safety and wellness',
+        ...daily.slice(0, 3).map((item) => `• ${item}`),
+        '',
+        'Get medical help',
+        ...urgent.slice(0, 2).map((item) => `• ${item}`)
+    ].join('\n');
 };
 
 // COMPLETE Fallback Health Recommendations
@@ -1256,5 +1309,6 @@ module.exports = {
     generateFirstAidRecommendations,
     calculateAge,
     calculateBMI,
-    getBMICategory
+    getBMICategory,
+    getConciseHealthRecommendations
 };

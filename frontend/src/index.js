@@ -1,5 +1,6 @@
 import React from 'react';
 import { createRoot } from 'react-dom/client';
+import '@ant-design/v5-patch-for-react-19';
 import { App as AntApp, ConfigProvider } from 'antd';
 import 'antd/dist/reset.css';
 import App from './App';
@@ -9,7 +10,7 @@ import './theme/elderlyCare.css';
 
 const root = createRoot(document.getElementById('root'));
 root.render(
-  <ConfigProvider theme={elderlyCareTheme} componentSize="large">
+  <ConfigProvider theme={elderlyCareTheme} componentSize="middle">
     <AntApp><AuthProvider><App /></AuthProvider></AntApp>
   </ConfigProvider>
 );

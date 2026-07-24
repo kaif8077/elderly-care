@@ -32,8 +32,8 @@ exports.download = async (req, res) => {
   });
   const doc = new PDFDocument({ size: 'A4', margin: 54 });
   doc.pipe(res);
-  doc.fillColor('#123f35').fontSize(22).text('ElderlyCare Health Recommendations');
-  doc.moveDown().fillColor('#526b64').fontSize(10).text(`Generated: ${new Date(item.generatedAt).toLocaleString()}`);
+  doc.fillColor('#0066ff').fontSize(22).text('ElderlyCare Necessary Health Recommendations');
+  doc.moveDown().fillColor('#4a5568').fontSize(10).text(`Generated: ${new Date(item.generatedAt).toLocaleString()}`);
   doc.moveDown().fillColor('#222').fontSize(10).text(item.content, { lineGap: 3 });
   doc.moveDown().fontSize(8).fillColor('#666').text('General wellness guidance only. Consult a qualified healthcare professional before changing treatment, medicines, diet, or exercise.');
   doc.end();
