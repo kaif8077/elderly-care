@@ -1,6 +1,7 @@
 // middleware/authMiddleware.js
 const jwt = require('jsonwebtoken');
 const User = require('../models/User');
+const { sessionMatches } = require('../services/userSessionService');
 
 const authMiddleware = async (req, res, next) => {
     
@@ -18,11 +19,13 @@ const authMiddleware = async (req, res, next) => {
         const user = await User.findById(decoded.id)
             .select('_id role accountStatus isDeleted sessionVersion')
             .lean();
-        const sessionIsCurrent = decoded.sessionVersion === undefined
-            || decoded.sessionVersion === user?.sessionVersion;
+        const sessionIsCurrent = user && sessionMatches(decoded.sessionVersion, user.sessionVersion);
 
-        if (!user || user.accountStatus !== 'active' || user.isDeleted || !sessionIsCurrent) {
-            return res.status(401).json({ message: 'Account session is no longer active' });
+        if (!user || user.accountStatus !== 'active' || user.isDeleted) {
+            return res.status(401).json({ message: 'Account is no longer active', code: 'ACCOUNT_NOT_ACTIVE' });
+        }
+        if (!sessionIsCurrent) {
+            return res.status(401).json({ message: 'Account session is no longer active', code: 'SESSION_REVOKED' });
         }
 
         req.user = { id: String(user._id), role: user.role };

@@ -3,9 +3,10 @@ const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const { sendOtpEmail } = require('../services/emailService');
 const { createOtp, normalizeIdentifier, verifyOtp } = require('../services/otpService');
+const { normalizeSessionVersion } = require('../services/userSessionService');
 
 const signUserToken = (user) => jwt.sign(
-  { id: user._id, sessionVersion: user.sessionVersion },
+  { id: user._id, sessionVersion: normalizeSessionVersion(user.sessionVersion) },
   process.env.JWT_SECRET,
   { expiresIn: '7d' }
 );
