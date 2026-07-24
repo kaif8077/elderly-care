@@ -1,6 +1,7 @@
+import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import {
-  Alert, Button, Card, Col, Flex, Image, Layout, List, Row, Space, Tag, Typography
+  Alert, Button, Card, Col, Divider, Flex, Image, Layout, List, Menu, Row, Space, Tag, Typography
 } from 'antd';
 import {
   CheckCircleOutlined, FilePdfOutlined, HeartOutlined, IdcardOutlined,
@@ -61,67 +62,108 @@ const services = [
   }
 ];
 
-const Services = () => (
-  <Layout>
-    <Content>
-      <PublicPageHero
-        eyebrow="ELDERLYCARE SERVICES"
-        title="One workflow for emergency-ready health information"
-        description="Create the profile, generate secure access, and keep private summaries available for the account owner."
-        primaryAction={{ to: '/register', label: 'Get started' }}
-        secondaryAction={{ to: '/contact', label: 'Ask a question' }}
-        image={aboutHero}
-      />
+const Services = () => {
+  const hashKey = window.location.hash.replace('#', '');
+  const [activeId, setActiveId] = useState(services.some(({ id }) => id === hashKey) ? hashKey : services[0].id);
+  const activeService = services.find(({ id }) => id === activeId) || services[0];
+  const activeIndex = services.findIndex(({ id }) => id === activeService.id);
 
-      <Flex vertical gap={24} style={{ width: 'calc(100% - 20px)', margin: '36px 10px 56px' }}>
-        <Alert
-          type="info"
-          showIcon
-          icon={<SafetyCertificateOutlined />}
-          message="Private account, limited emergency access"
-          description="Complete profiles, insurance details, and downloaded reports remain private. The QR emergency page displays only the limited information allowed for emergency use."
+  useEffect(() => {
+    if (window.location.hash !== `#${activeId}`) window.history.replaceState(null, '', `#${activeId}`);
+  }, [activeId]);
+
+  return (
+    <Layout>
+      <Content>
+        <PublicPageHero
+          eyebrow="ELDERLYCARE SERVICES"
+          title="One workflow for emergency-ready health information"
+          description="Choose a service to understand exactly what it provides and how it supports the ElderlyCare emergency workflow."
+          primaryAction={{ to: '/register', label: 'Get started' }}
+          secondaryAction={{ to: '/contact', label: 'Ask a question' }}
+          image={aboutHero}
         />
 
-        {services.map((service, index) => (
-          <Card id={service.id} key={service.id} styles={{ body: { padding: 0 } }} style={{ overflow: 'hidden' }}>
-            <Row align="stretch">
-              <Col
-                xs={{ span: 24, order: 1 }}
-                lg={{ span: 10, order: index % 2 === 0 ? 1 : 2 }}
-              >
-                <Flex align="center" justify="center" style={{ height: '100%', minHeight: 320, padding: 24, background: '#edf3ff' }}>
-                  <Image src={service.image} alt={service.title} preview={false} width="100%" style={{ maxHeight: 360, objectFit: 'contain' }} />
-                </Flex>
-              </Col>
-              <Col
-                xs={{ span: 24, order: 2 }}
-                lg={{ span: 14, order: index % 2 === 0 ? 2 : 1 }}
-              >
-                <Flex vertical justify="center" gap={14} style={{ height: '100%', minHeight: 320, padding: 'clamp(24px, 5vw, 60px)' }}>
-                  <Space wrap><Tag color="blue">SERVICE {index + 1}</Tag><Button type="primary" shape="circle" icon={service.icon} /></Space>
-                  <Title level={2} style={{ margin: 0 }}>{service.title}</Title>
-                  <Paragraph type="secondary" style={{ margin: 0, fontSize: 17 }}>{service.summary}</Paragraph>
-                  <List
-                    split={false}
-                    dataSource={service.points}
-                    renderItem={(point) => <List.Item><Text><CheckCircleOutlined style={{ color: '#0066ff', marginRight: 10 }} />{point}</Text></List.Item>}
-                  />
-                </Flex>
-              </Col>
-            </Row>
-          </Card>
-        ))}
+        <Flex vertical gap={20} style={{ width: 'calc(100% - 20px)', margin: '30px 10px 52px' }}>
+          <Alert
+            type="info"
+            showIcon
+            icon={<SafetyCertificateOutlined />}
+            message="Private account, limited emergency access"
+            description="Complete profiles, insurance details, and downloaded reports remain private. QR access shows only permitted emergency information."
+          />
 
-        <Card>
-          <Row align="middle" gutter={[20, 20]}>
-            <Col xs={24} md={16}><Title level={3} style={{ margin: 0 }}>Ready to prepare your profile?</Title><Text type="secondary">Verify your account and save each profile section at your own pace.</Text></Col>
-            <Col xs={24} md={8}><Link to="/register"><Button type="primary" size="large" block>Create an account</Button></Link></Col>
+          <Row gutter={[20, 20]} align="top">
+            <Col xs={24} lg={7} xl={6}>
+              <Card title="All services" styles={{ body: { padding: 8 } }}>
+                <Menu
+                  mode="inline"
+                  selectedKeys={[activeId]}
+                  onClick={({ key }) => setActiveId(key)}
+                  items={services.map((service) => ({
+                    key: service.id,
+                    icon: service.icon,
+                    label: service.title
+                  }))}
+                />
+              </Card>
+            </Col>
+
+            <Col xs={24} lg={17} xl={18}>
+              <Card styles={{ body: { padding: 0 } }} style={{ overflow: 'hidden' }}>
+                <Row>
+                  <Col xs={24} xl={10}>
+                    <Flex align="center" justify="center" style={{ minHeight: 390, height: '100%', padding: 28, background: '#edf3ff' }}>
+                      <Image
+                        key={activeService.id}
+                        src={activeService.image}
+                        alt={activeService.title}
+                        preview={false}
+                        width="100%"
+                        style={{ maxHeight: 390, objectFit: 'contain' }}
+                      />
+                    </Flex>
+                  </Col>
+                  <Col xs={24} xl={14}>
+                    <Flex vertical gap={14} style={{ padding: 'clamp(24px, 5vw, 56px)' }}>
+                      <Space wrap>
+                        <Tag color="blue">SERVICE {activeIndex + 1} OF {services.length}</Tag>
+                        <Button type="primary" shape="circle" icon={activeService.icon} />
+                      </Space>
+                      <Title level={2} style={{ margin: 0 }}>{activeService.title}</Title>
+                      <Paragraph type="secondary" style={{ margin: 0, fontSize: 17 }}>{activeService.summary}</Paragraph>
+                      <Divider orientation="left">What you receive</Divider>
+                      <List
+                        split={false}
+                        dataSource={activeService.points}
+                        renderItem={(point) => (
+                          <List.Item>
+                            <Text><CheckCircleOutlined style={{ color: '#0066ff', marginRight: 10 }} />{point}</Text>
+                          </List.Item>
+                        )}
+                      />
+                      <Alert
+                        type="warning"
+                        showIcon
+                        message={activeService.id === 'recommendations'
+                          ? 'Health guidance does not replace professional medical advice.'
+                          : 'Access to private information requires authentication.'}
+                      />
+                      <Space wrap>
+                        <Link to="/register"><Button type="primary">Create an account</Button></Link>
+                        <Link to="/contact"><Button>Contact us</Button></Link>
+                      </Space>
+                    </Flex>
+                  </Col>
+                </Row>
+              </Card>
+            </Col>
           </Row>
-        </Card>
-      </Flex>
-    </Content>
-    <PublicFooter />
-  </Layout>
-);
+        </Flex>
+      </Content>
+      <PublicFooter />
+    </Layout>
+  );
+};
 
 export default Services;

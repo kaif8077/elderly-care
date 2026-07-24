@@ -119,4 +119,8 @@ test('secondary public pages use the single about hero and About omits the team 
   const about = fs.readFileSync(path.join(__dirname, 'pages', 'About.js'), 'utf8');
   expect(about).not.toContain('THE PROJECT TEAM');
   expect(about).not.toContain('People behind ElderlyCare');
+  const services = fs.readFileSync(path.join(__dirname, 'pages', 'Services.js'), 'utf8');
+  expect(services).toContain('title="All services"');
+  expect(services).toContain('selectedKeys={[activeId]}');
+  expect(services).toContain('activeService.image');
 });
