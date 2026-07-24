@@ -2,7 +2,7 @@ import React, { useContext, useEffect, useMemo, useState } from 'react';
 import dayjs from 'dayjs';
 import { toast } from 'react-toastify';
 import {
-  Alert, Button, Card, Col, DatePicker, Divider, Form, Image, Input, InputNumber,
+  Alert, Button, Card, Checkbox, Col, DatePicker, Divider, Form, Image, Input, InputNumber,
   Row, Select, Space, Steps, Switch, Typography, Upload
 } from 'antd';
 import {
@@ -288,7 +288,7 @@ const MedicalForm = ({ onSubmissionSuccess }) => {
               </Row>
             </Card>
             <Form.Item name="reviewConfirmed" valuePropName="checked" rules={[{ validator: (_, checked) => checked ? Promise.resolve() : Promise.reject(new Error('Confirm the summary before saving')) }]} style={{ marginTop: 18 }}>
-              <Switch /> <Text style={{ marginLeft: 10 }}>I reviewed these details and confirm they are correct.</Text>
+              <Checkbox>I reviewed these details and confirm they are correct.</Checkbox>
             </Form.Item>
           </>
         )}

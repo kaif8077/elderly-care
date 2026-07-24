@@ -47,6 +47,7 @@ test('medical profile form saves steps and supports structured emergency contact
   expect(source).toContain('mode="tags"');
   expect(source).toContain('Profile photograph is required');
   expect(source).toContain('reviewConfirmed');
+  expect(source).toContain('<Checkbox>I reviewed these details and confirm they are correct.</Checkbox>');
   expect(source).toContain('const { reviewConfirmed, profilePhoto, ...clean }');
   expect(source).toContain('stepFields[step]');
   expect(source).toContain('setValues(form.getFieldsValue(true))');
