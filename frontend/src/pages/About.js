@@ -1,16 +1,17 @@
 import { Link } from 'react-router-dom';
 import {
   Avatar, Button, Card, Col, Divider, Flex, Image, Layout, Row, Space,
-  Tag, Timeline, Typography
+  Timeline, Typography
 } from 'antd';
 import {
   CheckCircleOutlined, LockOutlined, QrcodeOutlined, SafetyCertificateOutlined,
   TeamOutlined
 } from '@ant-design/icons';
-import aboutHero from '../assests/about-hero.jpg';
 import aboutUsImage from '../assests/about_us.png';
+import PublicPageHero from '../components/PublicPageHero';
+import PublicFooter from '../components/PublicFooter';
 
-const { Content, Footer } = Layout;
+const { Content } = Layout;
 const { Title, Paragraph, Text } = Typography;
 
 const principles = [
@@ -42,26 +43,13 @@ const team = [
 const About = () => (
   <Layout>
     <Content>
-      <Card styles={{ body: { padding: 0 } }} bordered={false} style={{ borderRadius: 0, overflow: 'hidden' }}>
-        <Row align="middle">
-          <Col xs={24} lg={12}>
-            <Flex vertical gap={16} style={{ padding: 'clamp(32px, 7vw, 88px)' }}>
-              <Tag color="blue">ABOUT ELDERLYCARE</Tag>
-              <Title style={{ margin: 0 }}>Helping families prepare important health information before an emergency</Title>
-              <Paragraph type="secondary" style={{ fontSize: 18 }}>
-                ElderlyCare is a MERN application for creating structured medical profiles, private emergency summaries, secure QR access, and emergency ID cards for older adults.
-              </Paragraph>
-              <Space wrap>
-                <Link to="/register"><Button type="primary" size="large">Create an account</Button></Link>
-                <Link to="/services"><Button size="large">See how it works</Button></Link>
-              </Space>
-            </Flex>
-          </Col>
-          <Col xs={24} lg={12}>
-            <Image src={aboutHero} alt="Supportive elderly care" preview={false} width="100%" style={{ display: 'block', maxHeight: 520, objectFit: 'cover' }} />
-          </Col>
-        </Row>
-      </Card>
+      <PublicPageHero
+        eyebrow="ABOUT ELDERLYCARE"
+        title="Helping families prepare important health information before an emergency"
+        description="ElderlyCare creates structured medical profiles, private emergency summaries, secure QR access, and emergency ID cards for older adults."
+        primaryAction={{ to: '/register', label: 'Create an account' }}
+        secondaryAction={{ to: '/services', label: 'See how it works' }}
+      />
 
       <Flex vertical gap={64} style={{ width: 'min(1200px, calc(100% - 32px))', margin: '64px auto' }}>
         <section aria-labelledby="about-purpose">
@@ -140,7 +128,7 @@ const About = () => (
         </section>
       </Flex>
     </Content>
-    <Footer style={{ textAlign: 'center' }}>© {new Date().getFullYear()} ElderlyCare</Footer>
+    <PublicFooter />
   </Layout>
 );
 

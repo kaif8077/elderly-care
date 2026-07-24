@@ -4,13 +4,15 @@ import {
   Typography, message
 } from 'antd';
 import {
-  EnvironmentOutlined, MailOutlined, MessageOutlined, PhoneOutlined,
+  EnvironmentOutlined, MailOutlined, PhoneOutlined,
   SendOutlined, StarOutlined
 } from '@ant-design/icons';
 import { submitContactForm } from '../services/contactService';
 import { submitFeedbackForm } from '../services/feedbackService';
+import PublicPageHero from '../components/PublicPageHero';
+import PublicFooter from '../components/PublicFooter';
 
-const { Content, Footer } = Layout;
+const { Content } = Layout;
 const { Title, Paragraph, Text, Link } = Typography;
 
 const Contact = () => {
@@ -73,13 +75,11 @@ const Contact = () => {
   return (
     <Layout>
       <Content>
-        <Flex vertical align="center" gap={12} style={{ padding: 'clamp(40px, 8vw, 88px) 16px', background: '#0066ff', color: '#fff' }}>
-          <MessageOutlined style={{ fontSize: 42 }} />
-          <Title style={{ margin: 0, color: '#fff', textAlign: 'center' }}>Contact ElderlyCare</Title>
-          <Paragraph style={{ margin: 0, color: '#fff', textAlign: 'center', maxWidth: 720, fontSize: 18 }}>
-            Ask a product question, report a problem, or share feedback about your ElderlyCare experience.
-          </Paragraph>
-        </Flex>
+        <PublicPageHero
+          eyebrow="CONTACT ELDERLYCARE"
+          title="Questions, support, and product feedback"
+          description="Ask a product question, report a problem, or share feedback about your ElderlyCare experience."
+        />
 
         <Flex vertical gap={28} style={{ width: 'min(1200px, calc(100% - 32px))', margin: '48px auto' }}>
           <Row gutter={[20, 20]}>
@@ -134,7 +134,7 @@ const Contact = () => {
           />
         </Flex>
       </Content>
-      <Footer style={{ textAlign: 'center' }}>© {new Date().getFullYear()} ElderlyCare</Footer>
+      <PublicFooter />
     </Layout>
   );
 };

@@ -2,17 +2,18 @@ import { useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import {
   Alert, Button, Card, Col, Collapse, Divider, Flex, Image, Layout,
-  Row, Space, Statistic, Tag, theme, Typography
+  Row, Space, Statistic, theme, Typography
 } from 'antd';
 import {
   BellOutlined, CheckCircleOutlined, FileProtectOutlined, HeartOutlined,
   IdcardOutlined, MedicineBoxOutlined, QrcodeOutlined, RightOutlined,
   SafetyCertificateOutlined, TeamOutlined
 } from '@ant-design/icons';
-import bannerImage from '../assests/banner1.jpg';
 import whyChooseUsImage from '../assests/why-choose-us.jpg';
+import PublicPageHero from '../components/PublicPageHero';
+import PublicFooter from '../components/PublicFooter';
 
-const { Content, Footer } = Layout;
+const { Content } = Layout;
 const { Title, Paragraph, Text } = Typography;
 
 const features = [
@@ -104,43 +105,13 @@ const Home = () => {
   return (
     <Layout>
       <Content>
-        <section aria-labelledby="home-hero-title">
-          <Card
-            styles={{ body: { padding: 0 } }}
-            bordered={false}
-            style={{ borderRadius: 0, overflow: 'hidden', background: token.colorPrimary }}
-          >
-            <Row align="middle">
-              <Col xs={24} lg={13}>
-                <Flex vertical gap={18} style={{ padding: 'clamp(32px, 7vw, 88px)', color: '#fff' }}>
-                  <Space wrap>
-                    <Tag color="blue">Emergency-ready information</Tag>
-                    <Tag color="orange">Designed for older adults</Tag>
-                  </Space>
-                  <Title id="home-hero-title" style={{ margin: 0, color: '#fff', fontSize: 'clamp(2.2rem, 5vw, 4rem)' }}>
-                    Important health information, ready when every second matters.
-                  </Title>
-                  <Paragraph style={{ margin: 0, color: '#fff', fontSize: 18, maxWidth: 680 }}>
-                    ElderlyCare helps older adults and families organize medical information, create a secure emergency QR, and keep an emergency ID card and private reports available.
-                  </Paragraph>
-                  <Space wrap size="middle">
-                    <Link to="/register"><Button type="primary" size="large" ghost>Create a protected profile</Button></Link>
-                    <Link to="/services"><Button size="large">Explore features</Button></Link>
-                  </Space>
-                </Flex>
-              </Col>
-              <Col xs={24} lg={11}>
-                <Image
-                  src={bannerImage}
-                  alt="Older adult receiving supportive care"
-                  preview={false}
-                  width="100%"
-                  style={{ display: 'block', maxHeight: 560, objectFit: 'cover' }}
-                />
-              </Col>
-            </Row>
-          </Card>
-        </section>
+        <PublicPageHero
+          eyebrow="EMERGENCY-READY INFORMATION"
+          title="Important health information, ready when every second matters."
+          description="ElderlyCare helps older adults and families organize medical information, create a secure emergency QR, and keep an emergency ID card and private reports available."
+          primaryAction={{ to: '/register', label: 'Create a protected profile' }}
+          secondaryAction={{ to: '/services', label: 'Explore features' }}
+        />
 
         <Flex vertical gap={64} style={{ width: 'min(1200px, calc(100% - 32px))', margin: '64px auto' }}>
           <section aria-labelledby="problem-title">
@@ -221,7 +192,23 @@ const Home = () => {
               <Text className="care-eyebrow">COMMON QUESTIONS</Text>
               <Title id="faq-title" level={2} style={{ margin: 0, textAlign: 'center' }}>Understand how emergency access works</Title>
             </Flex>
-            <Collapse accordion items={faqItems} style={{ marginTop: 24 }} />
+            <Collapse
+              accordion
+              bordered={false}
+              expandIconPosition="end"
+              size="large"
+              items={faqItems.map((item) => ({
+                ...item,
+                style: {
+                  marginBottom: 14,
+                  border: `1px solid ${token.colorBorder}`,
+                  borderRadius: token.borderRadiusLG,
+                  background: token.colorBgContainer,
+                  boxShadow: token.boxShadowTertiary
+                }
+              }))}
+              style={{ marginTop: 24, background: 'transparent' }}
+            />
           </section>
 
           <Alert
@@ -235,13 +222,7 @@ const Home = () => {
         </Flex>
       </Content>
 
-      <Footer style={{ textAlign: 'center' }}>
-        <Space direction="vertical" size={4}>
-          <Text strong>ElderlyCare</Text>
-          <Text type="secondary">Emergency information support for older adults and their families.</Text>
-          <Text type="secondary">© {new Date().getFullYear()} ElderlyCare</Text>
-        </Space>
-      </Footer>
+      <PublicFooter />
     </Layout>
   );
 };

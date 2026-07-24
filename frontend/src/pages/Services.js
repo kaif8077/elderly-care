@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import {
   Alert, Button, Card, Col, Flex, Grid, Image, Layout, List, Row, Space,
-  Tabs, Tag, Typography
+  Tabs, Typography
 } from 'antd';
 import {
   FilePdfOutlined, HeartOutlined, IdcardOutlined, MedicineBoxOutlined,
@@ -13,8 +13,10 @@ import recommendationsImage from '../assests/recommendation.png';
 import qrImage from '../assests/qr_id_card.png';
 import secureImage from '../assests/secure.png';
 import reportImage from '../assests/print.png';
+import PublicPageHero from '../components/PublicPageHero';
+import PublicFooter from '../components/PublicFooter';
 
-const { Content, Footer } = Layout;
+const { Content } = Layout;
 const { Title, Paragraph, Text } = Typography;
 const { useBreakpoint } = Grid;
 
@@ -79,11 +81,13 @@ const Services = () => {
   return (
     <Layout>
       <Content>
-        <Flex vertical align="center" gap={12} style={{ padding: 'clamp(40px, 8vw, 88px) 16px', background: '#0066ff', color: '#fff' }}>
-          <Tag color="orange">ELDERLYCARE SERVICES</Tag>
-          <Title style={{ margin: 0, color: '#fff', textAlign: 'center' }}>One workflow for emergency-ready health information</Title>
-          <Paragraph style={{ margin: 0, color: '#fff', textAlign: 'center', maxWidth: 760, fontSize: 18 }}>Create the profile, generate secure access, and keep private summaries available for the account owner.</Paragraph>
-        </Flex>
+        <PublicPageHero
+          eyebrow="ELDERLYCARE SERVICES"
+          title="One workflow for emergency-ready health information"
+          description="Create the profile, generate secure access, and keep private summaries available for the account owner."
+          primaryAction={{ to: '/register', label: 'Get started' }}
+          secondaryAction={{ to: '/contact', label: 'Ask a question' }}
+        />
 
         <Flex vertical gap={28} style={{ width: 'min(1200px, calc(100% - 32px))', margin: '48px auto' }}>
           <Alert type="info" showIcon icon={<SafetyCertificateOutlined />} message="Privacy boundary" description="Public QR access contains limited emergency details. Insurance information, complete reports, and editing remain private." />
@@ -112,7 +116,7 @@ const Services = () => {
           </Card>
         </Flex>
       </Content>
-      <Footer style={{ textAlign: 'center' }}>© {new Date().getFullYear()} ElderlyCare</Footer>
+      <PublicFooter />
     </Layout>
   );
 };

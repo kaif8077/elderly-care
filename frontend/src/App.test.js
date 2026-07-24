@@ -94,3 +94,18 @@ test('public information pages use Ant Design without legacy page CSS', () => {
   expect(contact).toContain('submitFeedbackForm');
   expect(contact).toContain('<Rate />');
 });
+
+test('public pages share the three-image carousel and dark footer', () => {
+  const hero = fs.readFileSync(path.join(__dirname, 'components', 'PublicPageHero.js'), 'utf8');
+  const footer = fs.readFileSync(path.join(__dirname, 'components', 'PublicFooter.js'), 'utf8');
+  expect(hero).toContain("banner1.jpg");
+  expect(hero).toContain("banner2.jpg");
+  expect(hero).toContain("banner3.jpg");
+  expect(hero).toContain('<Carousel autoplay');
+  expect(footer).toContain("background: '#1f2937'");
+  ['Home', 'About', 'Services', 'Contact'].forEach((page) => {
+    const source = fs.readFileSync(path.join(__dirname, 'pages', `${page}.js`), 'utf8');
+    expect(source).toContain('<PublicPageHero');
+    expect(source).toContain('<PublicFooter');
+  });
+});
