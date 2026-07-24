@@ -11,6 +11,7 @@ import { submitContactForm } from '../services/contactService';
 import { submitFeedbackForm } from '../services/feedbackService';
 import PublicPageHero from '../components/PublicPageHero';
 import PublicFooter from '../components/PublicFooter';
+import aboutHero from '../assests/about-hero.jpg';
 
 const { Content } = Layout;
 const { Title, Paragraph, Text, Link } = Typography;
@@ -79,6 +80,7 @@ const Contact = () => {
           eyebrow="CONTACT ELDERLYCARE"
           title="Questions, support, and product feedback"
           description="Ask a product question, report a problem, or share feedback about your ElderlyCare experience."
+          image={aboutHero}
         />
 
         <Flex vertical gap={28} style={{ width: 'min(1200px, calc(100% - 32px))', margin: '48px auto' }}>

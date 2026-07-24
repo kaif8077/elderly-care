@@ -1,124 +1,127 @@
-import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import {
-  Alert, Button, Card, Col, Flex, Grid, Image, Layout, List, Row, Space,
-  Tabs, Typography
+  Alert, Button, Card, Col, Flex, Image, Layout, List, Row, Space, Tag, Typography
 } from 'antd';
 import {
-  FilePdfOutlined, HeartOutlined, IdcardOutlined, MedicineBoxOutlined,
-  QrcodeOutlined, SafetyCertificateOutlined
+  CheckCircleOutlined, FilePdfOutlined, HeartOutlined, IdcardOutlined,
+  MedicineBoxOutlined, QrcodeOutlined, SafetyCertificateOutlined
 } from '@ant-design/icons';
 import formImage from '../assests/form.png';
 import recommendationsImage from '../assests/recommendation.png';
 import qrImage from '../assests/qr_id_card.png';
 import secureImage from '../assests/secure.png';
 import reportImage from '../assests/print.png';
+import aboutHero from '../assests/about-hero.jpg';
 import PublicPageHero from '../components/PublicPageHero';
 import PublicFooter from '../components/PublicFooter';
 
 const { Content } = Layout;
 const { Title, Paragraph, Text } = Typography;
-const { useBreakpoint } = Grid;
 
 const services = [
   {
-    key: 'form-filling',
+    id: 'form-filling',
     icon: <MedicineBoxOutlined />,
     title: 'Structured medical profile',
     image: formImage,
-    summary: 'Save important personal, contact, emergency, and medical details in guided steps.',
-    points: ['Mandatory emergency-ready personal details', 'Multiple emergency contacts', 'Custom conditions, allergies, medicines, and symptoms', 'Section-by-section backend saving']
+    summary: 'Complete a guided profile that keeps emergency-ready information organized without placing every detail on one long screen.',
+    points: ['Personal details and required profile photograph', 'Residential address and multiple emergency contacts', 'Custom conditions, allergies, medicines, and symptoms', 'Each completed step is saved to the backend']
   },
   {
-    key: 'qr-code-id-card',
+    id: 'qr-code-id-card',
     icon: <IdcardOutlined />,
-    title: 'ElderlyCare ID card',
+    title: 'ElderlyCare emergency ID card',
     image: qrImage,
-    summary: 'Create a printable front-and-back card with a 12-digit ElderlyCare ID.',
-    points: ['Photograph, name, date of birth, and blood group', 'Emergency QR code', 'Phone and residential address', 'Wallet-size PDF and ID-only print']
+    summary: 'Create a front-and-back wallet card that can be printed or downloaded as a private PDF.',
+    points: ['12-digit ElderlyCare number', 'Name, photograph, date of birth, and blood group', 'Residential and emergency contact information', 'High-resolution emergency QR']
   },
   {
-    key: 'qr-code-scan',
+    id: 'qr-code-scan',
     icon: <QrcodeOutlined />,
-    title: 'Secure emergency QR',
+    title: 'Secure emergency QR access',
     image: secureImage,
-    summary: 'Give responders fast access to a limited emergency view without publishing the full medical record.',
-    points: ['Random, opaque access token', 'Revocable and regenerable QR', 'No profile editing from public access', 'Insurance and private reports excluded']
+    summary: 'A responder can open limited emergency information quickly without receiving access to the account owner’s private profile.',
+    points: ['Opaque, non-guessable QR token', 'Revocable and regenerable access', 'No public insurance or private report data', 'No profile editing from the scanner page']
   },
   {
-    key: 'recommendations',
+    id: 'recommendations',
     icon: <HeartOutlined />,
     title: 'Necessary health guidance',
     image: recommendationsImage,
-    summary: 'Generate concise wellness and safety guidance supported by the saved profile.',
-    points: ['Short prioritized guidance', 'Profile-specific fall, allergy, and medication safety notes', 'Saved recommendation history', 'Private PDF download']
+    summary: 'Generate a short list of safety and wellness guidance supported by the saved medical profile.',
+    points: ['Concise priority guidance', 'Profile-specific allergy, fall, and medication-safety notes', 'Saved recommendation history', 'Authenticated PDF download']
   },
   {
-    key: 'medical-reports',
+    id: 'medical-reports',
     icon: <FilePdfOutlined />,
     title: 'Emergency Medical Summary',
     image: reportImage,
-    summary: 'Generate private, versioned snapshots instead of changing every historical report.',
-    points: ['Latest report and report history', 'Authenticated preview and download', 'Snapshot-based versions', 'Clear emergency-information disclaimer']
+    summary: 'Create private report versions that preserve the information used at the time each report was generated.',
+    points: ['Snapshot-based report versions', 'Latest report and previous history', 'Authenticated preview and PDF download', 'Emergency-information and medical-advice disclaimer']
   }
 ];
 
-const Services = () => {
-  const screens = useBreakpoint();
-  const initial = window.location.hash.replace('#', '');
-  const [activeKey, setActiveKey] = useState(services.some(({ key }) => key === initial) ? initial : services[0].key);
-  const active = services.find(({ key }) => key === activeKey) || services[0];
+const Services = () => (
+  <Layout>
+    <Content>
+      <PublicPageHero
+        eyebrow="ELDERLYCARE SERVICES"
+        title="One workflow for emergency-ready health information"
+        description="Create the profile, generate secure access, and keep private summaries available for the account owner."
+        primaryAction={{ to: '/register', label: 'Get started' }}
+        secondaryAction={{ to: '/contact', label: 'Ask a question' }}
+        image={aboutHero}
+      />
 
-  useEffect(() => {
-    if (window.location.hash !== `#${activeKey}`) window.history.replaceState(null, '', `#${activeKey}`);
-  }, [activeKey]);
-
-  const tabItems = services.map((service) => ({
-    key: service.key,
-    label: <Space>{service.icon}{service.title}</Space>
-  }));
-
-  return (
-    <Layout>
-      <Content>
-        <PublicPageHero
-          eyebrow="ELDERLYCARE SERVICES"
-          title="One workflow for emergency-ready health information"
-          description="Create the profile, generate secure access, and keep private summaries available for the account owner."
-          primaryAction={{ to: '/register', label: 'Get started' }}
-          secondaryAction={{ to: '/contact', label: 'Ask a question' }}
+      <Flex vertical gap={24} style={{ width: 'calc(100% - 20px)', margin: '36px 10px 56px' }}>
+        <Alert
+          type="info"
+          showIcon
+          icon={<SafetyCertificateOutlined />}
+          message="Private account, limited emergency access"
+          description="Complete profiles, insurance details, and downloaded reports remain private. The QR emergency page displays only the limited information allowed for emergency use."
         />
 
-        <Flex vertical gap={28} style={{ width: 'min(1200px, calc(100% - 32px))', margin: '48px auto' }}>
-          <Alert type="info" showIcon icon={<SafetyCertificateOutlined />} message="Privacy boundary" description="Public QR access contains limited emergency details. Insurance information, complete reports, and editing remain private." />
-          <Card>
-            <Tabs
-              tabPosition={screens.lg ? 'left' : 'top'}
-              activeKey={activeKey}
-              onChange={setActiveKey}
-              items={tabItems}
-            />
-            <Row align="middle" gutter={[32, 28]} style={{ marginTop: 24 }}>
-              <Col xs={24} lg={10}><Image src={active.image} alt={active.title} preview={false} width="100%" /></Col>
-              <Col xs={24} lg={14}>
-                <Text className="care-eyebrow">CURRENT FEATURE</Text>
-                <Title level={2}>{active.icon} {active.title}</Title>
-                <Paragraph type="secondary" style={{ fontSize: 17 }}>{active.summary}</Paragraph>
-                <List dataSource={active.points} renderItem={(point) => <List.Item><List.Item.Meta avatar={<Button type="primary" shape="circle" size="small" icon={<SafetyCertificateOutlined />} />} title={point} /></List.Item>} />
+        {services.map((service, index) => (
+          <Card id={service.id} key={service.id} styles={{ body: { padding: 0 } }} style={{ overflow: 'hidden' }}>
+            <Row align="stretch">
+              <Col
+                xs={{ span: 24, order: 1 }}
+                lg={{ span: 10, order: index % 2 === 0 ? 1 : 2 }}
+              >
+                <Flex align="center" justify="center" style={{ height: '100%', minHeight: 320, padding: 24, background: '#edf3ff' }}>
+                  <Image src={service.image} alt={service.title} preview={false} width="100%" style={{ maxHeight: 360, objectFit: 'contain' }} />
+                </Flex>
+              </Col>
+              <Col
+                xs={{ span: 24, order: 2 }}
+                lg={{ span: 14, order: index % 2 === 0 ? 2 : 1 }}
+              >
+                <Flex vertical justify="center" gap={14} style={{ height: '100%', minHeight: 320, padding: 'clamp(24px, 5vw, 60px)' }}>
+                  <Space wrap><Tag color="blue">SERVICE {index + 1}</Tag><Button type="primary" shape="circle" icon={service.icon} /></Space>
+                  <Title level={2} style={{ margin: 0 }}>{service.title}</Title>
+                  <Paragraph type="secondary" style={{ margin: 0, fontSize: 17 }}>{service.summary}</Paragraph>
+                  <List
+                    split={false}
+                    dataSource={service.points}
+                    renderItem={(point) => <List.Item><Text><CheckCircleOutlined style={{ color: '#0066ff', marginRight: 10 }} />{point}</Text></List.Item>}
+                  />
+                </Flex>
               </Col>
             </Row>
           </Card>
-          <Card>
-            <Row align="middle" gutter={[20, 20]}>
-              <Col xs={24} md={16}><Title level={3} style={{ margin: 0 }}>Ready to create an emergency-ready profile?</Title><Text type="secondary">Register, verify your email, and save each section securely.</Text></Col>
-              <Col xs={24} md={8}><Link to="/register"><Button type="primary" size="large" block>Get started</Button></Link></Col>
-            </Row>
-          </Card>
-        </Flex>
-      </Content>
-      <PublicFooter />
-    </Layout>
-  );
-};
+        ))}
+
+        <Card>
+          <Row align="middle" gutter={[20, 20]}>
+            <Col xs={24} md={16}><Title level={3} style={{ margin: 0 }}>Ready to prepare your profile?</Title><Text type="secondary">Verify your account and save each profile section at your own pace.</Text></Col>
+            <Col xs={24} md={8}><Link to="/register"><Button type="primary" size="large" block>Create an account</Button></Link></Col>
+          </Row>
+        </Card>
+      </Flex>
+    </Content>
+    <PublicFooter />
+  </Layout>
+);
 
 export default Services;

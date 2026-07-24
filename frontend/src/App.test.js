@@ -109,3 +109,14 @@ test('public pages share the three-image carousel and dark footer', () => {
     expect(source).toContain('<PublicFooter');
   });
 });
+
+test('secondary public pages use the single about hero and About omits the team section', () => {
+  ['About', 'Services', 'Contact'].forEach((page) => {
+    const source = fs.readFileSync(path.join(__dirname, 'pages', `${page}.js`), 'utf8');
+    expect(source).toContain("about-hero.jpg");
+    expect(source).toContain('image={aboutHero}');
+  });
+  const about = fs.readFileSync(path.join(__dirname, 'pages', 'About.js'), 'utf8');
+  expect(about).not.toContain('THE PROJECT TEAM');
+  expect(about).not.toContain('People behind ElderlyCare');
+});

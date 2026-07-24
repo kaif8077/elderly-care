@@ -1,13 +1,13 @@
 import { Link } from 'react-router-dom';
 import {
-  Avatar, Button, Card, Col, Divider, Flex, Image, Layout, Row, Space,
+  Button, Card, Col, Divider, Flex, Image, Layout, Row, Space,
   Timeline, Typography
 } from 'antd';
 import {
-  CheckCircleOutlined, LockOutlined, QrcodeOutlined, SafetyCertificateOutlined,
-  TeamOutlined
+  CheckCircleOutlined, LockOutlined, QrcodeOutlined, SafetyCertificateOutlined
 } from '@ant-design/icons';
 import aboutUsImage from '../assests/about_us.png';
+import aboutHero from '../assests/about-hero.jpg';
 import PublicPageHero from '../components/PublicPageHero';
 import PublicFooter from '../components/PublicFooter';
 
@@ -32,14 +32,6 @@ const principles = [
   }
 ];
 
-const team = [
-  ['VK', 'Vibhor Kumar Vishnoi', 'Project Mentor'],
-  ['MK', 'Mohammad Kaif', 'Frontend Developer'],
-  ['MP', 'Madhur Panghal', 'Backend Developer'],
-  ['MA', 'Mohammad Affan', 'UI/UX Designer'],
-  ['MS', 'Mohd Samir', 'Backend Developer']
-];
-
 const About = () => (
   <Layout>
     <Content>
@@ -49,6 +41,7 @@ const About = () => (
         description="ElderlyCare creates structured medical profiles, private emergency summaries, secure QR access, and emergency ID cards for older adults."
         primaryAction={{ to: '/register', label: 'Create an account' }}
         secondaryAction={{ to: '/services', label: 'See how it works' }}
+        image={aboutHero}
       />
 
       <Flex vertical gap={64} style={{ width: 'min(1200px, calc(100% - 32px))', margin: '64px auto' }}>
@@ -107,25 +100,6 @@ const About = () => (
             <Col xs={24} md={8}><Link to="/contact"><Button type="primary" block>Contact the project team</Button></Link></Col>
           </Row>
         </Card>
-
-        <section aria-labelledby="team-title">
-          <Flex vertical align="center" gap={8}>
-            <Text className="care-eyebrow">THE PROJECT TEAM</Text>
-            <Title id="team-title" level={2} style={{ margin: 0 }}><TeamOutlined /> People behind ElderlyCare</Title>
-          </Flex>
-          <Row gutter={[16, 16]} justify="center" style={{ marginTop: 24 }}>
-            {team.map(([initials, name, role]) => (
-              <Col xs={24} sm={12} lg={8} key={name}>
-                <Card size="small">
-                  <Space>
-                    <Avatar size={48} style={{ background: '#0066ff' }}>{initials}</Avatar>
-                    <div><Text strong>{name}</Text><br /><Text type="secondary">{role}</Text></div>
-                  </Space>
-                </Card>
-              </Col>
-            ))}
-          </Row>
-        </section>
       </Flex>
     </Content>
     <PublicFooter />

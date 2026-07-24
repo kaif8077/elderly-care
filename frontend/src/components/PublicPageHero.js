@@ -12,12 +12,13 @@ const PublicPageHero = ({
   title,
   description,
   primaryAction,
-  secondaryAction
+  secondaryAction,
+  image
 }) => (
   <section aria-label={`${title} banner`}>
     <Carousel autoplay autoplaySpeed={4500} arrows draggable dots>
-      {banners.map((image, index) => (
-        <div key={image}>
+      {(image ? [image] : banners).map((banner, index) => (
+        <div key={banner}>
           <Flex
             vertical
             justify="center"
@@ -26,7 +27,7 @@ const PublicPageHero = ({
             style={{
               minHeight: 'clamp(420px, 62vw, 620px)',
               padding: 'clamp(32px, 8vw, 110px)',
-              backgroundImage: `linear-gradient(90deg, rgba(10, 28, 58, .88), rgba(10, 28, 58, .35)), url(${image})`,
+              backgroundImage: `linear-gradient(90deg, rgba(10, 28, 58, .88), rgba(10, 28, 58, .35)), url(${banner})`,
               backgroundSize: 'cover',
               backgroundPosition: 'center',
               color: '#fff'
