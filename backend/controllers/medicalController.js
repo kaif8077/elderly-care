@@ -1,14 +1,38 @@
 const MedicalProfile = require('../models/MedicalProfile');
-const QRCode = require('qrcode');
+const requiredForCompletion = [
+    'firstName', 'lastName', 'dob', 'gender', 'bloodGroup', 'height', 'weight',
+    'dietPreference', 'preferredLanguage', 'mobilityStatus', 'maritalStatus', 'phone', 'address'
+];
 
-// Helper function to generate QR code
-const generateQR = async (text) => {
-    try {
-        return await QRCode.toDataURL(text);
-    } catch (err) {
-        console.error('QR Code generation error:', err);
-        return null;
+const createElderlyCareId = () => Array.from(
+    { length: 12 },
+    () => Math.floor(Math.random() * 10)
+).join('');
+
+const normalizeProfileData = (body, userId) => {
+    const data = { ...body, userId };
+    if (body.firstName || body.lastName) {
+        data.name = [body.firstName, body.lastName].filter(Boolean).join(' ').trim();
     }
+    if (body.dob) data.dob = new Date(body.dob);
+    if (body.height !== undefined) {
+        data.height = Number(body.height);
+        if (body.heightUnit === 'inches') data.height = Math.round(data.height * 2.54);
+    }
+    if (body.weight !== undefined) data.weight = Number(body.weight);
+    ['medicalHistory', 'allergies', 'medications', 'currentSymptoms', 'preferredLanguage', 'emergencyContacts']
+        .forEach((field) => {
+            if (body[field] !== undefined) data[field] = Array.isArray(body[field]) ? body[field] : [];
+        });
+    if (data.emergencyContacts?.length) {
+        const primary = data.emergencyContacts[0];
+        data.emergencyContact = primary.name || '';
+        data.emergencyPhone = primary.phone || '';
+        data.emergencyRelationship = primary.relationship || '';
+    }
+    delete data.heightUnit;
+    delete data.finalize;
+    return data;
 };
 
 exports.createProfile = async (req, res) => {
@@ -17,42 +41,50 @@ exports.createProfile = async (req, res) => {
     }
 
     try {
-        // Process height (convert from inches to cm if needed)
-        let height = Number(req.body.height);
-        if (req.body.heightUnit === 'inches') {
-            height = Math.round(height * 2.54); // Convert inches to cm
+        const profileData = normalizeProfileData(req.body, req.user.id);
+        const existingProfile = await MedicalProfile.findOne({ userId: req.user.id }).sort({ createdAt: -1 });
+        if (!existingProfile) {
+            let candidate;
+            do {
+                candidate = createElderlyCareId();
+            } while (await MedicalProfile.exists({ elderlyCareId: candidate }));
+            profileData.elderlyCareId = candidate;
         }
 
-        // Create profile data
-        const profileData = {
-            ...req.body,
-            userId: req.user.id,
-            dob: new Date(req.body.dob),
-            height,
-            weight: Number(req.body.weight),
-            medicalHistory: req.body.medicalHistory || [],
-            allergies: req.body.allergies || [],
-            medications: req.body.medications || [],
-            currentSymptoms: req.body.currentSymptoms || []
-        };
-
-        // Generate QR code with essential emergency info
-        const qrText = `MEDICAL PROFILE\nName: ${profileData.name}\nDOB: ${profileData.dob.toISOString().split('T')[0]}\nBlood: ${profileData.bloodGroup || 'Unknown'}\nAllergies: ${profileData.allergies.join(', ') || 'None'}\nEmergency: ${profileData.emergencyContact} (${profileData.emergencyPhone})`;
-        profileData.qrCodeImage = await generateQR(qrText);
-
-        // Create and save profile
-        const profile = new MedicalProfile(profileData);
+        const profile = existingProfile || new MedicalProfile();
+        Object.assign(profile, profileData);
+        if (req.body.finalize) {
+            const missing = requiredForCompletion.filter((field) => {
+                const value = profile[field];
+                return value === undefined || value === null || value === '' || (Array.isArray(value) && !value.length);
+            });
+            if (!profile.emergencyContacts?.length || !profile.emergencyContacts[0]?.name ||
+                !profile.emergencyContacts[0]?.phone || !profile.emergencyContacts[0]?.relationship) {
+                missing.push('emergencyContacts');
+            }
+            if (!profile.profilePhoto?.fileId) missing.push('profilePhoto');
+            if (missing.length) {
+                return res.status(400).json({
+                    message: 'Complete all mandatory profile fields before saving.',
+                    fields: [...new Set(missing)]
+                });
+            }
+            profile.profileStatus = 'completed';
+        }
         await profile.save();
         
-        res.status(201).json({
-            message: 'Medical profile created successfully',
+        res.status(existingProfile ? 200 : 201).json({
+            message: req.body.finalize ? 'Medical profile completed successfully' : 'Profile section saved',
             profile
         });
     } catch (error) {
         console.error('Error creating medical profile:', error);
-        res.status(500).json({ 
-            message: 'Error creating medical profile',
-            error: process.env.NODE_ENV === 'development' ? error.message : undefined
+        const isValidation = error.name === 'ValidationError' || error.name === 'CastError';
+        res.status(isValidation ? 400 : 500).json({
+            message: isValidation ? 'Please correct the medical profile fields.' : 'Error creating medical profile',
+            fields: isValidation
+                ? Object.fromEntries(Object.entries(error.errors || {}).map(([key, value]) => [key, value.message]))
+                : undefined
         });
     }
 };
@@ -79,7 +111,7 @@ exports.getMedicalProfile = async (req, res) => {
         const { profilePhoto, ...safeProfile } = medicalProfile;
         const response = {
             ...safeProfile,
-            dob: medicalProfile.dob.toISOString().split('T')[0],
+            dob: medicalProfile.dob ? medicalProfile.dob.toISOString().split('T')[0] : null,
             profilePhoto: profilePhoto?.fileId ? {
                 contentType: profilePhoto.contentType,
                 bytes: profilePhoto.bytes,

@@ -1,17 +1,11 @@
 import React, { useRef, useState } from 'react';
 import html2canvas from 'html2canvas';
 import { Button, Space, message } from 'antd';
-import { DownloadOutlined, PrinterOutlined, QrcodeOutlined, SafetyCertificateOutlined } from '@ant-design/icons';
+import { DownloadOutlined, PrinterOutlined, QrcodeOutlined } from '@ant-design/icons';
 import './UserIdCard.css';
 
-const age = (dob) => {
-  if (!dob) return null;
-  const birth = new Date(dob);
-  const today = new Date();
-  let value = today.getFullYear() - birth.getFullYear();
-  if (today < new Date(today.getFullYear(), birth.getMonth(), birth.getDate())) value -= 1;
-  return Number.isFinite(value) ? value : null;
-};
+const formatId = (value) => String(value || '').replace(/\D/g, '').padStart(12, '0').slice(-12).replace(/(\d{4})(?=\d)/g, '$1 ');
+const formatDob = (value) => value ? new Date(value).toLocaleDateString('en-GB') : 'Not provided';
 
 const UserIdCard = ({ profile, qrCode, photoUrl }) => {
   const pairRef = useRef(null);
@@ -20,7 +14,7 @@ const UserIdCard = ({ profile, qrCode, photoUrl }) => {
   const [working, setWorking] = useState(false);
 
   if (!profile) return null;
-  const elderlyCareId = `EC-${String(profile.userId || profile._id).slice(-8).toUpperCase()}`;
+  const elderlyCareId = formatId(profile.elderlyCareId || profile.userId || profile._id);
   const allergies = [...(profile.allergies || []), profile.allergiesOther].filter(Boolean).join(', ') || 'None reported';
 
   const renderCard = (element) => html2canvas(element, {
@@ -60,29 +54,30 @@ const UserIdCard = ({ profile, qrCode, photoUrl }) => {
     <section className="user-id-module">
       <div className="user-card-pair" ref={pairRef}>
         <article className="user-wallet-card" ref={frontRef}>
-          <header><span><SafetyCertificateOutlined /> ELDERLYCARE</span><b>EMERGENCY ID</b></header>
+          <header><span><img src="/favicon.png" alt="" /> ELDERLYCARE</span><b>IDENTITY CARD</b></header>
           <div className="user-card-main">
             <div className="user-card-person">
               <span className="user-card-photo">
                 {photoUrl ? <img src={photoUrl} alt={`${profile.name} profile`} /> : profile.name?.charAt(0)}
               </span>
-              <div><h3>{profile.name}</h3><p>{elderlyCareId}</p><p>{age(profile.dob) !== null ? `Age ${age(profile.dob)}` : 'Age unavailable'}</p></div>
+              <div><h3>{profile.name}</h3><p className="user-card-number">{elderlyCareId}</p><p>DOB: {formatDob(profile.dob)}</p></div>
             </div>
             <strong className="user-card-blood"><small>BLOOD GROUP</small>{profile.bloodGroup || 'Unknown'}</strong>
             <div className="user-card-qr">{qrCode ? <img src={qrCode} alt="Emergency QR code" /> : <QrcodeOutlined />}<b>SCAN IN EMERGENCY</b></div>
           </div>
-          <footer><span>{qrCode ? 'ACTIVE' : 'QR NOT GENERATED'}</span><span>Emergency use only</span></footer>
+          <footer><span>{qrCode ? 'ACTIVE' : 'QR NOT GENERATED'}</span><span>Identity and emergency access</span></footer>
         </article>
 
         <article className="user-wallet-card user-wallet-back" ref={backRef}>
-          <header><span>EMERGENCY DETAILS</span><b>{elderlyCareId}</b></header>
+          <header><span><img src="/favicon.png" alt="" /> ELDERLYCARE</span><b>{elderlyCareId}</b></header>
           <dl>
-            <div><dt>Primary contact</dt><dd>{profile.emergencyContact || 'Not provided'}</dd></div>
-            <div><dt>Phone</dt><dd>{profile.emergencyPhone || 'Not provided'}</dd></div>
+            <div><dt>Member phone</dt><dd>{profile.phone || 'Not provided'}</dd></div>
+            <div><dt>Emergency contact</dt><dd>{profile.emergencyPhone || 'Not provided'}</dd></div>
+            <div className="user-card-address"><dt>Residential address</dt><dd>{profile.address || 'Not provided'}</dd></div>
             <div className="user-card-warning"><dt>Allergy warning</dt><dd>{allergies}</dd></div>
           </dl>
-          <p>Call the listed contact and local emergency services when immediate help is required.</p>
-          <aside>No insurance policy or complete medical report is stored on this card.</aside>
+          <div className="user-card-back-qr">{qrCode ? <img src={qrCode} alt="Emergency QR code" /> : <QrcodeOutlined />}</div>
+          <aside>This card contains limited information. Scan the secure QR for permitted emergency details.</aside>
           <footer><span>Revocable secure QR</span><span>ElderlyCare</span></footer>
         </article>
       </div>

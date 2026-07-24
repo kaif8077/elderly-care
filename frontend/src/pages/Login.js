@@ -2,7 +2,7 @@ import React, { useContext, useState } from 'react';
 import axios from 'axios';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { Alert, Button, Card, Form, Input, Space, Typography } from 'antd';
-import { LockOutlined, MailOutlined, SafetyCertificateOutlined } from '@ant-design/icons';
+import { LockOutlined, MailOutlined } from '@ant-design/icons';
 import { AuthContext } from '../context/AuthContext';
 import { toast } from 'react-toastify';
 
@@ -38,7 +38,7 @@ const Login = () => {
     <main className="care-auth-page">
       <Card className="care-auth-card" styles={{ body: { padding: 28 } }}>
         <div className="care-auth-brand">
-          <span className="care-auth-logo"><SafetyCertificateOutlined /></span>
+          <span className="care-auth-logo"><img src="/favicon.png" alt="ElderlyCare logo" /></span>
           <div><Text className="care-eyebrow">ELDERLYCARE</Text><br /><Text type="secondary">Secure member access</Text></div>
         </div>
         <Title level={2}>Welcome back</Title>

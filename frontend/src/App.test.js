@@ -39,3 +39,19 @@ test('forgot-password and ID-card PDF flows are wired', () => {
   expect(cardSource).not.toContain('Download PNG');
   expect(cardSource).toContain('Download front + back PDF');
 });
+
+test('medical profile form saves steps and supports structured emergency contacts', () => {
+  const source = fs.readFileSync(path.join(__dirname, 'components', 'MedicalForm.js'), 'utf8');
+  expect(source).toContain("api.post('/api/medical'");
+  expect(source).toContain('<Form.List name="emergencyContacts">');
+  expect(source).toContain('mode="tags"');
+  expect(source).toContain('Profile photograph is required');
+  expect(source).toContain('reviewConfirmed');
+});
+
+test('dashboard uses a full-width QR flow without legacy quick-action cards', () => {
+  const source = fs.readFileSync(path.join(__dirname, 'pages', 'Dashboard.js'), 'utf8');
+  expect(source).toContain('<QRCodeDisplay />');
+  expect(source).not.toContain('const actions=');
+  expect(source).not.toContain('Emergency ID card');
+});
