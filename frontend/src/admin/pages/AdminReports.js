@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useState } from 'react';
-import { FaChevronLeft, FaChevronRight, FaFileMedical, FaSyncAlt, FaTimes } from 'react-icons/fa';
+import { FaChevronLeft, FaChevronRight, FaDownload, FaFileMedical, FaPrint, FaSyncAlt, FaTimes } from 'react-icons/fa';
 import adminApi from '../../services/adminApi';
 import AdminStatusBadge from '../components/AdminStatusBadge';
 import '../styles/AdminReports.css';
@@ -49,6 +49,20 @@ const AdminReports = () => {
     }
   };
 
+  const downloadPdf = async () => {
+    try {
+      const response = await adminApi.get(`/reports/${selected._id}/download`, { responseType: 'blob' });
+      const url = URL.createObjectURL(response.data);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = `elderlycare-report-v${selected.reportVersion}.pdf`;
+      link.click();
+      URL.revokeObjectURL(url);
+      setMessage('Authenticated PDF downloaded.');
+    } catch (error) {
+      setMessage('Unable to download the report PDF.');
+    }
+  };
   return (
     <div className="admin-reports-page">
       <div className="admin-page-actions">
@@ -95,7 +109,7 @@ const AdminReports = () => {
           <section><h3>Emergency contact</h3><p>{selected.snapshotData.emergencyContacts[0]?.name} · {selected.snapshotData.emergencyContacts[0]?.phone}</p></section>
         </div>
         <footer><span>This summary is not a replacement for professional medical advice.</span><div>
-          <button className="admin-secondary-button" onClick={() => verify('needs_correction')}>Needs correction</button>
+          <button className="admin-secondary-button" onClick={() => window.print()}><FaPrint /> Print</button><button className="admin-secondary-button" onClick={downloadPdf}><FaDownload /> Download PDF</button><button className="admin-secondary-button" onClick={() => verify('needs_correction')}>Needs correction</button>
           <button className="admin-primary-button" onClick={() => verify('verified')}>Mark verified</button>
         </div></footer>
       </section></div>}

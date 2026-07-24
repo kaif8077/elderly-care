@@ -7,6 +7,7 @@ import Login from './pages/Login';
 import Register from './pages/Register';
 import Profile from './pages/Profile';
 import Dashboard from './pages/Dashboard';
+import MedicalReports from './pages/MedicalReports';
 import About from './pages/About'; 
 import Services from './pages/Services';
 import Contact from './pages/Contact';
@@ -38,6 +39,7 @@ const AppRoutes = () => {
                 <Route path="/contact" element={<Contact />} />
                 <Route path="/profile" element={<Profile />} />
                 <Route path="/dashboard" element={<Dashboard />} />
+                <Route path="/reports" element={<MedicalReports />} />
                 <Route path="/services" element={<Services />} />
                 <Route path="/admin/login" element={<AdminLogin />} />
                 <Route

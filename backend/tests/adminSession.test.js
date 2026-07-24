@@ -8,6 +8,7 @@ process.env.NODE_ENV = 'test';
 const {
   ADMIN_COOKIE_NAME,
   createAdminToken,
+  cookieOptions,
   readCookie,
   verifyAdminToken
 } = require('../services/adminSessionService');
@@ -190,4 +191,25 @@ test('untrusted browser origins fail state-changing admin requests', () => {
   assert.equal(statusCode, 403);
   assert.equal(body.code, 'UNTRUSTED_ADMIN_ORIGIN');
   assert.equal(nextCalled, false);
+});
+
+test('cross-origin HTTPS admin cookies force SameSite=None and Secure', () => {
+  const previous = {
+    nodeEnv: process.env.NODE_ENV,
+    frontendUrl: process.env.FRONTEND_URL,
+    backendUrl: process.env.RENDER_BACKEND_URL,
+    sameSite: process.env.ADMIN_COOKIE_SAME_SITE
+  };
+  process.env.NODE_ENV = 'production';
+  process.env.FRONTEND_URL = 'https://elderlycare.example.com';
+  process.env.RENDER_BACKEND_URL = 'https://elderly-care.example.onrender.com';
+  process.env.ADMIN_COOKIE_SAME_SITE = 'lax';
+  const options = cookieOptions();
+  process.env.NODE_ENV = previous.nodeEnv;
+  process.env.FRONTEND_URL = previous.frontendUrl;
+  process.env.RENDER_BACKEND_URL = previous.backendUrl;
+  process.env.ADMIN_COOKIE_SAME_SITE = previous.sameSite;
+  assert.equal(options.secure, true);
+  assert.equal(options.sameSite, 'none');
+  assert.equal(options.partitioned, true);
 });

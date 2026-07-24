@@ -24,14 +24,29 @@ const createAdminToken = (admin) => jwt.sign({
 
 const verifyAdminToken = (token) => jwt.verify(token, getAdminSecret());
 
-const cookieOptions = () => ({
-  httpOnly: true,
-  secure: process.env.NODE_ENV === 'production',
-  sameSite: process.env.ADMIN_COOKIE_SAME_SITE
-    || (process.env.NODE_ENV === 'production' ? 'none' : 'lax'),
-  maxAge: getSessionHours() * 60 * 60 * 1000,
-  path: '/'
-});
+const isDifferentOrigin = () => {
+  try {
+    const frontend = new URL(process.env.FRONTEND_URL);
+    const backend = new URL(process.env.RENDER_BACKEND_URL);
+    return frontend.origin !== backend.origin;
+  } catch (error) {
+    return process.env.NODE_ENV === 'production';
+  }
+};
+
+const cookieOptions = () => {
+  const crossSite = isDifferentOrigin();
+  const usesHttps = String(process.env.FRONTEND_URL || '').startsWith('https://')
+    || String(process.env.RENDER_BACKEND_URL || '').startsWith('https://');
+  return {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === 'production' || usesHttps || crossSite,
+    sameSite: crossSite ? 'none' : (process.env.ADMIN_COOKIE_SAME_SITE || 'lax'),
+    partitioned: crossSite,
+    maxAge: getSessionHours() * 60 * 60 * 1000,
+    path: '/'
+  };
+};
 
 const setAdminCookie = (res, token) => {
   res.cookie(ADMIN_COOKIE_NAME, token, cookieOptions());
@@ -54,6 +69,8 @@ module.exports = {
   ADMIN_COOKIE_NAME,
   clearAdminCookie,
   createAdminToken,
+  cookieOptions,
+  isDifferentOrigin,
   readCookie,
   setAdminCookie,
   verifyAdminToken

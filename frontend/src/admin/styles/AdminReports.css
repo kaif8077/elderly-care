@@ -19,3 +19,10 @@
   .admin-report-preview footer { align-items: stretch; flex-direction: column; }
   .admin-report-preview footer div { flex-direction: column; }
 }
+
+@media print {
+  .admin-sidebar, .admin-topbar, .admin-page-actions, .admin-filter-panel, .admin-table-panel, .admin-action-message, .admin-report-close, .admin-report-preview footer div { display: none!important; }
+  .admin-modal-backdrop { position: static; display: block; padding: 0; background: #fff; }
+  .admin-report-preview { width: 100%; max-height: none; overflow: visible; padding: 0; box-shadow: none; }
+  .admin-report-sections { break-inside: avoid; }
+}
