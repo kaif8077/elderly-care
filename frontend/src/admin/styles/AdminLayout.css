@@ -155,6 +155,10 @@
 .admin-pagination button:disabled { opacity: .4; }
 .admin-visually-hidden { position: absolute!important; width: 1px!important; height: 1px!important; padding: 0!important; margin: -1px!important; overflow: hidden!important; clip: rect(0,0,0,0)!important; white-space: nowrap!important; border: 0!important; }
 .admin-sidebar-backdrop { display: none; }
+.admin-shell button:focus-visible, .admin-shell a:focus-visible, .admin-shell input:focus-visible, .admin-shell select:focus-visible, .admin-shell textarea:focus-visible {
+  outline: 3px solid #e09b22;
+  outline-offset: 2px;
+}
 
 .admin-back-link { display: inline-flex; align-items: center; gap: 8px; margin-bottom: 16px; color: #176b57; font-weight: 800; text-decoration: none; }
 .admin-detail-hero {

@@ -44,6 +44,14 @@ const AdminUserDetail = () => {
   }, [userId]);
 
   useEffect(() => { load(); }, [load]);
+  useEffect(() => {
+    if (!archiveOpen) return undefined;
+    const closeOnEscape = (event) => {
+      if (event.key === 'Escape' && !statusSaving) setArchiveOpen(false);
+    };
+    document.addEventListener('keydown', closeOnEscape);
+    return () => document.removeEventListener('keydown', closeOnEscape);
+  }, [archiveOpen, statusSaving]);
 
   if (loading) return <div className="admin-detail-skeleton skeleton" aria-label="Loading user details" />;
   if (error) return (
@@ -196,12 +204,14 @@ const AdminUserDetail = () => {
       </header>
 
       <div className="admin-detail-tabs" role="tablist" aria-label="User record sections">
-        {tabs.map((tab) => <button key={tab} role="tab" aria-selected={activeTab === tab} className={activeTab === tab ? 'active' : ''} onClick={() => setActiveTab(tab)}>{tab}</button>)}
+        {tabs.map((tab) => <button key={tab} id={`admin-tab-${tab}`} role="tab" aria-controls="admin-user-tabpanel" aria-selected={activeTab === tab} tabIndex={activeTab === tab ? 0 : -1} className={activeTab === tab ? 'active' : ''} onClick={() => setActiveTab(tab)}>{tab}</button>)}
       </div>
 
-      {!profile && !['Overview', 'Reports', 'QR'].includes(activeTab)
-        ? <div className="admin-state-card"><h2>No medical profile</h2><p>This user has not submitted medical information.</p></div>
-        : sections[activeTab]}
+      <div id="admin-user-tabpanel" role="tabpanel" aria-labelledby={`admin-tab-${activeTab}`}>
+        {!profile && !['Overview', 'Reports', 'QR'].includes(activeTab)
+          ? <div className="admin-state-card"><h2>No medical profile</h2><p>This user has not submitted medical information.</p></div>
+          : sections[activeTab]}
+      </div>
 
       {archiveOpen && (
         <div className="admin-modal-backdrop" role="presentation">

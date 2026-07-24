@@ -1,6 +1,5 @@
 require('dotenv').config({ override: true });
 const express = require('express');
-const path = require('path');
 const connectDB = require('./config/db');
 const authRoutes = require('./routes/authRoutes');
 const medicalRoutes = require('./routes/medicalRoutes');
@@ -14,6 +13,7 @@ const adminUserRoutes = require('./routes/adminUserRoutes');
 const adminIdCardRoutes = require('./routes/adminIdCardRoutes');
 const adminAuditRoutes = require('./routes/adminAuditRoutes');
 const cors = require('cors');
+const securityHeaders = require('./middleware/securityHeaders');
 const app = express();
 
 // Connect to the database
@@ -26,10 +26,9 @@ app.use(cors({
     allowedHeaders: ['Content-Type', 'Authorization'],
     credentials: true
 }));
+app.disable('x-powered-by');
+app.use(securityHeaders);
 app.use(express.json());
-
-// Static files
-app.use('/profiles', express.static(path.join(__dirname, 'public/profiles')));
 
 // API Routes
 app.use('/api/auth', authRoutes);

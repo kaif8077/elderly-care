@@ -63,7 +63,7 @@ const AdminAuditLogs = () => {
             : !data.logs.length ? <div className="admin-state-card"><h2>No audit events found</h2><p>Try changing the current filters.</p></div>
               : <div className="admin-table-scroll"><table className="admin-data-table admin-audit-table">
                 <caption className="admin-visually-hidden">Administrative audit events</caption>
-                <thead><tr><th>Date</th><th>Admin</th><th>Action</th><th>Resource</th><th>Affected user</th><th>Result</th><th>Reason / description</th></tr></thead>
+                <thead><tr><th scope="col">Date</th><th scope="col">Admin</th><th scope="col">Action</th><th scope="col">Resource</th><th scope="col">Affected user</th><th scope="col">Result</th><th scope="col">Reason / description</th></tr></thead>
                 <tbody>{data.logs.map((log) => <tr key={log.id}>
                   <td>{new Date(log.createdAt).toLocaleString()}</td>
                   <td>{log.actor?.name || 'System'}<small>{log.actor?.email || log.actorRole || 'Unknown'}</small></td>

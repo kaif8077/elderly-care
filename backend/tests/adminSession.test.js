@@ -13,15 +13,17 @@ const {
 } = require('../services/adminSessionService');
 const {
   DEFAULT_ADMIN_PERMISSIONS,
-  getPermissions
+  getPermissions,
+  requireRole
 } = require('../middleware/requirePermission');
-const { configuredOrigins } = require('../middleware/requireTrustedOrigin');
+const { configuredOrigins, requireTrustedOrigin } = require('../middleware/requireTrustedOrigin');
 const { calculateCompletion, isProfileComplete, parseQuery } = require('../services/adminUserQueryService');
 const { getAdminUserDetail } = require('../services/adminUserDetailService');
 const { getCard } = require('../services/adminIdCardService');
 const QRCodeModel = require('../models/QRCode');
 const { parseAuditQuery } = require('../services/adminAuditQueryService');
 const { validateArchiveRequest } = require('../services/adminUserLifecycleService');
+const securityHeaders = require('../middleware/securityHeaders');
 
 test('admin session token contains only expected authorization claims', () => {
   const admin = {
@@ -136,4 +138,56 @@ test('archive validation requires a reason and exact confirmation word', () => {
 
 test('audit pagination is bounded', () => {
   assert.deepEqual(parseAuditQuery({ page: '-5', limit: '1000' }), { page: 1, limit: 100 });
+});
+
+test('admin route modules register without invalid middleware callbacks', () => {
+  assert.equal(typeof require('../routes/adminUserRoutes'), 'function');
+  assert.equal(typeof require('../routes/adminIdCardRoutes'), 'function');
+  assert.equal(typeof require('../routes/adminAuditRoutes'), 'function');
+});
+
+test('security headers prevent framing and MIME sniffing', () => {
+  const headers = {};
+  const res = { set: (values) => Object.assign(headers, values) };
+  let called = false;
+  securityHeaders({}, res, () => { called = true; });
+  assert.equal(called, true);
+  assert.equal(headers['X-Frame-Options'], 'DENY');
+  assert.equal(headers['X-Content-Type-Options'], 'nosniff');
+  assert.equal(headers['Referrer-Policy'], 'no-referrer');
+});
+
+test('normal users fail the backend admin role boundary', () => {
+  const middleware = requireRole('admin', 'super_admin');
+  let statusCode;
+  let body;
+  let nextCalled = false;
+  middleware(
+    { admin: { role: 'user' } },
+    { status: (code) => { statusCode = code; return { json: (value) => { body = value; } }; } },
+    () => { nextCalled = true; }
+  );
+  assert.equal(statusCode, 403);
+  assert.equal(body.code, 'ADMIN_ROLE_REQUIRED');
+  assert.equal(nextCalled, false);
+});
+
+test('untrusted browser origins fail state-changing admin requests', () => {
+  const previousNodeEnv = process.env.NODE_ENV;
+  const previousFrontendUrl = process.env.FRONTEND_URL;
+  process.env.NODE_ENV = 'production';
+  process.env.FRONTEND_URL = 'https://elderlycare.example.com';
+  let statusCode;
+  let body;
+  let nextCalled = false;
+  requireTrustedOrigin(
+    { get: () => 'https://attacker.example.com' },
+    { status: (code) => { statusCode = code; return { json: (value) => { body = value; } }; } },
+    () => { nextCalled = true; }
+  );
+  process.env.NODE_ENV = previousNodeEnv;
+  process.env.FRONTEND_URL = previousFrontendUrl;
+  assert.equal(statusCode, 403);
+  assert.equal(body.code, 'UNTRUSTED_ADMIN_ORIGIN');
+  assert.equal(nextCalled, false);
 });

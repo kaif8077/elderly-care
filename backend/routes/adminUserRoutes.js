@@ -2,7 +2,7 @@ const express = require('express');
 const authenticateAdmin = require('../middleware/authenticateAdmin');
 const { requirePermission, requireRole } = require('../middleware/requirePermission');
 const adminUserController = require('../controllers/adminUserController');
-const requireTrustedOrigin = require('../middleware/requireTrustedOrigin');
+const { requireTrustedOrigin } = require('../middleware/requireTrustedOrigin');
 
 const router = express.Router();
 
