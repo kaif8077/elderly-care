@@ -1,18 +1,17 @@
-import React, { useEffect, useState, useContext, useRef } from 'react';
+import React, { useEffect, useState, useContext } from 'react';
 import axios from 'axios';
 import { AuthContext } from '../context/AuthContext';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import aboutHero from '../assests/about-hero.jpg';
 import './Profile.css';
-import html2canvas from 'html2canvas';
+import UserIdCard from '../components/UserIdCard';
 
 const Profile = () => {
     const { user } = useContext(AuthContext);
     const [medicalProfile, setMedicalProfile] = useState(null);
     const [qrCode, setQrCode] = useState('');
     const [isLoading, setIsLoading] = useState(true);
-    const idCardRef = useRef(null);
     const [photoUrl, setPhotoUrl] = useState('');
     const [photoBusy, setPhotoBusy] = useState(false);
 
@@ -98,27 +97,6 @@ const Profile = () => {
             setPhotoBusy(false);
         }
     };
-    const downloadIDCard = async () => {
-        if (!idCardRef.current || !medicalProfile) return;
-
-        try {
-            const canvas = await html2canvas(idCardRef.current, {
-                scale: 2,
-                logging: false,
-                useCORS: true,
-                backgroundColor: null
-            });
-
-            const link = document.createElement('a');
-            link.download = `ElderlyCare-ID-${medicalProfile.name.replace(/\s+/g, '-')}.png`;
-            link.href = canvas.toDataURL('image/png');
-            link.click();
-            toast.success('ID Card downloaded successfully!');
-        } catch (error) {
-            toast.error('Failed to download ID Card');
-        }
-    };
-
     if (isLoading) {
         return (
             <div className="profile-page">
@@ -227,55 +205,7 @@ const Profile = () => {
                     </div>
                 </div>
 
-                <div className="id-card-section">
-                    <div className="id-card-container">
-                        <div className="id-card-content" ref={idCardRef}>
-                            <div className="id-card-header">ELDERLYCARE</div>
-                            <div className="id-card-subheader">ID CARD</div>
-                            <div className="id-card-name">
-                                {medicalProfile?.name.toUpperCase() || 'N/A'}
-                            </div>
-                            
-                            <div className="id-card-qr">
-                                {qrCode ? (
-                                    <img src={qrCode} alt="Medical QR Code" />
-                                ) : (
-                                    <div className="qr-placeholder">QR Code Not Available</div>
-                                )}
-                            </div>
-                            <div className="id-card-footer">
-                                <p>Scan QR code in case of emergency</p>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div className="id-card-instructions">
-                        <div>
-                            <h3>How to Use Your ID Card</h3>
-                            <p style={{ textAlign: 'justify' }}>
-                                Your ElderlyCare ID Card contains important medical information that can be
-                                accessed by scanning the QR code in case of emergency. Keep this card with
-                                you at all times.
-                            </p>
-                            <p style={{ textAlign: 'justify' }}>
-                                Medical professionals can scan the QR code to access your vital health
-                                information when you're unable to communicate. This includes your medical
-                                history, allergies, and current medications.
-                            </p>
-                            <p style={{ textAlign: 'justify' }}>
-                                For your safety, we recommend keeping a digital copy of this ID card on
-                                your phone and a printed copy in your wallet or purse.
-                            </p>
-                        </div>
-                        <button
-                            className="download-id-btn"
-                            onClick={downloadIDCard}
-                            disabled={!medicalProfile || !qrCode}
-                        >
-                            Download ID Card
-                        </button>
-                    </div>
-                </div>
+                <UserIdCard profile={medicalProfile} qrCode={qrCode} photoUrl={photoUrl} />
             </div>
 
             <footer className="footer-section">

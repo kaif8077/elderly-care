@@ -1,52 +1,9 @@
-import React, { useState } from 'react';
+import React,{useContext,useState} from 'react';
+import {Link} from 'react-router-dom';
+import {FaAddressCard,FaFileMedical,FaHeartbeat,FaQrcode,FaUserCircle} from 'react-icons/fa';
+import {AuthContext} from '../context/AuthContext';
 import MedicalForm from '../components/MedicalForm';
 import QRCodeDisplay from '../components/QRCodeDisplay';
 import Recommendations from '../components/Recommendations';
-import aboutHero from '../assests/about-hero.jpg';
 import './Dashboard.css';
-
-const Dashboard = () => {
-    const [medicalFormSubmitted, setMedicalFormSubmitted] = useState(false);
-    
-    return (
-        <div className="dashboard-page">
-            {/* Hero Banner */}
-            <div 
-                className="dashboard-hero" 
-                style={{ backgroundImage: `url(${aboutHero})` }}
-            >
-                <div className="hero-overlay">
-                    <h1>Your Dashboard</h1>
-                    <p>Manage your health information and access services</p>
-                </div>
-            </div>
-
-            {/* Dashboard Content */}
-            <div className="dashboard-container">
-                <div className="">
-                    <MedicalForm onSubmissionSuccess={() => setMedicalFormSubmitted(true)} />
-                </div>
-                <div className="dashboard-section">
-                    <QRCodeDisplay />
-                </div>
-                <div className="dashboard-section recommendations" id="recommendations">
-                    {medicalFormSubmitted ? (
-                        <Recommendations />
-                    ) : (
-                        <div className="waiting-message pulse-animation">
-                            <i className="fas fa-heartbeat" style={{ fontSize: '2rem', marginBottom: '10px' }}></i>
-                            <p>We're ready to generate your recommendations once you submit your health information</p>
-                        </div>
-                    )}
-                </div>
-            </div>
-
-            {/* Footer Section */}
-            <footer className="footer-section">
-                <p>&copy; {new Date().getFullYear()} ElderlyCare. All rights reserved.</p>
-            </footer>
-        </div>
-    );
-};
-
-export default Dashboard;
+const Dashboard=()=>{const{user}=useContext(AuthContext);const[submitted,setSubmitted]=useState(false);return <main className="care-dashboard"><header className="care-dashboard-head"><div><span>ELDERLYCARE MEMBER AREA</span><h1>Welcome, {user?.name||'Member'}</h1><p>Keep emergency information accurate and ready when it matters.</p></div><Link to="/profile"><FaUserCircle/> Open my profile</Link></header><section className="care-quick-grid"><Link to="/profile"><FaAddressCard/><strong>Emergency ID card</strong><span>Preview, print and download</span></Link><Link to="/reports"><FaFileMedical/><strong>Medical reports</strong><span>Latest summary and history</span></Link><a href="#medical-form"><FaHeartbeat/><strong>Health information</strong><span>Create or update your profile</span></a><a href="#qr"><FaQrcode/><strong>Emergency QR</strong><span>Generate a revocable code</span></a></section><section id="medical-form"><MedicalForm onSubmissionSuccess={()=>setSubmitted(true)}/></section><section className="care-dashboard-columns"><article id="qr"><h2>Emergency QR</h2><p>Generate a random, revocable emergency-access code after saving your profile.</p><QRCodeDisplay/></article><article><h2>Health recommendations</h2>{submitted?<Recommendations/>:<div className="care-empty"><FaHeartbeat/><p>Save the medical form to refresh personalized recommendations.</p></div>}</article></section></main>};export default Dashboard;
