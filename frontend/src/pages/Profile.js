@@ -6,6 +6,7 @@ import 'react-toastify/dist/ReactToastify.css';
 import aboutHero from '../assests/about-hero.jpg';
 import './Profile.css';
 import UserIdCard from '../components/UserIdCard';
+import Recommendations from '../components/Recommendations';
 
 const Profile = () => {
     const { user } = useContext(AuthContext);
@@ -205,6 +206,7 @@ const Profile = () => {
                     </div>
                 </div>
 
+                <section className="profile-section"><Recommendations /></section>
                 <UserIdCard profile={medicalProfile} qrCode={qrCode} photoUrl={photoUrl} />
             </div>
 

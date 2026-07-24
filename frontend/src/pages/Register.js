@@ -1,9 +1,10 @@
-import React, { useState } from 'react';
+import React, { useContext, useState } from 'react';
 import axios from 'axios';
 import { useNavigate, Link } from 'react-router-dom';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import './Auth.css';
+import { AuthContext } from '../context/AuthContext';
 
 const Register = () => {
     const [step, setStep] = useState(1); // 1: register, 2: verify, 3: complete
@@ -20,6 +21,7 @@ const Register = () => {
     const [passwordStrength, setPasswordStrength] = useState(0);
     const [showPassword, setShowPassword] = useState(false);
     const navigate = useNavigate();
+    const { login } = useContext(AuthContext);
 
     const handleChange = (e) => {
         const { name, value } = e.target;
@@ -91,8 +93,15 @@ const Register = () => {
                 });
 
                 setRegistrationToken(verifyResponse.data.registrationToken);
-                toast.success("Email verified successfully");
-                setStep(3);
+                const completeResponse = await axios.post(`${process.env.REACT_APP_BACKEND_URI}/api/auth/complete-registration`, {
+                    name: formData.name,
+                    password: formData.password,
+                    registrationToken: verifyResponse.data.registrationToken
+                });
+                localStorage.setItem('token', completeResponse.data.token);
+                login(completeResponse.data.user);
+                toast.success('Registration completed. You are now logged in.');
+                navigate('/dashboard');
             } else if (step === 3) {
                 // Complete registration
                 const response = await axios.post(`${process.env.REACT_APP_BACKEND_URI}/api/auth/complete-registration`, {
@@ -103,7 +112,8 @@ const Register = () => {
 
                 localStorage.setItem("token", response.data.token);
                 toast.success("Registration successful! Redirecting...", { autoClose: 2000 });
-                setTimeout(() => navigate('/Login'), 2500);
+                login(response.data.user);
+                navigate('/dashboard');
             }
         } catch (error) {
             console.error('Error:', error);
