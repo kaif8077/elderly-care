@@ -1,4 +1,5 @@
 require('dotenv').config({ override: true });
+const crypto = require('crypto');
 const RecommendationCache = require('../models/RecommendationCache');
 
 // Free AI APIs - Multiple options
@@ -7,7 +8,7 @@ const HF_API_KEY = process.env.HF_API_KEY || 'your_hugging_face_token';
 const generateHealthRecommendations = async (profile) => {
     try {
         // Check cache first
-        const cacheKey = `health_${JSON.stringify(profile)}`;
+        const cacheKey = `health_${crypto.createHash('sha256').update(JSON.stringify(profile.toObject ? profile.toObject() : profile)).digest('hex')}`;
         const cached = await RecommendationCache.findOne({ cacheKey: cacheKey });
         if (cached && (Date.now() - cached.createdAt.getTime()) < 24 * 60 * 60 * 1000) {
             return cached.value;
@@ -16,7 +17,7 @@ const generateHealthRecommendations = async (profile) => {
         const age = calculateAge(profile.dob);
         const bmi = calculateBMI(profile.height, profile.weight);
         
-        const prompt = `As a senior medical expert, provide COMPREHENSIVE personalized health recommendations for:
+        const prompt = `Act as a cautious senior-wellness planning assistant. Create practical, personalized, non-diagnostic guidance for:
 
 PATIENT DEMOGRAPHICS:
 Full Name: ${profile.name || 'Not specified'}
@@ -59,13 +60,15 @@ Energy Levels: ${profile.energyLevels || 'Not specified'}
 Recent Lab Results: ${profile.labResults || 'Not specified'}
 Vital Signs: ${profile.vitalSigns || 'Not specified'}
 
-Provide EXTREMELY DETAILED recommendations in this exact format...`;
+Return clear sections for priorities, daily routine, nutrition, safe activity, medication discussion points, fall prevention, warning signs, and doctor follow-up. Avoid diagnosing, prescribing, guaranteed claims, or changing medicines. State when professional medical advice is required.`;
 
         // Try multiple free AI APIs with fallback
         let aiRecommendations = null;
         
         // Try Hugging Face with different models
-        aiRecommendations = await tryHuggingFaceAPI(prompt);
+        if (process.env.ENABLE_EXTERNAL_AI === 'true') {
+            aiRecommendations = await tryHuggingFaceAPI(prompt);
+        }
         
         // If Hugging Face fails, use fallback immediately
         let recommendations = aiRecommendations || getFallbackHealthRecommendations(profile);
@@ -89,7 +92,7 @@ Provide EXTREMELY DETAILED recommendations in this exact format...`;
 
 const generateFirstAidRecommendations = async (profile) => {
     try {
-        const cacheKey = `firstaid_${JSON.stringify(profile)}`;
+        const cacheKey = `firstaid_${crypto.createHash('sha256').update(JSON.stringify(profile.toObject ? profile.toObject() : profile)).digest('hex')}`;
         const cached = await RecommendationCache.findOne({ cacheKey: cacheKey });
         if (cached && (Date.now() - cached.createdAt.getTime()) < 24 * 60 * 60 * 1000) {
             return cached.value;
@@ -101,7 +104,8 @@ const generateFirstAidRecommendations = async (profile) => {
         const prompt = `Provide COMPREHENSIVE first aid instructions for elderly person with complete details...`;
 
         // Try AI API with fallback
-        let aiRecommendations = await tryHuggingFaceAPI(prompt);
+        let aiRecommendations = null;
+        if (process.env.ENABLE_EXTERNAL_AI === 'true') aiRecommendations = await tryHuggingFaceAPI(prompt);
         let recommendations = aiRecommendations || getFallbackFirstAidRecommendations(profile);
 
         // Cache result

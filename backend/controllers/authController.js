@@ -117,11 +117,12 @@ exports.login = async (req, res) => {
       return res.status(401).json({ message: 'Email is not verified' });
     }
 
-    await sendPurposeOtp(email, 'login');
-    res.json({ message: 'Login OTP sent to your email', email, requiresOtp: true });
+    user.lastLoginAt = new Date();
+    await user.save();
+    res.json({ token: signUserToken(user), user: publicUser(user), message: 'Login successful' });
   } catch (error) {
     console.error('Login error:', error.message);
-    res.status(500).json({ message: 'Unable to send login verification email' });
+    res.status(500).json({ message: 'Unable to log in' });
   }
 };
 
