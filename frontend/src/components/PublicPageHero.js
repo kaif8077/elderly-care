@@ -13,21 +13,24 @@ const PublicPageHero = ({
   description,
   primaryAction,
   secondaryAction,
-  image
+  image,
+  compact = false,
+  centered = false
 }) => {
   const slide = (background, index = 0) => (
     <Flex
       vertical
       justify="center"
-      align="flex-start"
+      align={centered ? 'center' : 'flex-start'}
       gap={16}
       style={{
-        minHeight: 'clamp(420px, 62vw, 620px)',
-        padding: 'clamp(32px, 8vw, 110px)',
+        minHeight: compact ? 'clamp(220px, 30vw, 320px)' : 'clamp(420px, 62vw, 620px)',
+        padding: compact ? 'clamp(24px, 5vw, 64px)' : 'clamp(32px, 8vw, 110px)',
         backgroundImage: `linear-gradient(90deg, rgba(10, 28, 58, .88), rgba(10, 28, 58, .35)), url(${background})`,
         backgroundSize: 'cover',
         backgroundPosition: 'center',
-        color: '#fff'
+        color: '#fff',
+        textAlign: centered ? 'center' : 'left'
       }}
     >
       <Tag color={index === 1 ? 'orange' : 'blue'}>{eyebrow}</Tag>

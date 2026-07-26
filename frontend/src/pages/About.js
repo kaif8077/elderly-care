@@ -1,10 +1,9 @@
-import { Link } from 'react-router-dom';
 import {
   Button, Card, Col, Divider, Flex, Image, Layout, Row, Space,
   Timeline, Typography
 } from 'antd';
 import {
-  CheckCircleOutlined, LockOutlined, QrcodeOutlined, SafetyCertificateOutlined
+  CheckCircleOutlined, LockOutlined, QrcodeOutlined
 } from '@ant-design/icons';
 import aboutUsImage from '../assests/about_us.png';
 import aboutHero from '../assests/about-hero.jpg';
@@ -36,11 +35,10 @@ const About = () => (
   <Layout>
     <Content>
       <PublicPageHero
-        
         title="About US"
-        
-        
         image={aboutHero}
+        compact
+        centered
       />
 
       <Flex vertical gap={64} style={{ width: 'min(1200px, calc(100% - 32px))', margin: '64px auto' }}>

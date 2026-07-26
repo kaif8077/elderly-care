@@ -76,9 +76,10 @@ const Services = () => {
     <Layout>
       <Content>
         <PublicPageHero
-          
           title="Services"
           image={aboutHero}
+          compact
+          centered
         />
 
         <Flex vertical gap={20} style={{ width: 'calc(100% - 20px)', margin: '30px 10px 52px' }}>
