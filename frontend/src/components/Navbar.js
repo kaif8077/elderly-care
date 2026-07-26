@@ -71,7 +71,8 @@ const Navbar = () => {
         top: 0,
         zIndex: 1000,
         width: '100%',
-        paddingInline: 10,
+        paddingInline: 35,
+        padding:7,
         background: '#fff',
         borderBottom: '1px solid #d8dee9'
       }}

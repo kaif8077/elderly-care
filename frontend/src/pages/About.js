@@ -36,11 +36,10 @@ const About = () => (
   <Layout>
     <Content>
       <PublicPageHero
-        eyebrow="ABOUT ELDERLYCARE"
-        title="Helping families prepare important health information before an emergency"
-        description="ElderlyCare creates structured medical profiles, private emergency summaries, secure QR access, and emergency ID cards for older adults."
-        primaryAction={{ to: '/register', label: 'Create an account' }}
-        secondaryAction={{ to: '/services', label: 'See how it works' }}
+        
+        title="About US"
+        
+        
         image={aboutHero}
       />
 
@@ -88,18 +87,7 @@ const About = () => (
           </Row>
         </section>
 
-        <Card>
-          <Row align="middle" gutter={[20, 20]}>
-            <Col xs={24} md={16}>
-              <Space direction="vertical">
-                <Text className="care-eyebrow">IMPORTANT BOUNDARY</Text>
-                <Title level={3} style={{ margin: 0 }}><SafetyCertificateOutlined /> Emergency support, not medical advice</Title>
-                <Text type="secondary">ElderlyCare organizes user-provided information. It does not diagnose conditions and is not a substitute for a doctor or emergency service.</Text>
-              </Space>
-            </Col>
-            <Col xs={24} md={8}><Link to="/contact"><Button type="primary" block>Contact the project team</Button></Link></Col>
-          </Row>
-        </Card>
+        
       </Flex>
     </Content>
     <PublicFooter />

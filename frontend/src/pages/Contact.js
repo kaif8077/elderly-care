@@ -77,9 +77,7 @@ const Contact = () => {
     <Layout>
       <Content>
         <PublicPageHero
-          eyebrow="CONTACT ELDERLYCARE"
-          title="Questions, support, and product feedback"
-          description="Ask a product question, report a problem, or share feedback about your ElderlyCare experience."
+          title="Contact Us"
           image={aboutHero}
         />
 

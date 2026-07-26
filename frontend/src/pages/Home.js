@@ -106,11 +106,10 @@ const Home = () => {
     <Layout>
       <Content>
         <PublicPageHero
-          eyebrow="EMERGENCY-READY INFORMATION"
           title="Important health information, ready when every second matters."
           description="ElderlyCare helps older adults and families organize medical information, create a secure emergency QR, and keep an emergency ID card and private reports available."
-          primaryAction={{ to: '/register', label: 'Create a protected profile' }}
-          secondaryAction={{ to: '/services', label: 'Explore features' }}
+        //   primaryAction={{ to: '/register', label: 'Create a protected profile' }}
+        //   secondaryAction={{ to: '/services', label: 'Explore features' }}
         />
 
         <Flex vertical gap={64} style={{ width: 'min(1200px, calc(100% - 32px))', margin: '64px auto' }}>
@@ -180,7 +179,7 @@ const Home = () => {
                   <Divider />
                   <Space wrap>
                     <Link to="/about"><Button type="primary">Learn about ElderlyCare</Button></Link>
-                    <Link to="/contact"><Button icon={<TeamOutlined />}>Contact us</Button></Link>
+                    {/* <Link to="/contact"><Button icon={<TeamOutlined />}>Contact us</Button></Link> */}
                   </Space>
                 </Col>
               </Row>
@@ -211,14 +210,7 @@ const Home = () => {
             />
           </section>
 
-          <Alert
-            type="info"
-            showIcon
-            icon={<HeartOutlined />}
-            message="Ready to prepare an emergency-ready profile?"
-            description="Create an account, verify your email, and complete each medical-profile section at your own pace."
-            action={<Link to="/register"><Button type="primary" icon={<RightOutlined />}>Get started</Button></Link>}
-          />
+          
         </Flex>
       </Content>
 

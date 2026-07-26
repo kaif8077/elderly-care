@@ -76,11 +76,8 @@ const Services = () => {
     <Layout>
       <Content>
         <PublicPageHero
-          eyebrow="ELDERLYCARE SERVICES"
-          title="One workflow for emergency-ready health information"
-          description="Choose a service to understand exactly what it provides and how it supports the ElderlyCare emergency workflow."
-          primaryAction={{ to: '/register', label: 'Get started' }}
-          secondaryAction={{ to: '/contact', label: 'Ask a question' }}
+          
+          title="Services"
           image={aboutHero}
         />
 
