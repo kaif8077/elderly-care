@@ -9,7 +9,7 @@ import {
 import './Recommendations.css';
 
 const { Paragraph, Text, Title } = Typography;
-const base = process.env.REACT_APP_BACKEND_URI || 'http://localhost:5000';
+const base = import.meta.env.VITE_BACKEND_URI || 'http://localhost:5000';
 
 const Recommendations = () => {
   const [items, setItems] = useState([]);

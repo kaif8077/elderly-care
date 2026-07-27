@@ -88,7 +88,7 @@ const Home = () => {
   const { token } = theme.useToken();
 
   useEffect(() => {
-    const backendUrl = process.env.REACT_APP_BACKEND_URI || 'https://elderly-care-zuq9.onrender.com';
+    const backendUrl = import.meta.env.VITE_BACKEND_URI || 'https://elderly-care-zuq9.onrender.com';
     const controller = new AbortController();
     const timeoutId = window.setTimeout(() => controller.abort(), 30000);
     fetch(`${backendUrl.replace(/\/$/, '')}/api`, {

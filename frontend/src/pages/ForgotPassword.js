@@ -5,7 +5,7 @@ import { Alert, Button, Card, Form, Input, Steps, Typography } from 'antd';
 import { LockOutlined, MailOutlined, SafetyCertificateOutlined } from '@ant-design/icons';
 
 const { Title, Text } = Typography;
-const apiBase = process.env.REACT_APP_BACKEND_URI || 'http://localhost:5000';
+const apiBase = import.meta.env.VITE_BACKEND_URI || 'http://localhost:5000';
 
 const ForgotPassword = () => {
   const [step, setStep] = useState(0);

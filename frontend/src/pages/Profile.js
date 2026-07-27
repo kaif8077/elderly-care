@@ -14,7 +14,7 @@ import UserIdCard from '../components/UserIdCard';
 import Recommendations from '../components/Recommendations';
 
 const { Title, Text } = Typography;
-const apiBase = process.env.REACT_APP_BACKEND_URI || 'http://localhost:5000';
+const apiBase = import.meta.env.VITE_BACKEND_URI || 'http://localhost:5000';
 const show = (value) => Array.isArray(value)
   ? value.filter(Boolean).join(', ') || 'None reported'
   : value || 'Not provided';

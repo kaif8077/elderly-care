@@ -7,7 +7,7 @@ const LocationTracker = () => {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        const response = await axios.post(`${process.env.REACT_APP_BACKEND_URI}/api/location`, { location, alertMessage });
+        const response = await axios.post(`${import.meta.env.VITE_BACKEND_URI || 'http://localhost:5000'}/api/location`, { location, alertMessage });
         console.log(response.data);
     };
 

@@ -3,7 +3,7 @@ import axios from 'axios';
 import { AuthContext } from '../context/AuthContext';
 import './MedicalReports.css';
 
-const apiBase = process.env.REACT_APP_BACKEND_URI || 'http://localhost:5000';
+const apiBase = import.meta.env.VITE_BACKEND_URI || 'http://localhost:5000';
 const listText = (items, other) => [...(items || []), other].filter(Boolean).join(', ') || 'None reported';
 
 const MedicalReports = () => {

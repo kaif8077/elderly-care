@@ -40,7 +40,7 @@ ADMIN_PASSWORD=replace_before_production
 Create `frontend/.env`:
 
 ```env
-REACT_APP_BACKEND_URI=http://localhost:5000
+VITE_BACKEND_URI=http://localhost:5000
 ```
 
 Then run:
@@ -48,7 +48,7 @@ Then run:
 ```powershell
 cd frontend
 npm install
-npm start
+npm run dev
 ```
 
 ## Verification
@@ -75,7 +75,7 @@ GET /api/health
 
 It returns HTTP 200 only when MongoDB is connected; otherwise it returns HTTP 503 with a limited degraded status.
 
-For a separate static frontend deployment, set `REACT_APP_BACKEND_URI` during its build. Cross-origin admin sessions require HTTPS; the backend automatically uses secure, cross-site, partitioned admin cookies when frontend and backend origins differ.
+For a separate static frontend deployment, set `VITE_BACKEND_URI` during its build. Cross-origin admin sessions require HTTPS; the backend automatically uses secure, cross-site, partitioned admin cookies when frontend and backend origins differ.
 
 ## Privacy and security notes
 

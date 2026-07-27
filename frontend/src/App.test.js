@@ -3,6 +3,9 @@ import { fireEvent, render, screen } from '@testing-library/react';
 import { AuthContext, AuthProvider } from './context/AuthContext';
 import fs from 'fs';
 import path from 'path';
+import { fileURLToPath } from 'url';
+
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 const Consumer = () => {
   const { user, login, logout } = useContext(AuthContext);
