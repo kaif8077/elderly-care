@@ -124,8 +124,8 @@ const Services = () => {
         <Flex vertical gap={22} style={{ width: 'min(1200px, calc(100% - 20px))', margin: '36px auto 56px' }}>
           <Flex vertical align="center" gap={8}>
             <Text className="care-eyebrow">HOW ELDERLYCARE HELPS</Text>
-            <Title level={2} style={{ margin: 0, textAlign: 'center' }}>Practical tools for everyday care and emergencies</Title>
-            <Paragraph type="secondary" style={{ maxWidth: 760, textAlign: 'center', margin: 0 }}>
+            <Title level={2} className="care-section-heading">Practical tools for everyday care and emergencies</Title>
+            <Paragraph type="secondary" className="care-section-subheading">
               Select a service to view its purpose, features, and the people it is designed to support.
             </Paragraph>
           </Flex>

@@ -59,8 +59,8 @@ const About = () => (
             </Col>
             <Col xs={24} lg={13}>
               <Text className="care-eyebrow">OUR PURPOSE</Text>
-              <Title id="about-purpose" level={2}>Helping families prepare before an emergency happens</Title>
-              <Paragraph type="secondary">
+              <Title id="about-purpose" level={2} className="care-section-heading care-section-heading-left">Helping families prepare before an emergency happens</Title>
+              <Paragraph type="secondary" className="care-section-subheading care-section-subheading-left">
                 ElderlyCare was created to make important health and contact information easier to organize, update, and reach when an older adult needs assistance. Families can maintain one structured profile instead of relying on scattered papers, messages, or memory.
               </Paragraph>
               <Paragraph type="secondary">
@@ -83,7 +83,7 @@ const About = () => (
         <section aria-labelledby="principles-title">
           <Flex vertical align="center" gap={8}>
             <Text className="care-eyebrow">PRODUCT PRINCIPLES</Text>
-            <Title id="principles-title" level={2} style={{ margin: 0, textAlign: 'center' }}>Useful, understandable, and privacy-conscious</Title>
+            <Title id="principles-title" level={2} className="care-section-heading">Useful, understandable, and privacy-conscious</Title>
           </Flex>
           <Row gutter={[20, 20]} style={{ marginTop: 24 }}>
             {principles.map((item) => (

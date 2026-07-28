@@ -115,8 +115,8 @@ const Home = () => {
           <section aria-labelledby="problem-title">
             <Flex vertical align="center" gap={8}>
               <Text className="care-eyebrow">THE PROBLEM WE SOLVE</Text>
-              <Title id="problem-title" level={2} style={{ margin: 0, textAlign: 'center' }}>Emergency information is often scattered or unavailable</Title>
-              <Paragraph type="secondary" style={{ textAlign: 'center', maxWidth: 760 }}>
+              <Title id="problem-title" level={2} className="care-section-heading">Emergency information is often scattered or unavailable</Title>
+              <Paragraph type="secondary" className="care-section-subheading">
                 During a fall, accident, or medical emergency, an older adult may be unable to explain their conditions, allergies, medicines, or whom to contact.
               </Paragraph>
             </Flex>
@@ -141,8 +141,8 @@ const Home = () => {
           <section aria-labelledby="features-title">
             <Flex vertical align="center" gap={8}>
               <Text className="care-eyebrow">ONE CONNECTED WORKFLOW</Text>
-              <Title id="features-title" level={2} style={{ margin: 0, textAlign: 'center' }}>Built for preparation, privacy, and faster emergency action</Title>
-              <Paragraph type="secondary" style={{ textAlign: 'center', maxWidth: 760 }}>Complete the profile once, keep it current, and use the permitted information across QR access, reports, and the ElderlyCare ID card.</Paragraph>
+              <Title id="features-title" level={2} className="care-section-heading">Built for preparation, privacy, and faster emergency action</Title>
+              <Paragraph type="secondary" className="care-section-subheading">Complete the profile once, keep it current, and use the permitted information across QR access, reports, and the ElderlyCare ID card.</Paragraph>
             </Flex>
             <Row gutter={[20, 20]} style={{ marginTop: 24 }}>
               {features.map((feature) => (
@@ -175,8 +175,8 @@ const Home = () => {
                 <Col xs={24} lg={12}>
                   <Flex vertical justify="center" style={{ height: '100%', minHeight: 430, padding: 'clamp(28px, 5vw, 56px)' }}>
                     <Text className="care-eyebrow">CLEAR PRIVACY BOUNDARIES</Text>
-                    <Title id="trust-title" level={2}>Useful in emergencies without publishing the complete record</Title>
-                    <Paragraph type="secondary">
+                    <Title id="trust-title" level={2} className="care-section-heading care-section-heading-left">Useful in emergencies without publishing the complete record</Title>
+                    <Paragraph type="secondary" className="care-section-subheading care-section-subheading-left">
                       ElderlyCare separates the private account from the limited public emergency view. Insurance details, private reports, and profile editing remain behind authentication.
                     </Paragraph>
                     <Row gutter={[16, 16]}>
@@ -196,7 +196,7 @@ const Home = () => {
           <section aria-labelledby="faq-title">
             <Flex vertical align="center" gap={8}>
               <Text className="care-eyebrow">COMMON QUESTIONS</Text>
-              <Title id="faq-title" level={2} style={{ margin: 0, textAlign: 'center' }}>Understand how emergency access works</Title>
+              <Title id="faq-title" level={2} className="care-section-heading">Understand how emergency access works</Title>
             </Flex>
             <Collapse
               accordion
