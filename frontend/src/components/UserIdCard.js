@@ -48,7 +48,6 @@ const UserIdCard = ({ profile, qrCode, photoUrl }) => {
               {photoUrl ? <img src={photoUrl} alt={`${profile.name} profile`} /> : profile.name?.charAt(0)}
             </span>
             <div className="user-card-person">
-              <small>CARD HOLDER</small>
               <h3>{profile.name}</h3>
               <p><strong>Date of birth</strong><br />{formatDob(profile.dob)}</p>
             </div>

@@ -88,7 +88,7 @@ const AdminIdCard = () => {
             <div className="wallet-card-main">
               <span className="wallet-photo" aria-label="Default profile avatar">{card.name.charAt(0).toUpperCase()}</span>
               <div className="wallet-card-person">
-                <div><small>CARD HOLDER</small><h2>{card.name}</h2><p>Date of birth<br /><strong>{formatDob(card.dob)}</strong></p></div>
+                <div><h2>{card.name}</h2><p>Date of birth<br /><strong>{formatDob(card.dob)}</strong></p></div>
               </div>
               <div className="wallet-qr">
                 {card.qr?.image ? <img src={card.qr.image} alt="Revocable emergency access QR code" /> : <div><FaQrcode /><span>No active QR</span></div>}
