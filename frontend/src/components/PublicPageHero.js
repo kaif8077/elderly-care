@@ -15,7 +15,8 @@ const PublicPageHero = ({
   secondaryAction,
   image,
   compact = false,
-  centered = false
+  centered = false,
+  headingOnly = false
 }) => {
   const slide = (background, index = 0) => (
     <Flex
@@ -24,8 +25,8 @@ const PublicPageHero = ({
       align={centered ? 'center' : 'flex-start'}
       gap={16}
       style={{
-        minHeight: compact ? 'clamp(220px, 30vw, 320px)' : 'clamp(420px, 62vw, 620px)',
-        padding: compact ? 'clamp(24px, 5vw, 64px)' : 'clamp(32px, 8vw, 110px)',
+        minHeight: compact ? 'clamp(210px, 25vw, 300px)' : 'clamp(420px, 62vw, 620px)',
+        padding: compact ? 'clamp(20px, 4vw, 48px)' : 'clamp(32px, 8vw, 110px)',
         backgroundImage: `linear-gradient(90deg, rgba(10, 28, 58, .88), rgba(10, 28, 58, .35)), url(${background})`,
         backgroundSize: 'cover',
         backgroundPosition: 'center',
@@ -33,10 +34,10 @@ const PublicPageHero = ({
         textAlign: centered ? 'center' : 'left'
       }}
     >
-      <Tag color={index === 1 ? 'orange' : 'blue'}>{eyebrow}</Tag>
+      {!headingOnly && <Tag color={index === 1 ? 'orange' : 'blue'}>{eyebrow}</Tag>}
       <Title style={{ margin: 0, maxWidth: 820, color: '#fff', fontSize: 'clamp(2.2rem, 5vw, 4rem)' }}>{title}</Title>
-      <Paragraph style={{ margin: 0, maxWidth: 720, color: '#fff', fontSize: 18 }}>{description}</Paragraph>
-      {(primaryAction || secondaryAction) && (
+      {!headingOnly && description && <Paragraph style={{ margin: 0, maxWidth: 720, color: '#fff', fontSize: 18 }}>{description}</Paragraph>}
+      {!headingOnly && (primaryAction || secondaryAction) && (
         <Space wrap size="middle">
           {primaryAction && <Link to={primaryAction.to}><Button type="primary" size="large">{primaryAction.label}</Button></Link>}
           {secondaryAction && <Link to={secondaryAction.to}><Button size="large">{secondaryAction.label}</Button></Link>}

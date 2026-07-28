@@ -80,6 +80,8 @@ const Contact = () => {
           title="Contact Us"
           image={aboutHero}
           compact
+          centered
+          headingOnly
         />
 
         <Flex vertical gap={28} style={{ width: 'min(1200px, calc(100% - 32px))', margin: '48px auto' }}>
