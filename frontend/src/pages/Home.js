@@ -1,13 +1,12 @@
 import { useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import {
-  Alert, Button, Card, Col, Collapse, Divider, Flex, Image, Layout,
+  Button, Card, Col, Collapse, Divider, Flex, Image, Layout,
   Row, Space, Statistic, theme, Typography
 } from 'antd';
 import {
   BellOutlined, CheckCircleOutlined, FileProtectOutlined, HeartOutlined,
-  IdcardOutlined, MedicineBoxOutlined, QrcodeOutlined, RightOutlined,
-  SafetyCertificateOutlined, TeamOutlined
+  IdcardOutlined, MedicineBoxOutlined, QrcodeOutlined, SafetyCertificateOutlined
 } from '@ant-design/icons';
 import whyChooseUsImage from '../assests/why-choose-us-v2.jpg';
 import PublicPageHero from '../components/PublicPageHero';

@@ -1,6 +1,6 @@
 import { Button, Flex, Space, Tag, Typography } from 'antd';
 import { Link } from 'react-router-dom';
-import banner1 from '../assests/banner1.jpg';
+import homeHero from '../assests/home-hero-v2.jpg';
 
 const { Title, Paragraph } = Typography;
 
@@ -15,7 +15,7 @@ const PublicPageHero = ({
   centered = false,
   headingOnly = false
 }) => {
-  const background = image || banner1;
+  const background = image || homeHero;
 
   return (
     <section aria-label={`${title} banner`}>

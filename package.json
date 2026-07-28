@@ -1,7 +1,4 @@
 {
-  "dependencies": {
-    "mongodb": "^6.20.0"
-  },
   "scripts": {
     "test": "npm --prefix backend test",
     "build": "npm --prefix frontend run build",

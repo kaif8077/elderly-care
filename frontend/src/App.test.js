@@ -105,7 +105,7 @@ test('public information pages use Ant Design without legacy page CSS', () => {
 test('public pages use a single non-gradient banner and text-branded footer', () => {
   const hero = fs.readFileSync(path.join(__dirname, 'components', 'PublicPageHero.js'), 'utf8');
   const footer = fs.readFileSync(path.join(__dirname, 'components', 'PublicFooter.js'), 'utf8');
-  expect(hero).toContain("banner1.jpg");
+  expect(hero).toContain("home-hero-v2.jpg");
   expect(hero).not.toContain("banner2.jpg");
   expect(hero).not.toContain("banner3.jpg");
   expect(hero).not.toContain('Carousel');
