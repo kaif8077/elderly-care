@@ -15,7 +15,8 @@ const PublicPageHero = ({
   image,
   compact = false,
   centered = false,
-  headingOnly = false
+  headingOnly = false,
+  showEyebrow = true
 }) => {
   const backgrounds = image ? [image] : homeBanners;
 
@@ -41,8 +42,8 @@ const PublicPageHero = ({
                 textAlign: centered ? 'center' : 'left'
               }}
             >
-              {!headingOnly && <Tag color="blue">{eyebrow}</Tag>}
-              <Title style={{ margin: 0, maxWidth: 980, color: '#fff', fontSize: compact ? 'clamp(2.2rem, 5vw, 4rem)' : 'clamp(3rem, 6vw, 5.4rem)', lineHeight: 1.05, textShadow: '0 2px 12px rgba(0, 0, 0, .45)' }}>{title}</Title>
+              {!headingOnly && showEyebrow && <Tag color="blue">{eyebrow}</Tag>}
+              <Title style={{ margin: 0, maxWidth: 900, color: '#fff', fontSize: 'clamp(2.2rem, 5vw, 4rem)', lineHeight: 1.08, textShadow: '0 2px 12px rgba(0, 0, 0, .45)' }}>{title}</Title>
               {!headingOnly && description && <Paragraph style={{ margin: 0, maxWidth: 660, color: '#ff6b00', fontSize: compact ? 15 : 16, fontWeight: 700, lineHeight: 1.5, textShadow: '0 1px 6px rgba(0, 0, 0, .65)' }}>{description}</Paragraph>}
               {!headingOnly && (primaryAction || secondaryAction) && (
                 <Space wrap size="middle">

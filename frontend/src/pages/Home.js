@@ -107,6 +107,7 @@ const Home = () => {
         <PublicPageHero
           title="Important health information, ready when every second matters."
           description="Secure medical details, emergency QR access, ID cards, and private reports—all ready when needed."
+          showEyebrow={false}
         //   primaryAction={{ to: '/register', label: 'Create a protected profile' }}
         //   secondaryAction={{ to: '/services', label: 'Explore features' }}
         />
@@ -115,7 +116,7 @@ const Home = () => {
           <section aria-labelledby="problem-title">
             <Flex vertical align="center" gap={8}>
               <Text className="care-eyebrow">THE PROBLEM WE SOLVE</Text>
-              <Title id="problem-title" level={2} className="care-section-heading">Emergency information is often scattered or unavailable</Title>
+              <Title id="problem-title" level={2} className="care-section-heading care-problem-heading">Emergency information is often scattered or unavailable</Title>
               <Paragraph type="secondary" className="care-section-subheading">
                 During a fall, accident, or medical emergency, an older adult may be unable to explain their conditions, allergies, medicines, or whom to contact.
               </Paragraph>
@@ -196,7 +197,7 @@ const Home = () => {
           <section aria-labelledby="faq-title">
             <Flex vertical align="center" gap={8}>
               <Text className="care-eyebrow">COMMON QUESTIONS</Text>
-              <Title id="faq-title" level={2} className="care-section-heading">Understand how emergency access works</Title>
+              <Title id="faq-title" level={2} className="care-section-heading care-faq-heading">Understand how emergency access works</Title>
             </Flex>
             <Collapse
               accordion
