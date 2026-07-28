@@ -27,7 +27,7 @@ const PublicFooter = () => (
       <Col xs={12} md={7}>
         <Space direction="vertical">
           <Text strong style={{ color: '#fff' }}>Contact</Text>
-          <Button type="link" href="tel:+918528576249" icon={<PhoneOutlined />} style={{ padding: 0 }}>+91 8528576249</Button>
+          <Button type="link" href="tel:+918528576249" icon={<PhoneOutlined />} style={{ padding: 0 }}>Call us</Button>
           <Button type="link" href="mailto:mohdkaif90275@gmail.com" icon={<MailOutlined />} style={{ padding: 0 }}>Email us</Button>
         </Space>
       </Col>
