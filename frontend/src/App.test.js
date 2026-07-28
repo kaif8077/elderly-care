@@ -94,8 +94,9 @@ test('public information pages use Ant Design without legacy page CSS', () => {
   });
   const contact = fs.readFileSync(path.join(__dirname, 'pages', 'Contact.js'), 'utf8');
   expect(contact).toContain('submitContactForm');
-  expect(contact).toContain('submitFeedbackForm');
-  expect(contact).toContain('<Rate />');
+  expect(contact).toContain('name="phone"');
+  expect(contact).not.toContain('submitFeedbackForm');
+  expect(contact).not.toContain('Do not use this page for an active medical emergency');
 });
 
 test('public pages share the three-image carousel and dark footer', () => {
@@ -106,6 +107,8 @@ test('public pages share the three-image carousel and dark footer', () => {
   expect(hero).toContain("banner3.jpg");
   expect(hero).toContain('<Carousel autoplay');
   expect(footer).toContain("background: '#1f2937'");
+  expect(footer).toContain("logo.png");
+  expect(footer).toContain('© 2025 ElderlyCare');
   ['Home', 'About', 'Services', 'Contact'].forEach((page) => {
     const source = fs.readFileSync(path.join(__dirname, 'pages', `${page}.js`), 'utf8');
     expect(source).toContain('<PublicPageHero');
@@ -120,21 +123,23 @@ test('secondary public pages use the single about hero and About omits the team 
     expect(source).toContain('image={aboutHero}');
   });
   const about = fs.readFileSync(path.join(__dirname, 'pages', 'About.js'), 'utf8');
+  expect(about).toContain("about-care.jpg");
   expect(about).not.toContain('THE PROJECT TEAM');
   expect(about).not.toContain('People behind ElderlyCare');
   const services = fs.readFileSync(path.join(__dirname, 'pages', 'Services.js'), 'utf8');
   expect(services).toContain('title="All services"');
   expect(services).toContain('selectedKeys={[activeId]}');
   expect(services).toContain('activeService.image');
+  expect(services).toContain('activeService.detail');
 });
 
-test('admin navigation exposes only the requested five modules', () => {
+test('admin navigation removes feedback and retains requested modules', () => {
   const sidebar = fs.readFileSync(path.join(__dirname, 'admin', 'components', 'AdminSidebar.js'), 'utf8');
-  ['Dashboard', 'Users', 'Audit Logs', 'Feedback', 'Contact Us'].forEach((label) => expect(sidebar).toContain(`label: '${label}'`));
-  ['Medical Profiles', 'Reports', 'ID Cards', 'QR Management', 'Emergency Alerts', 'Documents'].forEach((label) => expect(sidebar).not.toContain(`label: '${label}'`));
+  ['Dashboard', 'Users', 'Audit Logs', 'Contact Us'].forEach((label) => expect(sidebar).toContain(`label: '${label}'`));
+  ['Feedback', 'Medical Profiles', 'Reports', 'ID Cards', 'QR Management', 'Emergency Alerts', 'Documents'].forEach((label) => expect(sidebar).not.toContain(`label: '${label}'`));
   const app = fs.readFileSync(path.join(__dirname, 'App.js'), 'utf8');
   expect(app).toContain('path="contacts"');
-  expect(app).toContain('path="feedback"');
+  expect(app).not.toContain('path="feedback"');
   ['AdminUsers', 'AdminAuditLogs'].forEach((page) => {
     const source = fs.readFileSync(path.join(__dirname, 'admin', 'pages', `${page}.js`), 'utf8');
     expect(source).toContain('<Table');

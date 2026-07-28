@@ -3,13 +3,13 @@ const { escapeHtml, sendEmail } = require('../services/emailService');
 
 exports.submitContact = async (req, res) => {
   try {
-    const { name, email, message } = req.body;
+    const { name, email, phone, message } = req.body;
     const notificationEmail = process.env.SYSTEM_NOTIFICATION_EMAIL || process.env.ADMIN_EMAIL;
-    if (!name || !email || !message) {
+    if (!name || !email || !phone || !message) {
       return res.status(400).json({ success: false, message: 'All fields are required' });
     }
 
-    await Contact.create({ name, email, message });
+    await Contact.create({ name, email, phone, message });
 
     await Promise.all([
       sendEmail({
@@ -31,11 +31,12 @@ exports.submitContact = async (req, res) => {
         to: notificationEmail,
         subject: `New ElderlyCare contact from ${name}`,
         replyTo: email,
-        text: `Name: ${name}\nEmail: ${email}\n\n${message}`,
+        text: `Name: ${name}\nEmail: ${email}\nPhone: ${phone}\n\n${message}`,
         html: `
           <h2>New contact submission</h2>
           <p><strong>Name:</strong> ${escapeHtml(name)}</p>
           <p><strong>Email:</strong> ${escapeHtml(email)}</p>
+          <p><strong>Phone:</strong> ${escapeHtml(phone)}</p>
           <p><strong>Message:</strong></p>
           <p>${escapeHtml(message)}</p>`
       }) : Promise.resolve()

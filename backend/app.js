@@ -17,7 +17,6 @@ const adminIdCardRoutes = require('./routes/adminIdCardRoutes');
 const adminAuditRoutes = require('./routes/adminAuditRoutes');
 const adminReportRoutes = require('./routes/adminReportRoutes');
 const adminContactRoutes = require('./routes/adminContactRoutes');
-const adminFeedbackRoutes = require('./routes/adminFeedbackRoutes');
 const cors = require('cors');
 const securityHeaders = require('./middleware/securityHeaders');
 const { configuredOrigins } = require('./middleware/requireTrustedOrigin');
@@ -61,7 +60,6 @@ app.use('/api/admin/id-cards', adminIdCardRoutes);
 app.use('/api/admin/audit-logs', adminAuditRoutes);
 app.use('/api/admin/reports', adminReportRoutes);
 app.use('/api/admin/contacts', adminContactRoutes);
-app.use('/api/admin/feedback', adminFeedbackRoutes);
 app.use('/api/medical', medicalRoutes);
 app.use('/api/medical-reports', medicalReportRoutes);
 app.use('/api/qr', qrRoutes);
@@ -70,7 +68,6 @@ app.use('/api/send-sms', smsRoutes);
 app.use('/api/recommendations', recommendationRoutes);
 app.use('/api/emergency-alerts', emergencyAlertRoutes);
 app.use('/api/contact', require('./routes/contactRoutes'));
-app.use('/api/feedback', require('./routes/feedbackRoutes'));
 
 // ROOT ROUTE ADD KARO - Yeh missing tha
 app.get('/api', (req, res) => {

@@ -1,7 +1,8 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import {
-  Alert, Button, Card, Col, Divider, Flex, Image, Layout, List, Menu, Row, Space, Tag, Typography
+  Alert, Button, Card, Col, Flex, Image, Layout, List, Menu, Row, Space,
+  Tag, Typography
 } from 'antd';
 import {
   CheckCircleOutlined, FilePdfOutlined, HeartOutlined, IdcardOutlined,
@@ -21,55 +22,93 @@ const { Title, Paragraph, Text } = Typography;
 
 const services = [
   {
-    id: 'form-filling',
+    id: 'medical-profile',
     icon: <MedicineBoxOutlined />,
-    title: 'Structured medical profile',
+    title: 'Medical Profile',
     image: formImage,
-    summary: 'Complete a guided profile that keeps emergency-ready information organized without placing every detail on one long screen.',
-    points: ['Personal details and required profile photograph', 'Residential address and multiple emergency contacts', 'Custom conditions, allergies, medicines, and symptoms', 'Each completed step is saved to the backend']
+    summary: 'Keep the elderly person’s essential personal, contact, and medical information organized in one protected account.',
+    detail: 'The guided form separates personal details, address, emergency contacts, medical conditions, allergies, medicines, symptoms, doctors, and hospital preferences into manageable steps.',
+    points: [
+      'Save each completed section securely',
+      'Add multiple priority emergency contacts',
+      'Update medicines, allergies, and conditions',
+      'Review information before final submission'
+    ],
+    audience: 'Older adults, family members, guardians, and caregivers who need one dependable place for current health information.'
   },
   {
-    id: 'qr-code-id-card',
-    icon: <IdcardOutlined />,
-    title: 'ElderlyCare emergency ID card',
-    image: qrImage,
-    summary: 'Create a front-and-back wallet card that can be printed or downloaded as a private PDF.',
-    points: ['12-digit ElderlyCare number', 'Name, photograph, date of birth, and blood group', 'Residential and emergency contact information', 'High-resolution emergency QR']
-  },
-  {
-    id: 'qr-code-scan',
+    id: 'emergency-qr',
     icon: <QrcodeOutlined />,
-    title: 'Secure emergency QR access',
+    title: 'Emergency QR Access',
     image: secureImage,
-    summary: 'A responder can open limited emergency information quickly without receiving access to the account owner’s private profile.',
-    points: ['Opaque, non-guessable QR token', 'Revocable and regenerable access', 'No public insurance or private report data', 'No profile editing from the scanner page']
+    summary: 'Give responders fast access to a limited emergency view without exposing the complete private medical profile.',
+    detail: 'The QR code contains a revocable secure link rather than medical records. The public page can show essential details such as blood group, severe allergies, critical conditions, and trusted contact actions.',
+    points: [
+      'Random and non-guessable access token',
+      'Limited emergency information only',
+      'Revoke and regenerate QR access',
+      'No public profile editing or insurance data'
+    ],
+    audience: 'Emergency responders or people assisting an older adult who may be unable to communicate clearly.'
   },
   {
-    id: 'recommendations',
-    icon: <HeartOutlined />,
-    title: 'Necessary health guidance',
-    image: recommendationsImage,
-    summary: 'Generate a short list of safety and wellness guidance supported by the saved medical profile.',
-    points: ['Concise priority guidance', 'Profile-specific allergy, fall, and medication-safety notes', 'Saved recommendation history', 'Authenticated PDF download']
+    id: 'elder-id-card',
+    icon: <IdcardOutlined />,
+    title: 'ElderlyCare ID Card',
+    image: qrImage,
+    summary: 'Create a compact front-and-back emergency card that can be carried in a wallet and printed when needed.',
+    detail: 'The card combines the person’s photograph, ElderlyCare number, date of birth, blood group, residential information, emergency contact, and high-resolution QR in a familiar card format.',
+    points: [
+      'Front and back card preview',
+      'Printable PDF download',
+      'Clear emergency QR instruction',
+      'Essential details without excessive exposure'
+    ],
+    audience: 'Older adults who want physical emergency identification available even when a phone is not nearby.'
   },
   {
     id: 'medical-reports',
     icon: <FilePdfOutlined />,
-    title: 'Emergency Medical Summary',
+    title: 'Medical Reports',
     image: reportImage,
-    summary: 'Create private report versions that preserve the information used at the time each report was generated.',
-    points: ['Snapshot-based report versions', 'Latest report and previous history', 'Authenticated preview and PDF download', 'Emergency-information and medical-advice disclaimer']
+    summary: 'Generate a structured Emergency Medical Summary that can be viewed privately and downloaded as a PDF.',
+    detail: 'Each generated report keeps a snapshot of the information used at that time, allowing the latest report and previous versions to remain available without silently changing historical records.',
+    points: [
+      'Versioned medical information snapshots',
+      'Private preview and PDF download',
+      'Critical details placed near the top',
+      'Report history available from the profile'
+    ],
+    audience: 'Families preparing information for appointments, travel, caregiving, or emergency reference.'
+  },
+  {
+    id: 'health-guidance',
+    icon: <HeartOutlined />,
+    title: 'Health Recommendations',
+    image: recommendationsImage,
+    summary: 'Receive a concise set of practical health and safety suggestions based on the saved medical profile.',
+    detail: 'Recommendations focus on necessary medication, allergy, mobility, fall-risk, and wellness considerations. Saved versions can be reviewed later or downloaded as a PDF.',
+    points: [
+      'Short, prioritized recommendations',
+      'Relevant profile-based safety guidance',
+      'Saved recommendation history',
+      'PDF generation for private reference'
+    ],
+    audience: 'Account owners and caregivers looking for clear reminders that complement, but never replace, professional medical advice.'
   }
 ];
 
 const Services = () => {
   const hashKey = window.location.hash.replace('#', '');
-  const [activeId, setActiveId] = useState(services.some(({ id }) => id === hashKey) ? hashKey : services[0].id);
+  const initialId = services.some(({ id }) => id === hashKey) ? hashKey : services[0].id;
+  const [activeId, setActiveId] = useState(initialId);
   const activeService = services.find(({ id }) => id === activeId) || services[0];
   const activeIndex = services.findIndex(({ id }) => id === activeService.id);
 
   useEffect(() => {
-    if (window.location.hash !== `#${activeId}`) window.history.replaceState(null, '', `#${activeId}`);
+    if (window.location.hash !== `#${activeId}`) {
+      window.history.replaceState(null, '', `#${activeId}`);
+    }
   }, [activeId]);
 
   return (
@@ -83,18 +122,18 @@ const Services = () => {
           headingOnly
         />
 
-        <Flex vertical gap={20} style={{ width: 'calc(100% - 20px)', margin: '30px 10px 52px' }}>
-          <Alert
-            type="info"
-            showIcon
-            icon={<SafetyCertificateOutlined />}
-            message="Private account, limited emergency access"
-            description="Complete profiles, insurance details, and downloaded reports remain private. QR access shows only permitted emergency information."
-          />
+        <Flex vertical gap={22} style={{ width: 'min(1200px, calc(100% - 20px))', margin: '36px auto 56px' }}>
+          <Flex vertical align="center" gap={8}>
+            <Text className="care-eyebrow">HOW ELDERLYCARE HELPS</Text>
+            <Title level={2} style={{ margin: 0, textAlign: 'center' }}>Practical tools for everyday care and emergencies</Title>
+            <Paragraph type="secondary" style={{ maxWidth: 760, textAlign: 'center', margin: 0 }}>
+              Select a service to view its purpose, features, and the people it is designed to support.
+            </Paragraph>
+          </Flex>
 
-          <Row gutter={[20, 20]} align="top">
-            <Col xs={24} lg={7} xl={6}>
-              <Card title="All services" styles={{ body: { padding: 8 } }}>
+          <Row gutter={[20, 20]} align="stretch">
+            <Col xs={24} lg={8}>
+              <Card title="All services" style={{ height: '100%' }} styles={{ body: { padding: 8 } }}>
                 <Menu
                   mode="inline"
                   selectedKeys={[activeId]}
@@ -108,56 +147,71 @@ const Services = () => {
               </Card>
             </Col>
 
-            <Col xs={24} lg={17} xl={18}>
-              <Card styles={{ body: { padding: 0 } }} style={{ overflow: 'hidden' }}>
-                <Row>
-                  <Col xs={24} xl={10}>
-                    <Flex align="center" justify="center" style={{ minHeight: 390, height: '100%', padding: 28, background: '#edf3ff' }}>
-                      <Image
-                        key={activeService.id}
-                        src={activeService.image}
-                        alt={activeService.title}
-                        preview={false}
-                        width="100%"
-                        style={{ maxHeight: 390, objectFit: 'contain' }}
-                      />
-                    </Flex>
-                  </Col>
-                  <Col xs={24} xl={14}>
-                    <Flex vertical gap={14} style={{ padding: 'clamp(24px, 5vw, 56px)' }}>
-                      <Space wrap>
-                        <Tag color="blue">SERVICE {activeIndex + 1} OF {services.length}</Tag>
-                        <Button type="primary" shape="circle" icon={activeService.icon} />
-                      </Space>
-                      <Title level={2} style={{ margin: 0 }}>{activeService.title}</Title>
-                      <Paragraph type="secondary" style={{ margin: 0, fontSize: 17 }}>{activeService.summary}</Paragraph>
-                      <Divider orientation="left">What you receive</Divider>
-                      <List
-                        split={false}
-                        dataSource={activeService.points}
-                        renderItem={(point) => (
-                          <List.Item>
-                            <Text><CheckCircleOutlined style={{ color: '#0066ff', marginRight: 10 }} />{point}</Text>
-                          </List.Item>
-                        )}
-                      />
-                      <Alert
-                        type="warning"
-                        showIcon
-                        message={activeService.id === 'recommendations'
-                          ? 'Health guidance does not replace professional medical advice.'
-                          : 'Access to private information requires authentication.'}
-                      />
-                      <Space wrap>
-                        <Link to="/register"><Button type="primary">Create an account</Button></Link>
-                        <Link to="/contact"><Button>Contact us</Button></Link>
-                      </Space>
-                    </Flex>
-                  </Col>
-                </Row>
+            <Col xs={24} lg={16}>
+              <Card style={{ height: '100%', overflow: 'hidden' }} styles={{ body: { padding: 0 } }}>
+                <Flex
+                  vertical
+                  align="center"
+                  justify="center"
+                  gap={14}
+                  style={{ minHeight: 360, height: '100%', padding: 28, background: '#edf3ff' }}
+                >
+                  <Tag color="blue">SELECTED SERVICE {activeIndex + 1} OF {services.length}</Tag>
+                  <Image
+                    key={activeService.id}
+                    src={activeService.image}
+                    alt={`${activeService.title} service`}
+                    preview={false}
+                    width="100%"
+                    style={{ maxHeight: 290, objectFit: 'contain' }}
+                  />
+                </Flex>
               </Card>
             </Col>
           </Row>
+
+          <Card>
+            <Row gutter={[32, 24]}>
+              <Col xs={24} lg={15}>
+                <Space direction="vertical" size={14}>
+                  <Space wrap>
+                    <Button type="primary" shape="circle" icon={activeService.icon} aria-label={activeService.title} />
+                    <Title level={2} style={{ margin: 0 }}>{activeService.title}</Title>
+                  </Space>
+                  <Paragraph style={{ margin: 0, fontSize: 17 }}>{activeService.summary}</Paragraph>
+                  <Paragraph type="secondary" style={{ margin: 0, lineHeight: 1.8 }}>{activeService.detail}</Paragraph>
+                  <Alert
+                    type={activeService.id === 'health-guidance' ? 'warning' : 'info'}
+                    showIcon
+                    icon={<SafetyCertificateOutlined />}
+                    message={activeService.id === 'health-guidance'
+                      ? 'Recommendations do not replace professional medical advice.'
+                      : 'Private profile information remains protected behind authentication.'}
+                  />
+                </Space>
+              </Col>
+              <Col xs={24} lg={9}>
+                <Title level={4}>Included features</Title>
+                <List
+                  split={false}
+                  dataSource={activeService.points}
+                  renderItem={(point) => (
+                    <List.Item>
+                      <Text><CheckCircleOutlined style={{ color: '#0066ff', marginRight: 10 }} />{point}</Text>
+                    </List.Item>
+                  )}
+                />
+              </Col>
+            </Row>
+            <Card size="small" style={{ marginTop: 22, background: '#f8faff' }}>
+              <Text strong>Designed for: </Text>
+              <Text type="secondary">{activeService.audience}</Text>
+            </Card>
+            <Space wrap style={{ marginTop: 22 }}>
+              <Link to="/register"><Button type="primary">Create an account</Button></Link>
+              <Link to="/contact"><Button>Contact us</Button></Link>
+            </Space>
+          </Card>
         </Flex>
       </Content>
       <PublicFooter />
