@@ -5,15 +5,9 @@ import { Link, useParams } from 'react-router-dom';
 import adminApi from '../../services/adminApi';
 import AdminStatusBadge from '../components/AdminStatusBadge';
 
-const ageFromDob = (dob) => {
-  if (!dob) return null;
-  const birth = new Date(dob);
-  if (Number.isNaN(birth.getTime())) return null;
-  const now = new Date();
-  let age = now.getFullYear() - birth.getFullYear();
-  if (now < new Date(now.getFullYear(), birth.getMonth(), birth.getDate())) age -= 1;
-  return age;
-};
+const formatDob = (dob) => dob && !Number.isNaN(new Date(dob).getTime())
+  ? new Date(dob).toLocaleDateString('en-GB')
+  : 'Not available';
 
 const AdminIdCard = () => {
   const { userId } = useParams();
@@ -79,7 +73,6 @@ const AdminIdCard = () => {
   if (!data.card) return <div className="admin-state-card"><h2>No medical profile</h2><p>An ID card cannot be generated until the user has a medical profile.</p><Link to={`/admin/users/${userId}`}>Back to user</Link></div>;
 
   const { card, user } = data;
-  const age = ageFromDob(card.dob);
   const updated = card.lastUpdatedAt ? new Date(card.lastUpdatedAt).toLocaleDateString() : 'Not available';
 
   return (
@@ -95,17 +88,16 @@ const AdminIdCard = () => {
           <section className="wallet-card wallet-card-front" aria-label="ID card front side">
             <div className="wallet-card-brand"><span><FaShieldAlt /> ELDERLYCARE</span><b>EMERGENCY ID</b></div>
             <div className="wallet-card-main">
+              <span className="wallet-photo" aria-label="Default profile avatar">{card.name.charAt(0).toUpperCase()}</span>
               <div className="wallet-card-person">
-                <span className="wallet-photo" aria-label="Default profile avatar">{card.name.charAt(0).toUpperCase()}</span>
-                <div><h2>{card.name}</h2><p>{card.elderlyCareId}</p><p>{age !== null ? `Age ${age}` : 'Age not available'}</p></div>
+                <div><small>CARD HOLDER</small><h2>{card.name}</h2><p>Date of birth<br /><strong>{formatDob(card.dob)}</strong></p></div>
               </div>
-              <div className="wallet-blood"><small>BLOOD GROUP</small><strong>{card.bloodGroup}</strong></div>
               <div className="wallet-qr">
                 {card.qr?.image ? <img src={card.qr.image} alt="Revocable emergency access QR code" /> : <div><FaQrcode /><span>No active QR</span></div>}
                 <b>SCAN IN CASE OF EMERGENCY</b>
               </div>
             </div>
-            <div className="wallet-card-meta"><span>{card.status.toUpperCase()}</span><span>Updated {updated}</span></div>
+            <div className="wallet-card-meta"><span>ELDERLYCARE CARD NUMBER</span><strong>{card.elderlyCareId}</strong><span>Updated {updated}</span></div>
           </section>
 
         </div>

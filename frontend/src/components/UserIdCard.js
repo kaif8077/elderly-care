@@ -52,15 +52,17 @@ const UserIdCard = ({ profile, qrCode, photoUrl }) => {
         <article className="user-wallet-card" ref={frontRef}>
           <header><span><img src="/favicon.png" alt="" /> ELDERLYCARE</span><b>IDENTITY CARD</b></header>
           <div className="user-card-main">
+            <span className="user-card-photo">
+              {photoUrl ? <img src={photoUrl} alt={`${profile.name} profile`} /> : profile.name?.charAt(0)}
+            </span>
             <div className="user-card-person">
-              <span className="user-card-photo">
-                {photoUrl ? <img src={photoUrl} alt={`${profile.name} profile`} /> : profile.name?.charAt(0)}
-              </span>
-              <div><h3>{profile.name}</h3><p className="user-card-number">{elderlyCareId}</p><p>DOB: {formatDob(profile.dob)}</p></div>
+              <small>CARD HOLDER</small>
+              <h3>{profile.name}</h3>
+              <p><strong>Date of birth</strong><br />{formatDob(profile.dob)}</p>
             </div>
             <div className="user-card-qr">{qrCode ? <img src={qrCode} alt="Emergency QR code" /> : <QrcodeOutlined />}<b>SCAN IN EMERGENCY</b></div>
           </div>
-          <footer><span>{qrCode ? 'ACTIVE' : 'QR NOT GENERATED'}</span><span>Identity and emergency access</span></footer>
+          <footer><span>ELDERLYCARE CARD NUMBER</span><strong className="user-card-number">{elderlyCareId}</strong></footer>
         </article>
 
       </div>
