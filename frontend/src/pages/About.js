@@ -39,6 +39,7 @@ const About = () => (
         image={aboutHero}
         compact
         centered
+        headingOnly
       />
 
       <Flex vertical gap={64} style={{ width: 'min(1200px, calc(100% - 32px))', margin: '64px auto' }}>

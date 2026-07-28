@@ -80,6 +80,7 @@ const Services = () => {
           image={aboutHero}
           compact
           centered
+          headingOnly
         />
 
         <Flex vertical gap={20} style={{ width: 'calc(100% - 20px)', margin: '30px 10px 52px' }}>
