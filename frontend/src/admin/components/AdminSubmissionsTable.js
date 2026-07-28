@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useState } from 'react';
 import {
-  Alert, Button, Card, Empty, Input, Modal, Rate, Space, Table, Typography
+  Alert, Button, Card, Empty, Input, Modal, Space, Table, Typography
 } from 'antd';
 import { EyeOutlined, ReloadOutlined, SearchOutlined } from '@ant-design/icons';
 import adminApi from '../../services/adminApi';
@@ -30,13 +30,12 @@ const AdminSubmissionsTable = ({ endpoint, type }) => {
 
   useEffect(() => { load(); }, [load]);
 
-  const contentKey = type === 'feedback' ? 'comments' : 'message';
   const columns = [
     { title: 'Submitted', dataIndex: 'createdAt', key: 'createdAt', render: (value) => new Date(value).toLocaleString(), sorter: (a, b) => new Date(a.createdAt) - new Date(b.createdAt) },
     { title: 'Name', dataIndex: 'name', key: 'name', render: (value) => <Text strong>{value}</Text> },
     { title: 'Email', dataIndex: 'email', key: 'email', render: (value) => <a href={`mailto:${value}`}>{value}</a> },
-    ...(type === 'feedback' ? [{ title: 'Rating', dataIndex: 'rating', key: 'rating', render: (value) => <Rate disabled value={value} /> }] : []),
-    { title: type === 'feedback' ? 'Comments' : 'Message', dataIndex: contentKey, key: contentKey, ellipsis: true },
+    { title: 'Phone', dataIndex: 'phone', key: 'phone', render: (value) => value ? <a href={`tel:${value}`}>{value}</a> : '—' },
+    { title: 'Message', dataIndex: 'message', key: 'message', ellipsis: true },
     { title: 'Action', key: 'action', render: (_, record) => <Button type="link" icon={<EyeOutlined />} onClick={() => setSelected(record)}>View</Button> }
   ];
 
@@ -69,12 +68,12 @@ const AdminSubmissionsTable = ({ endpoint, type }) => {
           }}
         />
       </Card>
-      <Modal title={type === 'feedback' ? 'Feedback details' : 'Contact message'} open={Boolean(selected)} onCancel={() => setSelected(null)} footer={<Button onClick={() => setSelected(null)}>Close</Button>}>
+      <Modal title="Contact message" open={Boolean(selected)} onCancel={() => setSelected(null)} footer={<Button onClick={() => setSelected(null)}>Close</Button>}>
         {selected && <Space direction="vertical" size={14} style={{ width: '100%' }}>
           <div><Text type="secondary">Name</Text><br /><Text strong>{selected.name}</Text></div>
           <div><Text type="secondary">Email</Text><br /><a href={`mailto:${selected.email}`}>{selected.email}</a></div>
-          {type === 'feedback' && <div><Text type="secondary">Rating</Text><br /><Rate disabled value={selected.rating} /></div>}
-          <div><Text type="secondary">{type === 'feedback' ? 'Comments' : 'Message'}</Text><Paragraph>{selected[contentKey]}</Paragraph></div>
+          <div><Text type="secondary">Phone</Text><br />{selected.phone ? <a href={`tel:${selected.phone}`}>{selected.phone}</a> : 'Not provided'}</div>
+          <div><Text type="secondary">Message</Text><Paragraph>{selected.message}</Paragraph></div>
           <Text type="secondary">Submitted {new Date(selected.createdAt).toLocaleString()}</Text>
         </Space>}
       </Modal>

@@ -1,14 +1,12 @@
 import { useState } from 'react';
 import {
-  Alert, Button, Card, Col, Flex, Form, Input, Layout, Rate, Row, Space,
+  Alert, Button, Card, Col, Flex, Form, Input, Layout, Row, Space,
   Typography, message
 } from 'antd';
 import {
-  EnvironmentOutlined, MailOutlined, PhoneOutlined,
-  SendOutlined, StarOutlined
+  EnvironmentOutlined, MailOutlined, PhoneOutlined, SendOutlined
 } from '@ant-design/icons';
 import { submitContactForm } from '../services/contactService';
-import { submitFeedbackForm } from '../services/feedbackService';
 import PublicPageHero from '../components/PublicPageHero';
 import PublicFooter from '../components/PublicFooter';
 import aboutHero from '../assests/about-hero.jpg';
@@ -16,62 +14,45 @@ import aboutHero from '../assests/about-hero.jpg';
 const { Content } = Layout;
 const { Title, Paragraph, Text, Link } = Typography;
 
+const contactMethods = [
+  {
+    icon: <PhoneOutlined />,
+    title: 'Phone',
+    description: 'Call during normal business hours',
+    content: <Link href="tel:+918528576249">+91 8528576249</Link>
+  },
+  {
+    icon: <MailOutlined />,
+    title: 'Email',
+    description: 'Send product and support questions',
+    content: <Link href="mailto:mohdkaif90275@gmail.com">mohdkaif90275@gmail.com</Link>
+  },
+  {
+    icon: <EnvironmentOutlined />,
+    title: 'Location',
+    description: 'MIT College, Moradabad',
+    content: <Link href="https://maps.app.goo.gl/mVbpZJ9dhpVq8Xtf9" target="_blank" rel="noreferrer">Open map</Link>
+  }
+];
+
 const Contact = () => {
-  const [contactForm] = Form.useForm();
-  const [feedbackForm] = Form.useForm();
-  const [contactLoading, setContactLoading] = useState(false);
-  const [feedbackLoading, setFeedbackLoading] = useState(false);
-  const [contactError, setContactError] = useState('');
-  const [feedbackError, setFeedbackError] = useState('');
+  const [form] = Form.useForm();
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
 
   const submitContact = async (values) => {
-    setContactLoading(true);
-    setContactError('');
+    setLoading(true);
+    setError('');
     try {
       const response = await submitContactForm(values);
       message.success(response.message || 'Your message has been received.');
-      contactForm.resetFields();
-    } catch (error) {
-      setContactError(error.message || 'Unable to send your message.');
+      form.resetFields();
+    } catch (requestError) {
+      setError(requestError.message || 'Unable to send your message.');
     } finally {
-      setContactLoading(false);
+      setLoading(false);
     }
   };
-
-  const submitFeedback = async (values) => {
-    setFeedbackLoading(true);
-    setFeedbackError('');
-    try {
-      const response = await submitFeedbackForm(values);
-      message.success(response.message || 'Thank you for your feedback.');
-      feedbackForm.resetFields();
-    } catch (error) {
-      setFeedbackError(error.message || 'Unable to submit your feedback.');
-    } finally {
-      setFeedbackLoading(false);
-    }
-  };
-
-  const contactMethods = [
-    {
-      icon: <PhoneOutlined />,
-      title: 'Phone',
-      description: 'Call during normal business hours',
-      content: <Link href="tel:+918528576249">+91 8528576249</Link>
-    },
-    {
-      icon: <MailOutlined />,
-      title: 'Email',
-      description: 'Send product and support questions',
-      content: <Link href="mailto:mohdkaif90275@gmail.com">mohdkaif90275@gmail.com</Link>
-    },
-    {
-      icon: <EnvironmentOutlined />,
-      title: 'Project location',
-      description: 'MIT College, Moradabad',
-      content: <Link href="https://maps.app.goo.gl/mVbpZJ9dhpVq8Xtf9" target="_blank" rel="noreferrer">Open map</Link>
-    }
-  ];
 
   return (
     <Layout>
@@ -84,57 +65,93 @@ const Contact = () => {
           headingOnly
         />
 
-        <Flex vertical gap={28} style={{ width: 'min(1200px, calc(100% - 32px))', margin: '48px auto' }}>
-          <Row gutter={[20, 20]}>
-            {contactMethods.map((method) => (
-              <Col xs={24} md={8} key={method.title}>
-                <Card hoverable style={{ height: '100%' }}>
-                  <Space direction="vertical" size={12}>
-                    <Button type="primary" shape="circle" size="large" icon={method.icon} />
-                    <Title level={4} style={{ margin: 0 }}>{method.title}</Title>
-                    <Text type="secondary">{method.description}</Text>
-                    {method.content}
-                  </Space>
-                </Card>
-              </Col>
-            ))}
-          </Row>
+        <Flex vertical gap={28} style={{ width: 'min(1100px, calc(100% - 32px))', margin: '48px auto' }}>
+          <Flex vertical align="center" gap={8}>
+            <Text className="care-eyebrow">WE ARE HERE TO HELP</Text>
+            <Title level={2} style={{ margin: 0, textAlign: 'center' }}>Talk to the ElderlyCare team</Title>
+            <Paragraph type="secondary" style={{ margin: 0, maxWidth: 680, textAlign: 'center' }}>
+              Contact us with a product question, support request, or suggestion about your ElderlyCare experience.
+            </Paragraph>
+          </Flex>
 
-          <Row gutter={[24, 24]}>
-            <Col xs={24} lg={12}>
+          <Row gutter={[24, 24]} align="stretch">
+            <Col xs={24} lg={9}>
+              <Space direction="vertical" size={16} style={{ width: '100%' }}>
+                {contactMethods.map((method) => (
+                  <Card key={method.title} hoverable>
+                    <Flex align="center" gap={16}>
+                      <Button type="primary" shape="circle" size="large" icon={method.icon} aria-label={method.title} />
+                      <Flex vertical gap={2}>
+                        <Title level={4} style={{ margin: 0 }}>{method.title}</Title>
+                        <Text type="secondary">{method.description}</Text>
+                        {method.content}
+                      </Flex>
+                    </Flex>
+                  </Card>
+                ))}
+              </Space>
+            </Col>
+
+            <Col xs={24} lg={15}>
               <Card title={<Space><SendOutlined />Send us a message</Space>} style={{ height: '100%' }}>
-                <Paragraph type="secondary">Use this form for support questions or to report an application problem.</Paragraph>
-                {contactError && <Alert type="error" showIcon message={contactError} closable onClose={() => setContactError('')} style={{ marginBottom: 18 }} />}
-                <Form form={contactForm} layout="vertical" requiredMark onFinish={submitContact}>
-                  <Form.Item name="name" label="Full name" rules={[{ required: true, message: 'Enter your full name' }]}><Input placeholder="Enter your full name" /></Form.Item>
-                  <Form.Item name="email" label="Email address" rules={[{ required: true, message: 'Enter your email address' }, { type: 'email', message: 'Enter a valid email address' }]}><Input placeholder="Enter your email address" /></Form.Item>
-                  <Form.Item name="message" label="Message" rules={[{ required: true, message: 'Enter your message' }, { min: 10, message: 'Use at least 10 characters' }]}><Input.TextArea rows={5} showCount maxLength={2000} placeholder="Describe your question or problem" /></Form.Item>
-                  <Button type="primary" htmlType="submit" block icon={<SendOutlined />} loading={contactLoading}>Send message</Button>
-                </Form>
-              </Card>
-            </Col>
-
-            <Col xs={24} lg={12}>
-              <Card title={<Space><StarOutlined />Share feedback</Space>} style={{ height: '100%' }}>
-                <Paragraph type="secondary">Tell us what is useful and what should be improved.</Paragraph>
-                {feedbackError && <Alert type="error" showIcon message={feedbackError} closable onClose={() => setFeedbackError('')} style={{ marginBottom: 18 }} />}
-                <Form form={feedbackForm} layout="vertical" requiredMark onFinish={submitFeedback}>
-                  <Form.Item name="name" label="Full name" rules={[{ required: true, message: 'Enter your full name' }]}><Input placeholder="Enter your full name" /></Form.Item>
-                  <Form.Item name="email" label="Email address" rules={[{ required: true, message: 'Enter your email address' }, { type: 'email', message: 'Enter a valid email address' }]}><Input placeholder="Enter your email address" /></Form.Item>
-                  <Form.Item name="rating" label="Rating" rules={[{ required: true, message: 'Select a rating' }]}><Rate /></Form.Item>
-                  <Form.Item name="comments" label="Comments" rules={[{ required: true, message: 'Enter your comments' }, { min: 10, message: 'Use at least 10 characters' }]}><Input.TextArea rows={5} showCount maxLength={2000} placeholder="Share your experience with ElderlyCare" /></Form.Item>
-                  <Button type="primary" htmlType="submit" block icon={<StarOutlined />} loading={feedbackLoading}>Submit feedback</Button>
+                <Paragraph type="secondary">
+                  Complete the form and our team will respond using the email address or phone number you provide.
+                </Paragraph>
+                {error && (
+                  <Alert
+                    type="error"
+                    showIcon
+                    message={error}
+                    closable
+                    onClose={() => setError('')}
+                    style={{ marginBottom: 18 }}
+                  />
+                )}
+                <Form form={form} layout="vertical" requiredMark onFinish={submitContact}>
+                  <Form.Item
+                    name="name"
+                    label="Full name"
+                    rules={[{ required: true, message: 'Enter your full name' }]}
+                  >
+                    <Input placeholder="Enter your full name" />
+                  </Form.Item>
+                  <Form.Item
+                    name="email"
+                    label="Email address"
+                    rules={[
+                      { required: true, message: 'Enter your email address' },
+                      { type: 'email', message: 'Enter a valid email address' }
+                    ]}
+                  >
+                    <Input placeholder="Enter your email address" />
+                  </Form.Item>
+                  <Form.Item
+                    name="phone"
+                    label="Phone number"
+                    rules={[
+                      { required: true, message: 'Enter your phone number' },
+                      { pattern: /^[+0-9()\-\s]{8,20}$/, message: 'Enter a valid phone number' }
+                    ]}
+                  >
+                    <Input inputMode="tel" placeholder="Enter your phone number" />
+                  </Form.Item>
+                  <Form.Item
+                    name="message"
+                    label="Message"
+                    rules={[
+                      { required: true, message: 'Enter your message' },
+                      { min: 10, message: 'Use at least 10 characters' }
+                    ]}
+                  >
+                    <Input.TextArea rows={6} showCount maxLength={2000} placeholder="Describe your question or support request" />
+                  </Form.Item>
+                  <Button type="primary" htmlType="submit" block icon={<SendOutlined />} loading={loading}>
+                    Send message
+                  </Button>
                 </Form>
               </Card>
             </Col>
           </Row>
-
-          <Alert
-            type="warning"
-            showIcon
-            message="Do not use this page for an active medical emergency"
-            description="Call your local emergency service or the person’s listed emergency contact when immediate assistance is required."
-          />
         </Flex>
       </Content>
       <PublicFooter />

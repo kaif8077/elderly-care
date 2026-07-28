@@ -1,5 +1,4 @@
 const Contact = require('../models/Contact');
-const Feedback = require('../models/Feedback');
 
 const escapeRegExp = (value) => String(value || '').replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 const pagination = (query) => ({
@@ -28,7 +27,6 @@ const list = (Model, fields) => async (req, res) => {
   }
 };
 
-exports.contacts = list(Contact, ['name', 'email', 'message']);
-exports.feedback = list(Feedback, ['name', 'email', 'comments']);
+exports.contacts = list(Contact, ['name', 'email', 'phone', 'message']);
 exports.pagination = pagination;
 exports.escapeRegExp = escapeRegExp;

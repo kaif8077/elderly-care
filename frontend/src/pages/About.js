@@ -5,7 +5,7 @@ import {
 import {
   CheckCircleOutlined, LockOutlined, QrcodeOutlined
 } from '@ant-design/icons';
-import aboutUsImage from '../assests/about_us.png';
+import aboutCareImage from '../assests/about-care.jpg';
 import aboutHero from '../assests/about-hero.jpg';
 import PublicPageHero from '../components/PublicPageHero';
 import PublicFooter from '../components/PublicFooter';
@@ -35,7 +35,7 @@ const About = () => (
   <Layout>
     <Content>
       <PublicPageHero
-        title="About US"
+        title="About Us"
         image={aboutHero}
         compact
         centered
@@ -45,15 +45,26 @@ const About = () => (
       <Flex vertical gap={64} style={{ width: 'min(1200px, calc(100% - 32px))', margin: '64px auto' }}>
         <section aria-labelledby="about-purpose">
           <Row align="middle" gutter={[24, 28]}>
-            <Col xs={24} lg={10}><Image src={aboutUsImage} alt="ElderlyCare health information workflow" preview={false} width="100%" /></Col>
-            <Col xs={24} lg={14}>
+            <Col xs={24} lg={11}>
+              <Image
+                src={aboutCareImage}
+                alt="An older adult reviewing health information with a family caregiver"
+                preview={false}
+                width="100%"
+                style={{ borderRadius: 16, objectFit: 'cover', aspectRatio: '3 / 2' }}
+              />
+            </Col>
+            <Col xs={24} lg={13}>
               <Text className="care-eyebrow">OUR PURPOSE</Text>
-              <Title id="about-purpose" level={2}>Reduce uncertainty when an older adult needs help</Title>
+              <Title id="about-purpose" level={2}>Helping families prepare before an emergency happens</Title>
               <Paragraph type="secondary">
-                Medical conditions, allergies, medicines, emergency numbers, and hospital preferences are often spread across paper records and family messages. ElderlyCare brings the essential details into one structured profile.
+                ElderlyCare was created to make important health and contact information easier to organize, update, and reach when an older adult needs assistance. Families can maintain one structured profile instead of relying on scattered papers, messages, or memory.
               </Paragraph>
               <Paragraph type="secondary">
-                The account owner controls the private profile. Emergency QR access is intentionally limited and does not publish insurance information, full reports, or profile-editing controls.
+                The platform brings together medical conditions, allergies, medicines, emergency contacts, doctors, hospital preferences, reports, and a printable emergency ID card in a clear workflow designed for everyday use.
+              </Paragraph>
+              <Paragraph type="secondary">
+                Privacy remains central to the experience. Account owners control their protected records, while a revocable QR can show responders only the limited emergency details needed to provide timely help.
               </Paragraph>
               <Divider />
               <Timeline items={[

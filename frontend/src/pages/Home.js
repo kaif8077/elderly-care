@@ -198,6 +198,12 @@ const Home = () => {
               size="large"
               items={faqItems.map((item) => ({
                 ...item,
+                label: <Text strong style={{ color: '#1f2937', fontSize: 17 }}>{item.label}</Text>,
+                children: (
+                  <Paragraph type="secondary" style={{ margin: 0, fontSize: 14, lineHeight: 1.75 }}>
+                    {item.children}
+                  </Paragraph>
+                ),
                 style: {
                   marginBottom: 14,
                   border: `1px solid ${token.colorBorder}`,
