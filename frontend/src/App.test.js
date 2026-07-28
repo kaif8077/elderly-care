@@ -40,7 +40,9 @@ test('forgot-password and ID-card PDF flows are wired', () => {
   expect(loginSource).toContain('to="/forgot-password"');
   expect(cardSource).toContain("await import('jspdf')");
   expect(cardSource).not.toContain('Download PNG');
-  expect(cardSource).toContain('Download front + back PDF');
+  expect(cardSource).toContain('Download ID card PDF');
+  expect(cardSource).not.toContain('backRef');
+  expect(cardSource).not.toContain('pdf.addPage');
 });
 
 test('medical profile form saves steps and supports structured emergency contacts', () => {

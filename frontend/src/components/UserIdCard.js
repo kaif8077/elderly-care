@@ -10,7 +10,6 @@ const formatDob = (value) => value ? new Date(value).toLocaleDateString('en-GB')
 const UserIdCard = ({ profile, qrCode, photoUrl }) => {
   const pairRef = useRef(null);
   const frontRef = useRef(null);
-  const backRef = useRef(null);
   const [working, setWorking] = useState(false);
 
   if (!profile) return null;
@@ -23,17 +22,15 @@ const UserIdCard = ({ profile, qrCode, photoUrl }) => {
   });
 
   const downloadPdf = async () => {
-    if (!frontRef.current || !backRef.current) return;
+    if (!frontRef.current) return;
     setWorking(true);
     try {
       const { jsPDF } = await import('jspdf');
-      const [front, back] = await Promise.all([renderCard(frontRef.current), renderCard(backRef.current)]);
+      const front = await renderCard(frontRef.current);
       const pdf = new jsPDF({ orientation: 'landscape', unit: 'mm', format: [85.6, 53.98] });
       pdf.addImage(front.toDataURL('image/jpeg', 0.95), 'JPEG', 0, 0, 85.6, 53.98);
-      pdf.addPage([85.6, 53.98], 'landscape');
-      pdf.addImage(back.toDataURL('image/jpeg', 0.95), 'JPEG', 0, 0, 85.6, 53.98);
-      pdf.save(`${elderlyCareId}-front-back.pdf`);
-      message.success('Front and back ID card PDF downloaded.');
+      pdf.save(`${elderlyCareId}-id-card.pdf`);
+      message.success('ID card PDF downloaded.');
     } catch (error) {
       message.error('Unable to create the ID card PDF.');
     } finally {
@@ -66,19 +63,13 @@ const UserIdCard = ({ profile, qrCode, photoUrl }) => {
           <footer><span>{qrCode ? 'ACTIVE' : 'QR NOT GENERATED'}</span><span>Identity and emergency access</span></footer>
         </article>
 
-        <article className="user-wallet-card user-wallet-back" ref={backRef}>
-          <header><span><img src="/favicon.png" alt="" /> ELDERLYCARE</span><b>{elderlyCareId}</b></header>
-          <div className="user-card-back-qr">{qrCode ? <img src={qrCode} alt="Emergency QR code" /> : <QrcodeOutlined />}</div>
-          <aside className="user-card-emergency-guide">In an emergency, scan this QR code to view permitted details, contact caregivers, and share the person's location quickly and securely.</aside>
-          <footer><span>Revocable secure QR</span><span>ElderlyCare</span></footer>
-        </article>
       </div>
 
       <Space className="user-card-actions" wrap>
         <Button type="primary" icon={<DownloadOutlined />} onClick={downloadPdf} loading={working}>
-          Download front + back PDF
+          Download ID card PDF
         </Button>
-        <Button icon={<PrinterOutlined />} onClick={printCards}>Print ID card only</Button>
+        <Button icon={<PrinterOutlined />} onClick={printCards}>Print ID card</Button>
       </Space>
     </section>
   );

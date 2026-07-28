@@ -55,10 +55,10 @@ const services = [
     icon: <IdcardOutlined />,
     title: 'ElderlyCare ID Card',
     image: qrImage,
-    summary: 'Create a compact front-and-back emergency card that can be carried in a wallet and printed when needed.',
-    detail: 'The card combines the person’s photograph, ElderlyCare number, date of birth, blood group, residential information, emergency contact, and high-resolution QR in a familiar card format.',
+    summary: 'Create a compact emergency card that can be carried in a wallet and printed when needed.',
+    detail: 'The single-sided card combines the person’s photograph, ElderlyCare number, date of birth, status, and secure QR in a clear wallet-card format.',
     points: [
-      'Front and back card preview',
+      'Single-sided card preview',
       'Printable PDF download',
       'Clear emergency QR instruction',
       'Essential details without excessive exposure'

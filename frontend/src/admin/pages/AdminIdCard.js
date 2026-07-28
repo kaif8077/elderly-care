@@ -63,10 +63,10 @@ const AdminIdCard = () => {
     try {
       const canvas = await html2canvas(cardRef.current, { scale: 4, backgroundColor: '#f3f6fc', useCORS: true });
       const link = document.createElement('a');
-      link.download = `${data.card.elderlyCareId}-front-back.png`;
+      link.download = `${data.card.elderlyCareId}-id-card.png`;
       link.href = canvas.toDataURL('image/png');
       link.click();
-      setMessage('High-resolution front and back card image downloaded.');
+      setMessage('High-resolution ID card image downloaded.');
     } catch (downloadError) {
       setMessage('Unable to download the ID card image.');
     } finally {
@@ -81,7 +81,6 @@ const AdminIdCard = () => {
   const { card, user } = data;
   const age = ageFromDob(card.dob);
   const updated = card.lastUpdatedAt ? new Date(card.lastUpdatedAt).toLocaleDateString() : 'Not available';
-  const generated = card.qr?.generatedAt ? new Date(card.qr.generatedAt).toLocaleDateString() : 'Not generated';
 
   return (
     <div className="admin-id-card-page">
@@ -92,7 +91,7 @@ const AdminIdCard = () => {
       </div>
 
       <div className="admin-card-workspace">
-        <div className="elder-card-pair" ref={cardRef} aria-label="ElderlyCare ID card front and back preview">
+        <div className="elder-card-pair" ref={cardRef} aria-label="ElderlyCare ID card preview">
           <section className="wallet-card wallet-card-front" aria-label="ID card front side">
             <div className="wallet-card-brand"><span><FaShieldAlt /> ELDERLYCARE</span><b>EMERGENCY ID</b></div>
             <div className="wallet-card-main">
@@ -109,24 +108,12 @@ const AdminIdCard = () => {
             <div className="wallet-card-meta"><span>{card.status.toUpperCase()}</span><span>Updated {updated}</span></div>
           </section>
 
-          <section className="wallet-card wallet-card-back" aria-label="ID card back side">
-            <div className="wallet-card-brand"><span>EMERGENCY DETAILS</span><b>{card.elderlyCareId}</b></div>
-            <dl className="wallet-emergency-list">
-              <div><dt>Primary contact</dt><dd>{card.emergencyContact}</dd></div>
-              <div><dt>Phone</dt><dd>{card.emergencyPhone}</dd></div>
-              <div className="wallet-warning"><dt>Allergy warning</dt><dd>{card.allergyWarning}</dd></div>
-              <div><dt>Preferred language</dt><dd>{card.preferredLanguage}</dd></div>
-            </dl>
-            <p className="wallet-instruction">Call the emergency contact and local emergency services if immediate help is required.</p>
-            <div className="wallet-privacy"><strong>Privacy:</strong> Scan the revocable QR for the permitted emergency summary. No insurance or full report is stored on this card.</div>
-            <div className="wallet-card-meta"><span>QR issued {generated}</span><span>elderlycare</span></div>
-          </section>
         </div>
 
         <aside className="admin-card-controls">
           <h2>Card controls</h2>
           <p>The QR contains a random revocable token, never a user ID or complete medical record.</p>
-          <button className="admin-primary-button" onClick={downloadImage} disabled={working || !card.qr}><FaDownload /> Download front + back PNG</button>
+          <button className="admin-primary-button" onClick={downloadImage} disabled={working || !card.qr}><FaDownload /> Download ID card PNG</button>
           <button className="admin-secondary-button" onClick={() => window.print()} disabled={working}><FaPrint /> Print / Save wallet PDF</button>
           <button className="admin-secondary-button" onClick={() => runAction('regenerate')} disabled={working || user.accountStatus !== 'active'}><FaSyncAlt /> Generate new QR</button>
           <button className="admin-danger-button" onClick={() => runAction('revoke')} disabled={working || !card.qr}><FaTimesCircle /> Revoke QR</button>
