@@ -88,13 +88,6 @@ const Recommendations = () => {
             extra={<Button icon={<DownloadOutlined />} onClick={() => download(latest._id)}>PDF</Button>}
           >
             <div className="recommendation-content">{latest.content}</div>
-            <Alert
-              style={{ marginTop: 16 }}
-              type="warning"
-              showIcon
-              message="General wellness guidance only"
-              description="Consult a qualified healthcare professional before changing treatment, medicines, diet, or exercise."
-            />
           </Card>
           {items.length > 1 && (
             <Card size="small" title={<Space><HistoryOutlined />Previous recommendations</Space>} style={{ marginTop: 14 }}>

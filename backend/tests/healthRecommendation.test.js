@@ -15,7 +15,7 @@ test('recommendation routes register authenticated history and PDF endpoints', (
   assert.equal(typeof require('../routes/recommendationRoutes'), 'function');
 });
 
-test('fallback health recommendations remain concise and profile-specific', () => {
+test('fallback health recommendations remain bounded and profile-specific', () => {
   const { getConciseHealthRecommendations } = require('../controllers/recommendationController');
   const result = getConciseHealthRecommendations({
     name: 'Test User',
@@ -31,5 +31,7 @@ test('fallback health recommendations remain concise and profile-specific', () =
 
   assert.match(result, /Penicillin/);
   assert.match(result, /fall hazards/);
-  assert.ok(result.split('\n').length <= 16);
+  const bulletCount = result.split('\n').filter((line) => line.startsWith('• ')).length;
+  assert.ok(bulletCount >= 10);
+  assert.ok(bulletCount <= 12);
 });

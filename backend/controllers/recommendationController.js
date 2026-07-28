@@ -8,7 +8,7 @@ const HF_API_KEY = process.env.HF_API_KEY || 'your_hugging_face_token';
 const generateHealthRecommendations = async (profile) => {
     try {
         // Check cache first
-        const cacheKey = `health_v2_${crypto.createHash('sha256').update(JSON.stringify(profile.toObject ? profile.toObject() : profile)).digest('hex')}`;
+        const cacheKey = `health_v3_${crypto.createHash('sha256').update(JSON.stringify(profile.toObject ? profile.toObject() : profile)).digest('hex')}`;
         const cached = await RecommendationCache.findOne({ cacheKey: cacheKey });
         if (cached && (Date.now() - cached.createdAt.getTime()) < 24 * 60 * 60 * 1000) {
             return cached.value;
@@ -60,12 +60,13 @@ Energy Levels: ${profile.energyLevels || 'Not specified'}
 Recent Lab Results: ${profile.labResults || 'Not specified'}
 Vital Signs: ${profile.vitalSigns || 'Not specified'}
 
-Use no more than 8 short bullet points divided into:
-1. Top priorities (maximum 3)
-2. Daily safety and wellness (maximum 3)
-3. When to contact a doctor or emergency services (maximum 2)
+Provide 10 to 12 concise, personalized bullet points divided into:
+1. Top health priorities (3 to 4)
+2. Medication and appointment safety (2)
+3. Daily nutrition, hydration, movement, sleep, and fall prevention (3 to 4)
+4. Warning signs and when to seek urgent help (2)
 
-Mention only issues supported by the supplied profile. Do not diagnose, prescribe medicines or supplements, provide exact treatment targets, or recommend changing medication. Do not repeat the full medical profile.`;
+Prioritize recommendations that match the supplied conditions, symptoms, medicines, allergies, mobility, age, and lifestyle. Include practical caregiver-friendly actions. Mention only issues supported by the profile. Do not diagnose, prescribe medicines or supplements, provide exact treatment targets, or recommend changing medication. Do not repeat the full medical profile.`;
 
         // Try multiple free AI APIs with fallback
         let aiRecommendations = null;
@@ -234,15 +235,20 @@ const getConciseHealthRecommendations = (profile) => {
     if (conditions.length && priorities.length < 3) {
         priorities.push(`Arrange routine follow-up for: ${conditions.slice(0, 3).join(', ')}.`);
     }
+    if (profile.doctorName && priorities.length < 4) {
+        priorities.push(`Keep scheduled reviews with ${profile.doctorName} and take an updated symptom and medicine list.`);
+    }
     if (!priorities.length) {
         priorities.push('Schedule routine health reviews and keep the medical profile current.');
     }
 
+    daily.push('Use a simple daily medicine schedule and record missed doses or possible side effects for the next clinical review.');
     if (profile.fallRisk || ['walking_aid', 'wheelchair', 'bed_assistance'].includes(profile.mobilityStatus)) {
         daily.push('Reduce fall hazards, use the prescribed mobility aid, and keep frequently used items within easy reach.');
     }
     daily.push('Choose regular balanced meals and fluids that follow existing doctor-provided dietary restrictions.');
     daily.push('Use gentle activity appropriate to current mobility and stop if pain, dizziness, chest discomfort, or unusual breathlessness occurs.');
+    daily.push('Maintain a consistent sleep routine and report persistent sleep changes, unusual fatigue, or daytime confusion.');
 
     urgent.push('Seek urgent medical help for chest pain, severe breathing difficulty, fainting, sudden weakness, new confusion, or uncontrolled bleeding.');
     urgent.push(`Emergency contact: ${profile.emergencyContact || 'not provided'}${profile.emergencyPhone ? ` (${profile.emergencyPhone})` : ''}.`);
@@ -251,10 +257,10 @@ const getConciseHealthRecommendations = (profile) => {
         'NECESSARY HEALTH RECOMMENDATIONS',
         '',
         'Top priorities',
-        ...priorities.slice(0, 3).map((item) => `• ${item}`),
+        ...priorities.slice(0, 4).map((item) => `• ${item}`),
         '',
-        'Daily safety and wellness',
-        ...daily.slice(0, 3).map((item) => `• ${item}`),
+        'Medication, safety and daily wellness',
+        ...daily.slice(0, 5).map((item) => `• ${item}`),
         '',
         'Get medical help',
         ...urgent.slice(0, 2).map((item) => `• ${item}`)

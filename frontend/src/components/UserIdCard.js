@@ -15,7 +15,6 @@ const UserIdCard = ({ profile, qrCode, photoUrl }) => {
 
   if (!profile) return null;
   const elderlyCareId = formatId(profile.elderlyCareId || profile.userId || profile._id);
-  const allergies = [...(profile.allergies || []), profile.allergiesOther].filter(Boolean).join(', ') || 'None reported';
 
   const renderCard = (element) => html2canvas(element, {
     scale: 4,
@@ -62,7 +61,6 @@ const UserIdCard = ({ profile, qrCode, photoUrl }) => {
               </span>
               <div><h3>{profile.name}</h3><p className="user-card-number">{elderlyCareId}</p><p>DOB: {formatDob(profile.dob)}</p></div>
             </div>
-            <strong className="user-card-blood"><small>BLOOD GROUP</small>{profile.bloodGroup || 'Unknown'}</strong>
             <div className="user-card-qr">{qrCode ? <img src={qrCode} alt="Emergency QR code" /> : <QrcodeOutlined />}<b>SCAN IN EMERGENCY</b></div>
           </div>
           <footer><span>{qrCode ? 'ACTIVE' : 'QR NOT GENERATED'}</span><span>Identity and emergency access</span></footer>
@@ -70,14 +68,8 @@ const UserIdCard = ({ profile, qrCode, photoUrl }) => {
 
         <article className="user-wallet-card user-wallet-back" ref={backRef}>
           <header><span><img src="/favicon.png" alt="" /> ELDERLYCARE</span><b>{elderlyCareId}</b></header>
-          <dl>
-            <div><dt>Member phone</dt><dd>{profile.phone || 'Not provided'}</dd></div>
-            <div><dt>Emergency contact</dt><dd>{profile.emergencyPhone || 'Not provided'}</dd></div>
-            <div className="user-card-address"><dt>Residential address</dt><dd>{profile.address || 'Not provided'}</dd></div>
-            <div className="user-card-warning"><dt>Allergy warning</dt><dd>{allergies}</dd></div>
-          </dl>
           <div className="user-card-back-qr">{qrCode ? <img src={qrCode} alt="Emergency QR code" /> : <QrcodeOutlined />}</div>
-          <aside>This card contains limited information. Scan the secure QR for permitted emergency details.</aside>
+          <aside className="user-card-emergency-guide">In an emergency, scan this QR code to view permitted details, contact caregivers, and share the person's location quickly and securely.</aside>
           <footer><span>Revocable secure QR</span><span>ElderlyCare</span></footer>
         </article>
       </div>

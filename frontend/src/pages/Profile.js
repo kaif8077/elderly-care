@@ -1,11 +1,11 @@
 import React, { useCallback, useContext, useEffect, useState } from 'react';
 import axios from 'axios';
 import {
-  Alert, Avatar, Button, Card, Col, Descriptions, Empty, Modal, Row,
-  Skeleton, Space, Switch, Tag, Typography
+  Alert, Avatar, Button, Card, Col, Descriptions, Empty, Row,
+  Skeleton, Space, Tag, Typography
 } from 'antd';
 import {
-  EditOutlined, FileTextOutlined, IdcardOutlined, MedicineBoxOutlined,
+  FileTextOutlined, IdcardOutlined, MedicineBoxOutlined,
   PhoneOutlined, SafetyCertificateOutlined, UserOutlined
 } from '@ant-design/icons';
 import { AuthContext } from '../context/AuthContext';
@@ -25,9 +25,9 @@ const Profile = () => {
   const [qrCode, setQrCode] = useState('');
   const [loading, setLoading] = useState(true);
   const [photoUrl, setPhotoUrl] = useState('');
-  const [showReports, setShowReports] = useState(true);
+  const [showReports, setShowReports] = useState(false);
+  const [showRecommendations, setShowRecommendations] = useState(true);
   const [latestReport, setLatestReport] = useState(null);
-  const [reportOpen, setReportOpen] = useState(false);
 
   const loadPhoto = useCallback(async (token) => {
     const response = await axios.get(`${apiBase}/api/medical/${user._id}/photo`, {
@@ -114,17 +114,8 @@ const Profile = () => {
             <Title level={2} style={{ margin: '5px 0' }}>{profile.name}</Title>
             <Space wrap><Tag color="blue">Active profile</Tag><Tag>{profile.bloodGroup || 'Blood group unknown'}</Tag></Space>
           </Col>
-          <Col><Button href="/dashboard#medical-form" icon={<EditOutlined />}>Edit on dashboard</Button></Col>
         </Row>
       </Card>
-
-      <Alert
-        style={{ marginTop: 18 }}
-        type="info"
-        showIcon
-        message="Profile photograph"
-        description="Photograph upload and replacement are available only inside the Personal Information step on your dashboard."
-      />
 
       {section('Personal information', <UserOutlined />, [
         ['Full name', profile.name], ['Date of birth', profile.dob], ['Gender', profile.gender],
@@ -150,26 +141,10 @@ const Profile = () => {
 
       <Card
         className="care-section-card"
-        title={<Space><FileTextOutlined />Reports and recommendations</Space>}
-        extra={<Space wrap>{latestReport && <Button onClick={() => setReportOpen(true)}>Preview latest report</Button>}<Text>Show</Text><Switch checked={showReports} onChange={setShowReports} /></Space>}
+        title={<Space><FileTextOutlined />Latest medical report</Space>}
+        extra={<Button onClick={() => setShowReports((current) => !current)}>{showReports ? 'Hide report' : 'Show report'}</Button>}
       >
-        {showReports
-          ? <Recommendations />
-          : <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} description="Reports are hidden on this profile view." />}
-      </Card>
-
-      <Card className="care-section-card" title={<Space><IdcardOutlined />Emergency ID card</Space>}>
-        <UserIdCard profile={profile} qrCode={qrCode} photoUrl={photoUrl} />
-      </Card>
-
-      <Modal
-        title="Emergency Medical Summary"
-        open={reportOpen}
-        onCancel={() => setReportOpen(false)}
-        footer={<Button type="primary" href="/reports">Open reports page</Button>}
-        width={720}
-      >
-        {latestReport ? (
+        {showReports ? (latestReport ? (
           <Space direction="vertical" size={18} style={{ width: '100%' }}>
             <Alert
               type="warning"
@@ -188,10 +163,26 @@ const Profile = () => {
                 { key: 'medications', label: 'Medications', children: show(latestReport.snapshotData?.medical?.medications) }
               ]}
             />
-            <Text type="secondary">This emergency summary is not a replacement for professional medical advice.</Text>
+            <Button type="primary" href="/reports">Open report history</Button>
           </Space>
-        ) : <Empty description="No medical report has been generated yet." />}
-      </Modal>
+        ) : <Empty description="No medical report has been generated yet."><Button type="primary" href="/reports">Generate report</Button></Empty>)
+          : <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} description="Report is hidden." />}
+      </Card>
+
+      <Card
+        className="care-section-card"
+        title={<Space><MedicineBoxOutlined />Health recommendations</Space>}
+        extra={<Button onClick={() => setShowRecommendations((current) => !current)}>{showRecommendations ? 'Hide recommendations' : 'Show recommendations'}</Button>}
+      >
+        {showRecommendations
+          ? <Recommendations />
+          : <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} description="Recommendations are hidden." />}
+      </Card>
+
+      <Card className="care-section-card" title={<Space><IdcardOutlined />Emergency ID card</Space>}>
+        <UserIdCard profile={profile} qrCode={qrCode} photoUrl={photoUrl} />
+      </Card>
+
     </main>
   );
 };

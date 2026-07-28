@@ -1,5 +1,6 @@
 import React, { useContext } from 'react';
 import { Card, Typography } from 'antd';
+import { useNavigate } from 'react-router-dom';
 import { AuthContext } from '../context/AuthContext';
 import MedicalForm from '../components/MedicalForm';
 import QRCodeDisplay from '../components/QRCodeDisplay';
@@ -9,6 +10,7 @@ const { Title, Text, Paragraph } = Typography;
 
 const Dashboard = () => {
   const { user } = useContext(AuthContext);
+  const navigate = useNavigate();
   return (
     <main className="care-page">
       <Card className="care-dashboard-hero" styles={{ body: { padding: 32 } }}>
@@ -20,7 +22,9 @@ const Dashboard = () => {
           </div>
         </div>
       </Card>
-      <Card id="medical-form" className="care-section-card"><MedicalForm /></Card>
+      <Card id="medical-form" className="care-section-card">
+        <MedicalForm onSubmissionSuccess={() => navigate('/profile')} />
+      </Card>
       <section id="qr"><QRCodeDisplay /></section>
       <Card className="care-section-card"><Recommendations /></Card>
     </main>
