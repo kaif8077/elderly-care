@@ -247,12 +247,12 @@
 }
 
 .download-id-btn:hover {
-  background: #ff6b00; /* New hover color */
+  background: #0052cc;
   transform: translateY(-2px);
 }
 
 .download-id-btn:active {
-  background: #ff6b00; /* Active state same as hover */
+  background: #0047b3;
   transform: translateY(0);
 }
 

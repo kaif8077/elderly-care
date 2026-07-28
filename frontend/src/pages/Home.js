@@ -106,7 +106,7 @@ const Home = () => {
       <Content>
         <PublicPageHero
           title="Important health information, ready when every second matters."
-          description="ElderlyCare helps older adults and families organize medical information, create a secure emergency QR, and keep an emergency ID card and private reports available."
+          description="Secure medical details, emergency QR access, ID cards, and private reports—all ready when needed."
         //   primaryAction={{ to: '/register', label: 'Create a protected profile' }}
         //   secondaryAction={{ to: '/services', label: 'Explore features' }}
         />
