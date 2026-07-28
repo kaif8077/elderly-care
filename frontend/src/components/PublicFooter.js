@@ -1,17 +1,16 @@
-import { Button, Col, Divider, Flex, Image, Layout, Row, Space, Typography } from 'antd';
+import { Button, Col, Divider, Flex, Layout, Row, Space, Typography } from 'antd';
 import { Link } from 'react-router-dom';
 import { MailOutlined, PhoneOutlined } from '@ant-design/icons';
-import logoImage from '../assests/logo.png';
 
 const { Footer } = Layout;
-const { Text } = Typography;
+const { Title, Text } = Typography;
 
 const PublicFooter = () => (
   <Footer style={{ padding: '44px clamp(20px, 7vw, 90px) 24px', background: '#1f2937' }}>
     <Row gutter={[32, 28]}>
       <Col xs={24} md={10}>
         <Flex vertical gap={14}>
-          <Image src={logoImage} alt="ElderlyCare" preview={false} width={150} />
+          <Title level={3} style={{ margin: 0, color: '#fff', fontWeight: 800 }}>ElderlyCare</Title>
           <Text style={{ color: '#d1d5db', maxWidth: 430, lineHeight: 1.7 }}>
             ElderlyCare helps families organize essential health information, create emergency-ready profiles, and connect responders with trusted contacts when timely support matters most.
           </Text>

@@ -1,5 +1,5 @@
 import React, { useContext, useEffect, useState } from 'react';
-import { Alert, Button, Card, Empty, Image, Skeleton, Space, Typography } from 'antd';
+import { Button, Card, Empty, Image, Skeleton, Space, Typography } from 'antd';
 import { QrcodeOutlined, ReloadOutlined } from '@ant-design/icons';
 import { toast } from 'react-toastify';
 import { AuthContext } from '../context/AuthContext';
@@ -46,7 +46,6 @@ const QRCodeDisplay = () => {
         {loading ? <Skeleton.Image active className="qr-skeleton" /> : qrCode
           ? <Image src={qrCode} width={260} preview={false} alt="Emergency QR code" className="qr-image" />
           : <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} description="No emergency QR generated yet" />}
-        <Alert type="info" showIcon message="The QR contains a secure access link, not your complete medical record." />
         <Button type="primary" size="large" block icon={qrCode ? <ReloadOutlined /> : <QrcodeOutlined />} loading={loading} onClick={generate}>
           {qrCode ? 'Regenerate emergency QR' : 'Generate emergency QR'}
         </Button>

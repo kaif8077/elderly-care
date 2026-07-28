@@ -62,6 +62,9 @@ test('dashboard uses a full-width QR flow without legacy quick-action cards', ()
   expect(source).toContain('<QRCodeDisplay />');
   expect(source).not.toContain('const actions=');
   expect(source).not.toContain('Emergency ID card');
+  expect(source).not.toContain('Open my profile');
+  const qrSource = fs.readFileSync(path.join(__dirname, 'components', 'QRCodeDisplay.js'), 'utf8');
+  expect(qrSource).not.toContain('The QR contains a secure access link, not your complete medical record.');
 });
 
 test('main navigation uses Ant Design without the legacy hard CSS', () => {
@@ -99,15 +102,17 @@ test('public information pages use Ant Design without legacy page CSS', () => {
   expect(contact).not.toContain('Do not use this page for an active medical emergency');
 });
 
-test('public pages share the three-image carousel and dark footer', () => {
+test('public pages use a single non-gradient banner and text-branded footer', () => {
   const hero = fs.readFileSync(path.join(__dirname, 'components', 'PublicPageHero.js'), 'utf8');
   const footer = fs.readFileSync(path.join(__dirname, 'components', 'PublicFooter.js'), 'utf8');
   expect(hero).toContain("banner1.jpg");
-  expect(hero).toContain("banner2.jpg");
-  expect(hero).toContain("banner3.jpg");
-  expect(hero).toContain('<Carousel autoplay');
+  expect(hero).not.toContain("banner2.jpg");
+  expect(hero).not.toContain("banner3.jpg");
+  expect(hero).not.toContain('Carousel');
+  expect(hero).not.toContain('linear-gradient');
   expect(footer).toContain("background: '#1f2937'");
-  expect(footer).toContain("logo.png");
+  expect(footer).not.toContain("logo.png");
+  expect(footer).toContain('fontWeight: 800');
   expect(footer).toContain('© 2025 ElderlyCare');
   ['Home', 'About', 'Services', 'Contact'].forEach((page) => {
     const source = fs.readFileSync(path.join(__dirname, 'pages', `${page}.js`), 'utf8');
@@ -124,6 +129,8 @@ test('secondary public pages use the single about hero and About omits the team 
   });
   const about = fs.readFileSync(path.join(__dirname, 'pages', 'About.js'), 'utf8');
   expect(about).toContain("about-care.jpg");
+  expect(about).toContain('<Card hoverable');
+  expect(about).toContain('minHeight: 500');
   expect(about).not.toContain('THE PROJECT TEAM');
   expect(about).not.toContain('People behind ElderlyCare');
   const services = fs.readFileSync(path.join(__dirname, 'pages', 'Services.js'), 'utf8');
@@ -131,6 +138,10 @@ test('secondary public pages use the single about hero and About omits the team 
   expect(services).toContain('selectedKeys={[activeId]}');
   expect(services).toContain('activeService.image');
   expect(services).toContain('activeService.detail');
+  expect(services).not.toContain('Create an account');
+  expect(services).not.toContain('>Contact us</Button>');
+  const home = fs.readFileSync(path.join(__dirname, 'pages', 'Home.js'), 'utf8');
+  expect(home).toContain("why-choose-us-v2.jpg");
 });
 
 test('admin navigation removes feedback and retains requested modules', () => {

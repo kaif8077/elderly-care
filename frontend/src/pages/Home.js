@@ -9,7 +9,7 @@ import {
   IdcardOutlined, MedicineBoxOutlined, QrcodeOutlined, RightOutlined,
   SafetyCertificateOutlined, TeamOutlined
 } from '@ant-design/icons';
-import whyChooseUsImage from '../assests/why-choose-us.jpg';
+import whyChooseUsImage from '../assests/why-choose-us-v2.jpg';
 import PublicPageHero from '../components/PublicPageHero';
 import PublicFooter from '../components/PublicFooter';
 
@@ -161,26 +161,34 @@ const Home = () => {
           </section>
 
           <section aria-labelledby="trust-title">
-            <Card>
-              <Row align="middle" gutter={[32, 28]}>
-                <Col xs={24} lg={10}>
-                  <Image src={whyChooseUsImage} alt="Older adult with a trusted caregiver" preview={false} width="100%" style={{ borderRadius: token.borderRadiusLG }} />
+            <Card styles={{ body: { padding: 0 } }} style={{ overflow: 'hidden' }}>
+              <Row align="stretch">
+                <Col xs={24} lg={12}>
+                  <Image
+                    src={whyChooseUsImage}
+                    alt="Older adult preparing an emergency card with a trusted family caregiver"
+                    preview={false}
+                    width="100%"
+                    height="100%"
+                    style={{ minHeight: 430, objectFit: 'cover' }}
+                  />
                 </Col>
-                <Col xs={24} lg={14}>
-                  <Text className="care-eyebrow">CLEAR PRIVACY BOUNDARIES</Text>
-                  <Title id="trust-title" level={2}>Useful in emergencies without publishing the complete record</Title>
-                  <Paragraph type="secondary">
-                    ElderlyCare separates the private account from the limited public emergency view. Insurance details, private reports, and profile editing remain behind authentication.
-                  </Paragraph>
-                  <Row gutter={[16, 16]}>
-                    <Col xs={12}><Statistic title="ElderlyCare ID" value="12 digit" prefix={<IdcardOutlined />} /></Col>
-                    <Col xs={12}><Statistic title="QR access" value="Revocable" prefix={<QrcodeOutlined />} /></Col>
-                  </Row>
-                  <Divider />
-                  <Space wrap>
-                    <Link to="/about"><Button type="primary">Learn about ElderlyCare</Button></Link>
-                    {/* <Link to="/contact"><Button icon={<TeamOutlined />}>Contact us</Button></Link> */}
-                  </Space>
+                <Col xs={24} lg={12}>
+                  <Flex vertical justify="center" style={{ height: '100%', minHeight: 430, padding: 'clamp(28px, 5vw, 56px)' }}>
+                    <Text className="care-eyebrow">CLEAR PRIVACY BOUNDARIES</Text>
+                    <Title id="trust-title" level={2}>Useful in emergencies without publishing the complete record</Title>
+                    <Paragraph type="secondary">
+                      ElderlyCare separates the private account from the limited public emergency view. Insurance details, private reports, and profile editing remain behind authentication.
+                    </Paragraph>
+                    <Row gutter={[16, 16]}>
+                      <Col xs={12}><Statistic title="ElderlyCare ID" value="12 digit" prefix={<IdcardOutlined />} /></Col>
+                      <Col xs={12}><Statistic title="QR access" value="Revocable" prefix={<QrcodeOutlined />} /></Col>
+                    </Row>
+                    <Divider />
+                    <Space wrap>
+                      <Link to="/about"><Button type="primary">Learn about ElderlyCare</Button></Link>
+                    </Space>
+                  </Flex>
                 </Col>
               </Row>
             </Card>

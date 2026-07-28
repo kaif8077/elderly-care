@@ -1,5 +1,4 @@
 import { useEffect, useState } from 'react';
-import { Link } from 'react-router-dom';
 import {
   Alert, Button, Card, Col, Flex, Image, Layout, List, Menu, Row, Space,
   Tag, Typography
@@ -207,10 +206,6 @@ const Services = () => {
               <Text strong>Designed for: </Text>
               <Text type="secondary">{activeService.audience}</Text>
             </Card>
-            <Space wrap style={{ marginTop: 22 }}>
-              <Link to="/register"><Button type="primary">Create an account</Button></Link>
-              <Link to="/contact"><Button>Contact us</Button></Link>
-            </Space>
           </Card>
         </Flex>
       </Content>

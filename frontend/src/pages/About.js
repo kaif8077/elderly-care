@@ -44,15 +44,18 @@ const About = () => (
 
       <Flex vertical gap={64} style={{ width: 'min(1200px, calc(100% - 32px))', margin: '64px auto' }}>
         <section aria-labelledby="about-purpose">
-          <Row align="middle" gutter={[24, 28]}>
+          <Row align="stretch" gutter={[24, 28]}>
             <Col xs={24} lg={11}>
-              <Image
-                src={aboutCareImage}
-                alt="An older adult reviewing health information with a family caregiver"
-                preview={false}
-                width="100%"
-                style={{ borderRadius: 16, objectFit: 'cover', aspectRatio: '3 / 2' }}
-              />
+              <Card hoverable style={{ height: '100%', overflow: 'hidden' }} styles={{ body: { padding: 0, height: '100%' } }}>
+                <Image
+                  src={aboutCareImage}
+                  alt="An older adult reviewing health information with a family caregiver"
+                  preview={false}
+                  width="100%"
+                  height="100%"
+                  style={{ minHeight: 500, objectFit: 'cover' }}
+                />
+              </Card>
             </Col>
             <Col xs={24} lg={13}>
               <Text className="care-eyebrow">OUR PURPOSE</Text>
