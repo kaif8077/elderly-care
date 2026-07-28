@@ -1,7 +1,7 @@
 import React, { useRef, useState } from 'react';
 import html2canvas from 'html2canvas';
 import { Button, Space, message } from 'antd';
-import { DownloadOutlined, PrinterOutlined, QrcodeOutlined } from '@ant-design/icons';
+import { DownloadOutlined, QrcodeOutlined } from '@ant-design/icons';
 import './UserIdCard.css';
 
 const formatId = (value) => String(value || '').replace(/\D/g, '').padStart(12, '0').slice(-12).replace(/(\d{4})(?=\d)/g, '$1 ');
@@ -38,14 +38,6 @@ const UserIdCard = ({ profile, qrCode, photoUrl }) => {
     }
   };
 
-  const printCards = () => {
-    document.body.classList.add('id-card-print-mode');
-    const cleanup = () => document.body.classList.remove('id-card-print-mode');
-    window.addEventListener('afterprint', cleanup, { once: true });
-    window.print();
-    window.setTimeout(cleanup, 1000);
-  };
-
   return (
     <section className="user-id-module">
       <div className="user-card-pair" ref={pairRef}>
@@ -62,7 +54,7 @@ const UserIdCard = ({ profile, qrCode, photoUrl }) => {
             </div>
             <div className="user-card-qr">{qrCode ? <img src={qrCode} alt="Emergency QR code" /> : <QrcodeOutlined />}<b>SCAN IN EMERGENCY</b></div>
           </div>
-          <footer><span>ELDERLYCARE CARD NUMBER</span><strong className="user-card-number">{elderlyCareId}</strong></footer>
+          <footer><strong className="user-card-number">{elderlyCareId}</strong></footer>
         </article>
 
       </div>
@@ -71,7 +63,6 @@ const UserIdCard = ({ profile, qrCode, photoUrl }) => {
         <Button type="primary" icon={<DownloadOutlined />} onClick={downloadPdf} loading={working}>
           Download ID card PDF
         </Button>
-        <Button icon={<PrinterOutlined />} onClick={printCards}>Print ID card</Button>
       </Space>
     </section>
   );

@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
-import { FaArrowLeft, FaDownload, FaPrint, FaQrcode, FaShieldAlt, FaSyncAlt, FaTimesCircle } from 'react-icons/fa';
+import { FaArrowLeft, FaDownload, FaQrcode, FaShieldAlt, FaSyncAlt, FaTimesCircle } from 'react-icons/fa';
 import html2canvas from 'html2canvas';
 import { Link, useParams } from 'react-router-dom';
 import adminApi from '../../services/adminApi';
@@ -73,8 +73,6 @@ const AdminIdCard = () => {
   if (!data.card) return <div className="admin-state-card"><h2>No medical profile</h2><p>An ID card cannot be generated until the user has a medical profile.</p><Link to={`/admin/users/${userId}`}>Back to user</Link></div>;
 
   const { card, user } = data;
-  const updated = card.lastUpdatedAt ? new Date(card.lastUpdatedAt).toLocaleDateString() : 'Not available';
-
   return (
     <div className="admin-id-card-page">
       <Link className="admin-back-link" to={`/admin/users/${userId}`}><FaArrowLeft /> Back to user</Link>
@@ -97,7 +95,7 @@ const AdminIdCard = () => {
                 <b>SCAN IN CASE OF EMERGENCY</b>
               </div>
             </div>
-            <div className="wallet-card-meta"><span>ELDERLYCARE CARD NUMBER</span><strong>{card.elderlyCareId}</strong><span>Updated {updated}</span></div>
+            <div className="wallet-card-meta"><strong>{card.elderlyCareId}</strong></div>
           </section>
 
         </div>
@@ -106,7 +104,6 @@ const AdminIdCard = () => {
           <h2>Card controls</h2>
           <p>The QR contains a random revocable token, never a user ID or complete medical record.</p>
           <button className="admin-primary-button" onClick={downloadImage} disabled={working || !card.qr}><FaDownload /> Download ID card PNG</button>
-          <button className="admin-secondary-button" onClick={() => window.print()} disabled={working}><FaPrint /> Print / Save wallet PDF</button>
           <button className="admin-secondary-button" onClick={() => runAction('regenerate')} disabled={working || user.accountStatus !== 'active'}><FaSyncAlt /> Generate new QR</button>
           <button className="admin-danger-button" onClick={() => runAction('revoke')} disabled={working || !card.qr}><FaTimesCircle /> Revoke QR</button>
           {message && <p className="admin-action-message" role="status">{message}</p>}
