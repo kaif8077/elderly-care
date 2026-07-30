@@ -58,8 +58,8 @@ const About = () => (
               </Card>
             </Col>
             <Col xs={24} lg={13}>
-              <Text className="care-eyebrow">OUR PURPOSE</Text>
-              <Title id="about-purpose" level={2} className="care-section-heading care-section-heading-left">Helping families prepare before an emergency happens</Title>
+              <Title level={2} className="care-eyebrow">OUR PURPOSE</Title>
+              <Title id="about-purpose" level={4} className="care-section-heading care-section-heading-left">Helping families prepare before an emergency happens</Title>
               <Paragraph type="secondary" className="care-section-subheading care-section-subheading-left">
                 ElderlyCare was created to make important health and contact information easier to organize, update, and reach when an older adult needs assistance. Families can maintain one structured profile instead of relying on scattered papers, messages, or memory.
               </Paragraph>
@@ -82,8 +82,8 @@ const About = () => (
 
         <section aria-labelledby="principles-title">
           <Flex vertical align="center" gap={8}>
-            <Text className="care-eyebrow">PRODUCT PRINCIPLES</Text>
-            <Title id="principles-title" level={2} className="care-section-heading">Useful, understandable, and privacy-conscious</Title>
+            <Title level={2} className="care-eyebrow">PRODUCT PRINCIPLES</Title>
+            <Title id="principles-title" level={4} className="care-section-heading">Useful, understandable, and privacy-conscious</Title>
           </Flex>
           <Row gutter={[20, 20]} style={{ marginTop: 24 }}>
             {principles.map((item) => (

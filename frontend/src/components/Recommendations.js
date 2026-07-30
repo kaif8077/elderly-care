@@ -72,8 +72,8 @@ const Recommendations = () => {
     <section>
       <Space align="start" style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 18 }}>
         <div>
-          <Text className="care-eyebrow">PERSONALIZED WELLNESS</Text>
-          <Title level={3} style={{ margin: '5px 0' }}><HeartOutlined /> Necessary health guidance</Title>
+          <Title level={2} className="care-eyebrow">PERSONALIZED WELLNESS</Title>
+          <Title level={4} style={{ margin: '5px 0' }}><HeartOutlined /> Necessary health guidance</Title>
           <Paragraph type="secondary" style={{ margin: 0 }}>A short list based on your latest medical profile.</Paragraph>
         </div>
         <Button type="primary" icon={<ReloadOutlined />} onClick={generate} loading={working}>Generate new</Button>

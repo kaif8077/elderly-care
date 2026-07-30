@@ -161,3 +161,14 @@ test('admin navigation removes feedback and retains requested modules', () => {
     expect(source).not.toContain('<table');
   });
 });
+
+test('public section eyebrow labels use h2 and descriptive titles use h4', () => {
+  ['Home', 'About', 'Services', 'Contact'].forEach((page) => {
+    const source = fs.readFileSync(path.join(__dirname, 'pages', `${page}.js`), 'utf8');
+    expect(source).not.toContain('<Text className="care-eyebrow">');
+    expect(source).toContain('<Title level={2} className="care-eyebrow">');
+  });
+
+  const contact = fs.readFileSync(path.join(__dirname, 'pages', 'Contact.js'), 'utf8');
+  expect(contact).toContain('<Title level={4} className="care-section-heading">Talk to the ElderlyCare team</Title>');
+});

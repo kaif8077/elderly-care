@@ -67,8 +67,8 @@ const Contact = () => {
 
         <Flex vertical gap={28} style={{ width: 'min(1100px, calc(100% - 32px))', margin: '48px auto' }}>
           <Flex vertical align="center" gap={8}>
-            <Text className="care-eyebrow">WE ARE HERE TO HELP</Text>
-            <Title level={2} className="care-section-heading">Talk to the ElderlyCare team</Title>
+            <Title level={2} className="care-eyebrow">WE ARE HERE TO HELP</Title>
+            <Title level={4} className="care-section-heading">Talk to the ElderlyCare team</Title>
             <Paragraph type="secondary" className="care-section-subheading">
               Contact us with a product question, support request, or suggestion about your ElderlyCare experience.
             </Paragraph>
