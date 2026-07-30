@@ -161,3 +161,15 @@ test('admin navigation removes feedback and retains requested modules', () => {
     expect(source).not.toContain('<table');
   });
 });
+
+test('reports are hidden from the member profile and admin routes', () => {
+  const app = fs.readFileSync(path.join(__dirname, 'App.js'), 'utf8');
+  const profile = fs.readFileSync(path.join(__dirname, 'pages', 'Profile.js'), 'utf8');
+  const adminUser = fs.readFileSync(path.join(__dirname, 'admin', 'pages', 'AdminUserDetail.js'), 'utf8');
+
+  expect(profile).not.toContain('Latest medical report');
+  expect(profile).not.toContain('/api/medical-reports/latest');
+  expect(app).not.toContain('path="reports" element={<AdminReports');
+  expect(adminUser).not.toContain("'Reports'");
+  expect(adminUser).not.toContain('Saved reports');
+});
