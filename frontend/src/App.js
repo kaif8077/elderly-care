@@ -23,7 +23,6 @@ import AdminUsers from './admin/pages/AdminUsers';
 import AdminUserDetail from './admin/pages/AdminUserDetail';
 import AdminIdCard from './admin/pages/AdminIdCard';
 import AdminAuditLogs from './admin/pages/AdminAuditLogs';
-import AdminReports from './admin/pages/AdminReports';
 import AdminContacts from './admin/pages/AdminContacts';
 import ProtectedRoute from './components/ProtectedRoute';
 import './App.css';
@@ -58,7 +57,6 @@ const AppRoutes = () => {
                     <Route path="users/:userId" element={<AdminUserDetail />} />
                     <Route path="id-cards/:userId" element={<AdminIdCard />} />
                     <Route path="audit-logs" element={<AdminAuditLogs />} />
-                    <Route path="reports" element={<AdminReports />} />
                     <Route path="contacts" element={<AdminContacts />} />
                     <Route path="phase-1" element={<AdminDashboardPlaceholder />} />
                 </Route>

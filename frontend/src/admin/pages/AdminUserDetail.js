@@ -1,10 +1,10 @@
 import React, { useCallback, useEffect, useState } from 'react';
-import { FaArrowLeft, FaFileMedical, FaIdCard, FaQrcode, FaUser } from 'react-icons/fa';
+import { FaArrowLeft, FaIdCard, FaQrcode, FaUser } from 'react-icons/fa';
 import { Link, useParams } from 'react-router-dom';
 import adminApi from '../../services/adminApi';
 import AdminStatusBadge from '../components/AdminStatusBadge';
 
-const tabs = ['Overview', 'Personal', 'Contact', 'Medical', 'Insurance', 'Reports', 'QR'];
+const tabs = ['Overview', 'Personal', 'Contact', 'Medical', 'Insurance', 'QR'];
 const archiveReasons = ['Duplicate account', 'User request', 'Test account', 'Incorrect data', 'Inactive account', 'Privacy request', 'Other'];
 const value = (item) => item === null || item === undefined || item === '' ? 'Not provided' : String(item);
 const listValue = (items, other) => {
@@ -61,7 +61,7 @@ const AdminUserDetail = () => {
     </div>
   );
 
-  const { user, profile, qr, reports } = data;
+  const { user, profile, qr } = data;
   const personal = profile?.personal;
   const contact = profile?.contact;
   const emergency = profile?.emergencyContact;
@@ -137,7 +137,6 @@ const AdminUserDetail = () => {
         <dl>
           <Field label="Medical profile"><AdminStatusBadge status={user.profileStatus} /></Field>
           <Field label="Completion">{user.profileCompletion}%</Field>
-          <Field label="Saved reports"><AdminStatusBadge status={reports.available ? 'available' : 'not available'} /></Field>
           <Field label="QR record"><AdminStatusBadge status={qr.status} /></Field>
         </dl>
         <div className="admin-detail-actions">
@@ -184,7 +183,6 @@ const AdminUserDetail = () => {
       <Field label="Provider">{value(insurance.provider || insurance.providerOther)}</Field>
       <Field label="Policy number">{value(insurance.policyNumber)}</Field>
     </dl></section> : null,
-    Reports: reports.available ? <section className="admin-detail-card"><h2>Medical report history</h2><div className="admin-report-history">{reports.history.map((report) => <div className="admin-report-history-row" key={report._id}><span><strong>Version {report.reportVersion}</strong><small>{new Date(report.generatedAt).toLocaleString()}</small></span><AdminStatusBadge status={report.verificationStatus} />{report.isLatest && <AdminStatusBadge status="latest" />}</div>)}</div><Link className="admin-primary-button" to="/admin/reports">Open report management</Link></section> : <section className="admin-detail-card admin-empty-feature"><FaFileMedical aria-hidden="true" /><h2>No saved reports</h2><p>{reports.message}</p><small>The account owner can generate an immutable emergency-summary snapshot.</small></section>,
     QR: <section className="admin-detail-card"><h2>QR information</h2><dl>
       <Field label="Status"><AdminStatusBadge status={qr.status} /></Field>
       <Field label="Legacy QR records">{qr.totalRecords}</Field>
@@ -208,7 +206,7 @@ const AdminUserDetail = () => {
       </div>
 
       <div id="admin-user-tabpanel" role="tabpanel" aria-labelledby={`admin-tab-${activeTab}`}>
-        {!profile && !['Overview', 'Reports', 'QR'].includes(activeTab)
+        {!profile && !['Overview', 'QR'].includes(activeTab)
           ? <div className="admin-state-card"><h2>No medical profile</h2><p>This user has not submitted medical information.</p></div>
           : sections[activeTab]}
       </div>
