@@ -172,3 +172,15 @@ test('public section eyebrow labels use h2 and descriptive titles use h4', () =>
   const contact = fs.readFileSync(path.join(__dirname, 'pages', 'Contact.js'), 'utf8');
   expect(contact).toContain('<Title level={4} className="care-section-heading">Talk to the ElderlyCare team</Title>');
 });
+
+test('reports are hidden from the member profile and admin routes', () => {
+  const app = fs.readFileSync(path.join(__dirname, 'App.js'), 'utf8');
+  const profile = fs.readFileSync(path.join(__dirname, 'pages', 'Profile.js'), 'utf8');
+  const adminUser = fs.readFileSync(path.join(__dirname, 'admin', 'pages', 'AdminUserDetail.js'), 'utf8');
+
+  expect(profile).not.toContain('Latest medical report');
+  expect(profile).not.toContain('/api/medical-reports/latest');
+  expect(app).not.toContain('path="reports" element={<AdminReports');
+  expect(adminUser).not.toContain("'Reports'");
+  expect(adminUser).not.toContain('Saved reports');
+});

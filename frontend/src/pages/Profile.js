@@ -1,11 +1,11 @@
 import React, { useCallback, useContext, useEffect, useState } from 'react';
 import axios from 'axios';
 import {
-  Alert, Avatar, Button, Card, Col, Descriptions, Empty, Row,
+  Avatar, Button, Card, Col, Descriptions, Empty, Row,
   Skeleton, Space, Tag, Typography
 } from 'antd';
 import {
-  FileTextOutlined, IdcardOutlined, MedicineBoxOutlined,
+  IdcardOutlined, MedicineBoxOutlined,
   PhoneOutlined, SafetyCertificateOutlined, UserOutlined
 } from '@ant-design/icons';
 import { AuthContext } from '../context/AuthContext';
@@ -25,9 +25,7 @@ const Profile = () => {
   const [qrCode, setQrCode] = useState('');
   const [loading, setLoading] = useState(true);
   const [photoUrl, setPhotoUrl] = useState('');
-  const [showReports, setShowReports] = useState(false);
   const [showRecommendations, setShowRecommendations] = useState(true);
-  const [latestReport, setLatestReport] = useState(null);
 
   const loadPhoto = useCallback(async (token) => {
     const response = await axios.get(`${apiBase}/api/medical/${user._id}/photo`, {
@@ -51,14 +49,6 @@ const Profile = () => {
         });
         if (!active) return;
         setProfile(medical.data);
-        try {
-          const report = await axios.get(`${apiBase}/api/medical-reports/latest`, {
-            headers: { Authorization: `Bearer ${token}` }
-          });
-          if (active) setLatestReport(report.data.report);
-        } catch (reportError) {
-          if (reportError.response?.status !== 404) toast.error('Unable to load the latest medical report.');
-        }
         if (medical.data.profilePhoto) await loadPhoto(token);
         try {
           const qr = await axios.get(`${apiBase}/api/qr/${user._id}`, {
@@ -138,36 +128,6 @@ const Profile = () => {
         ['Provider', profile.hasInsurance && profile.insuranceProvider],
         ['Policy number', profile.hasInsurance && profile.policyNumber]
       ])}
-
-      <Card
-        className="care-section-card"
-        title={<Space><FileTextOutlined />Latest medical report</Space>}
-        extra={<Button onClick={() => setShowReports((current) => !current)}>{showReports ? 'Hide report' : 'Show report'}</Button>}
-      >
-        {showReports ? (latestReport ? (
-          <Space direction="vertical" size={18} style={{ width: '100%' }}>
-            <Alert
-              type="warning"
-              showIcon
-              message={`Blood group: ${latestReport.snapshotData?.personal?.bloodGroup || profile.bloodGroup || 'Unknown'}`}
-              description={`Allergies: ${show(latestReport.snapshotData?.medical?.allergies)}`}
-            />
-            <Descriptions
-              bordered
-              size="small"
-              column={{ xs: 1, sm: 2 }}
-              items={[
-                { key: 'name', label: 'Name', children: latestReport.snapshotData?.personal?.name || profile.name },
-                { key: 'version', label: 'Report version', children: latestReport.reportVersion },
-                { key: 'conditions', label: 'Known conditions', children: show(latestReport.snapshotData?.medical?.medicalHistory) },
-                { key: 'medications', label: 'Medications', children: show(latestReport.snapshotData?.medical?.medications) }
-              ]}
-            />
-            <Button type="primary" href="/reports">Open report history</Button>
-          </Space>
-        ) : <Empty description="No medical report has been generated yet."><Button type="primary" href="/reports">Generate report</Button></Empty>)
-          : <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} description="Report is hidden." />}
-      </Card>
 
       <Card
         className="care-section-card"
