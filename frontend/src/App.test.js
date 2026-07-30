@@ -170,7 +170,8 @@ test('public section eyebrow labels use h2 and descriptive titles use h6', () =>
   });
 
   const contact = fs.readFileSync(path.join(__dirname, 'pages', 'Contact.js'), 'utf8');
-  expect(contact).toContain('<Title level={6} className="care-section-heading care-secondary-heading">Talk to the ElderlyCare team</Title>');
+  expect(contact).toContain('<h6 className="care-section-heading care-secondary-heading">Talk to the ElderlyCare team</h6>');
+  expect(contact).not.toContain('level={6}');
 });
 
 test('reports are hidden from the member profile and admin routes', () => {

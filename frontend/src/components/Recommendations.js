@@ -73,7 +73,7 @@ const Recommendations = () => {
       <Space align="start" style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 18 }}>
         <div>
           <Title level={2} className="care-eyebrow">PERSONALIZED WELLNESS</Title>
-          <Title level={6} className="care-secondary-heading" style={{ margin: '5px 0' }}><HeartOutlined /> Necessary health guidance</Title>
+          <h6 className="care-secondary-heading" style={{ margin: '5px 0' }}><HeartOutlined /> Necessary health guidance</h6>
           <Paragraph type="secondary" style={{ margin: 0 }}>A short list based on your latest medical profile.</Paragraph>
         </div>
         <Button type="primary" icon={<ReloadOutlined />} onClick={generate} loading={working}>Generate new</Button>

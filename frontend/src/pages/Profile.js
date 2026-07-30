@@ -101,7 +101,7 @@ const Profile = () => {
           <Col><Avatar size={88} src={photoUrl} icon={<UserOutlined />} className="care-profile-photo" /></Col>
           <Col flex="auto">
             <Title level={2} className="care-eyebrow">MY ELDERLYCARE PROFILE</Title>
-            <Title level={6} className="care-secondary-heading" style={{ margin: '5px 0' }}>{profile.name}</Title>
+            <h6 className="care-secondary-heading" style={{ margin: '5px 0' }}>{profile.name}</h6>
             <Space wrap><Tag color="blue">Active profile</Tag><Tag>{profile.bloodGroup || 'Blood group unknown'}</Tag></Space>
           </Col>
         </Row>

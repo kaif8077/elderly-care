@@ -186,7 +186,7 @@ const MedicalForm = ({ onSubmissionSuccess }) => {
       <Row justify="space-between" align="top" gutter={[16, 16]}>
         <Col>
           <Title level={2} className="care-eyebrow">HEALTH PROFILE</Title>
-          <Title level={6} className="care-secondary-heading" style={{ margin: '6px 0' }}>Medical information</Title>
+          <h6 className="care-secondary-heading" style={{ margin: '6px 0' }}>Medical information</h6>
           <Paragraph type="secondary">Each step is saved securely before you continue.</Paragraph>
         </Col>
         <Col><Text strong>{step + 1} of 4</Text></Col>
