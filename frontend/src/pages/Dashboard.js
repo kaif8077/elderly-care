@@ -16,7 +16,7 @@ const Dashboard = () => {
       <Card className="care-dashboard-hero" styles={{ body: { padding: 32 } }}>
         <div className="care-dashboard-heading">
           <div>
-            <Title level={2} className="care-eyebrow" style={{ color: '#dbe8ff' }}>ELDERLYCARE MEMBER AREA</Title>
+            <Title level={2} className="care-eyebrow">ELDERLYCARE MEMBER AREA</Title>
             <Title style={{ margin: '8px 0' }}>Welcome, {user?.name || 'Member'}</Title>
             <Paragraph type="secondary" style={{ margin: 0, fontSize: 17 }}>Keep emergency information accurate and ready when it matters.</Paragraph>
           </div>

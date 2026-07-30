@@ -162,7 +162,7 @@ test('admin navigation removes feedback and retains requested modules', () => {
   });
 });
 
-test('public section eyebrow labels use h2 and descriptive titles use h4', () => {
+test('public section eyebrow labels use h2 and descriptive titles use h6', () => {
   ['Home', 'About', 'Services', 'Contact'].forEach((page) => {
     const source = fs.readFileSync(path.join(__dirname, 'pages', `${page}.js`), 'utf8');
     expect(source).not.toContain('<Text className="care-eyebrow">');
@@ -170,7 +170,7 @@ test('public section eyebrow labels use h2 and descriptive titles use h4', () =>
   });
 
   const contact = fs.readFileSync(path.join(__dirname, 'pages', 'Contact.js'), 'utf8');
-  expect(contact).toContain('<Title level={4} className="care-section-heading">Talk to the ElderlyCare team</Title>');
+  expect(contact).toContain('<Title level={6} className="care-section-heading care-secondary-heading">Talk to the ElderlyCare team</Title>');
 });
 
 test('reports are hidden from the member profile and admin routes', () => {
