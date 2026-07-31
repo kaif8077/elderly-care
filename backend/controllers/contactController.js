@@ -11,7 +11,12 @@ exports.submitContact = async (req, res) => {
 
     await Contact.create({ name, email, phone, message });
 
-    await Promise.all([
+    res.status(201).json({
+      success: true,
+      message: 'Thank you! Your message has been received.'
+    });
+
+    const emailTasks = [
       sendEmail({
         to: email,
         subject: 'Thank you for contacting ElderlyCare',
@@ -40,13 +45,17 @@ exports.submitContact = async (req, res) => {
           <p><strong>Message:</strong></p>
           <p>${escapeHtml(message)}</p>`
       }) : Promise.resolve()
-    ]);
+    ];
 
-    res.status(201).json({
-      success: true,
-      message: 'Thank you! Your message has been received.'
+    Promise.allSettled(emailTasks).then((results) => {
+      results.forEach((result) => {
+        if (result.status === 'rejected') {
+          console.error('Contact email delivery error:', result.reason?.message || 'Unknown email error');
+        }
+      });
     });
   } catch (error) {
+    if (res.headersSent) return;
     console.error('Contact submission error:', error.message);
     if (error.name === 'ValidationError') {
       return res.status(400).json({
