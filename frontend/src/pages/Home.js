@@ -102,7 +102,7 @@ const Home = () => {
   }, []);
 
   return (
-    <Layout>
+    <Layout className="care-public-page care-home-page">
       <Content>
         <PublicPageHero
           title="Important health information, ready when every second matters."

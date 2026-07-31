@@ -32,7 +32,7 @@ const principles = [
 ];
 
 const About = () => (
-  <Layout>
+  <Layout className="care-public-page care-about-page">
     <Content>
       <PublicPageHero
         title="About Us"

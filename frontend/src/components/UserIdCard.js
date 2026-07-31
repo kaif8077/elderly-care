@@ -8,7 +8,6 @@ const formatId = (value) => String(value || '').replace(/\D/g, '').padStart(12, 
 const formatDob = (value) => value ? new Date(value).toLocaleDateString('en-GB') : 'Not provided';
 
 const UserIdCard = ({ profile, qrCode, photoUrl }) => {
-  const pairRef = useRef(null);
   const frontRef = useRef(null);
   const [working, setWorking] = useState(false);
 
@@ -16,9 +15,16 @@ const UserIdCard = ({ profile, qrCode, photoUrl }) => {
   const elderlyCareId = formatId(profile.elderlyCareId || profile.userId || profile._id);
 
   const renderCard = (element) => html2canvas(element, {
-    scale: 4,
+    scale: 2,
     backgroundColor: '#ffffff',
-    useCORS: true
+    useCORS: true,
+    width: 856,
+    height: 540,
+    windowWidth: 1200,
+    windowHeight: 800,
+    onclone: (documentClone) => {
+      documentClone.querySelector('.user-wallet-card')?.classList.add('pdf-capture');
+    }
   });
 
   const downloadPdf = async () => {
@@ -29,7 +35,14 @@ const UserIdCard = ({ profile, qrCode, photoUrl }) => {
       const front = await renderCard(frontRef.current);
       const pdf = new jsPDF({ orientation: 'landscape', unit: 'mm', format: [85.6, 53.98] });
       pdf.addImage(front.toDataURL('image/jpeg', 0.95), 'JPEG', 0, 0, 85.6, 53.98);
-      pdf.save(`${elderlyCareId}-id-card.pdf`);
+      const blobUrl = URL.createObjectURL(pdf.output('blob'));
+      const link = document.createElement('a');
+      link.href = blobUrl;
+      link.download = `${elderlyCareId}-id-card.pdf`;
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+      window.setTimeout(() => URL.revokeObjectURL(blobUrl), 1000);
       message.success('ID card PDF downloaded.');
     } catch (error) {
       message.error('Unable to create the ID card PDF.');
@@ -40,7 +53,7 @@ const UserIdCard = ({ profile, qrCode, photoUrl }) => {
 
   return (
     <section className="user-id-module">
-      <div className="user-card-pair" ref={pairRef}>
+      <div className="user-card-pair">
         <article className="user-wallet-card" ref={frontRef}>
           <header><span><img src="/favicon.png" alt="" /> ELDERLYCARE</span><b>IDENTITY CARD</b></header>
           <div className="user-card-main">
