@@ -1,2 +1,88 @@
-import React,{useContext,useState} from 'react';import {Avatar,Button,Dropdown,Input,Space,Typography} from 'antd';import {BellOutlined,LogoutOutlined,MenuFoldOutlined,MenuOutlined,MenuUnfoldOutlined,SearchOutlined,UserOutlined} from '@ant-design/icons';import {useNavigate} from 'react-router-dom';import {AdminAuthContext} from '../context/AdminAuthContext';
-const AdminTopbar=({title,onMenu,collapsed,onCollapse})=>{const{admin,logout}=useContext(AdminAuthContext);const[search,setSearch]=useState('');const[loggingOut,setLoggingOut]=useState(false);const navigate=useNavigate();const exit=async()=>{setLoggingOut(true);await logout();navigate('/admin/login',{replace:true})};const items=[{key:'logout',label:'Logout',icon:<LogoutOutlined/>,danger:true,onClick:exit}];return <><Space><Button className="admin-ant-mobile" type="text" icon={<MenuOutlined/>} onClick={onMenu} aria-label="Open navigation"/><Button className="admin-ant-desktop" type="text" icon={collapsed?<MenuUnfoldOutlined/>:<MenuFoldOutlined/>} onClick={onCollapse} aria-label="Toggle sidebar"/><div><Typography.Text type="secondary" style={{fontSize:12}}>ADMIN WORKSPACE</Typography.Text><Typography.Title level={3} style={{margin:0}}>{title}</Typography.Title></div></Space><Space><Input className="admin-ant-desktop" allowClear prefix={<SearchOutlined/>} value={search} onChange={e=>setSearch(e.target.value)} onPressEnter={()=>navigate(search.trim()?`/admin/users?search=${encodeURIComponent(search.trim())}`:'/admin/users')} placeholder="Search users" style={{width:250}}/><Button type="text" disabled icon={<BellOutlined/>} aria-label="Notifications"/><Dropdown menu={{items}} placement="bottomRight"><Button type="text" loading={loggingOut}><Space><Avatar icon={<UserOutlined/>}/><span className="admin-ant-desktop">{admin?.name||'Administrator'}</span></Space></Button></Dropdown></Space></>};export default AdminTopbar;
+import React, { useContext, useState } from 'react';
+import { Avatar, Button, Dropdown, Input, Space, Typography } from 'antd';
+import {
+  LogoutOutlined, MenuFoldOutlined, MenuOutlined, MenuUnfoldOutlined,
+  SearchOutlined, UserOutlined
+} from '@ant-design/icons';
+import { useNavigate } from 'react-router-dom';
+import { AdminAuthContext } from '../context/AdminAuthContext';
+
+const AdminTopbar = ({ title, onMenu, collapsed, onCollapse }) => {
+  const { admin, logout } = useContext(AdminAuthContext);
+  const [search, setSearch] = useState('');
+  const [loggingOut, setLoggingOut] = useState(false);
+  const navigate = useNavigate();
+
+  const searchUsers = () => {
+    const query = search.trim();
+    navigate(query ? `/admin/users?search=${encodeURIComponent(query)}` : '/admin/users');
+  };
+
+  const exit = async () => {
+    setLoggingOut(true);
+    await logout();
+    navigate('/admin/login', { replace: true });
+  };
+
+  const accountItems = [{
+    key: 'logout',
+    label: 'Logout',
+    icon: <LogoutOutlined />,
+    danger: true,
+    onClick: exit
+  }];
+
+  return (
+    <div className="admin-topbar-inner">
+      <div className="admin-topbar-leading">
+        <Button
+          className="admin-ant-mobile"
+          type="text"
+          icon={<MenuOutlined />}
+          onClick={onMenu}
+          aria-label="Open admin navigation"
+        />
+        <Button
+          className="admin-ant-desktop"
+          type="text"
+          icon={collapsed ? <MenuUnfoldOutlined /> : <MenuFoldOutlined />}
+          onClick={onCollapse}
+          aria-label={collapsed ? 'Expand sidebar' : 'Collapse sidebar'}
+        />
+        <div className="admin-topbar-heading">
+          <Typography.Text>ADMIN PANEL</Typography.Text>
+          <Typography.Title level={4}>{title}</Typography.Title>
+        </div>
+      </div>
+
+      <div className="admin-topbar-tools">
+        <Input.Search
+          className="admin-topbar-search admin-ant-desktop"
+          allowClear
+          value={search}
+          onChange={(event) => setSearch(event.target.value)}
+          onSearch={searchUsers}
+          placeholder="Search users"
+          enterButton
+        />
+        <Button
+          className="admin-ant-mobile"
+          type="text"
+          icon={<SearchOutlined />}
+          onClick={() => navigate('/admin/users')}
+          aria-label="Search users"
+        />
+        <Dropdown menu={{ items: accountItems }} placement="bottomRight" trigger={['click']}>
+          <Button className="admin-account-button" type="text" loading={loggingOut}>
+            <Space size={8}>
+              <Avatar size="small" icon={<UserOutlined />} />
+              <span className="admin-account-name">{admin?.name || 'Administrator'}</span>
+            </Space>
+          </Button>
+        </Dropdown>
+      </div>
+    </div>
+  );
+};
+
+export default AdminTopbar;

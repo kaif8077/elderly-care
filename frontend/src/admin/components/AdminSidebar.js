@@ -19,9 +19,14 @@ const AdminSidebar = ({ collapsed, onClose }) => {
 
   return (
     <>
-      <div className="admin-ant-brand">
+      <div className={`admin-ant-brand${collapsed ? ' is-collapsed' : ''}`}>
         <span className="admin-ant-brand-mark">EC</span>
-        {!collapsed && <span>ElderlyCare<br /><Typography.Text style={{ color: '#dbe8ff', fontSize: 12 }}>ADMINISTRATION</Typography.Text></span>}
+        {!collapsed && (
+          <span className="admin-ant-brand-copy">
+            <strong>ElderlyCare</strong>
+            <Typography.Text>ADMINISTRATION</Typography.Text>
+          </span>
+        )}
       </div>
       <Menu
         theme="dark"

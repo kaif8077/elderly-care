@@ -57,7 +57,7 @@ const AdminUsers = () => {
     <Space direction="vertical" size={18} style={{ width: '100%' }}>
       {error && <Alert type="error" showIcon message={error} action={<Button onClick={load}>Retry</Button>} />}
       <Card>
-        <Space wrap>
+        <Space className="admin-users-toolbar" wrap>
           <Space.Compact>
             <Input value={search} onChange={(event) => setSearch(event.target.value)} onPressEnter={() => updateQuery({ search: search.trim() })} prefix={<SearchOutlined />} placeholder="Name, email, or phone" allowClear />
             <Button type="primary" onClick={() => updateQuery({ search: search.trim() })}>Search</Button>
