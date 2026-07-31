@@ -11,6 +11,7 @@ const escapeRegex = (value) => String(value).replace(/[.*+?^${}()|[\]\\]/g, '\\$
 
 const calculateCompletion = (profile) => {
   if (!profile) return 0;
+  const primaryEmergency = profile.emergencyContacts?.[0];
   const fields = [
     profile.name,
     profile.dob,
@@ -20,8 +21,8 @@ const calculateCompletion = (profile) => {
     profile.weight,
     profile.phone,
     profile.address,
-    profile.emergencyContact,
-    profile.emergencyPhone,
+    profile.emergencyContact || primaryEmergency?.name,
+    profile.emergencyPhone || primaryEmergency?.phone,
     profile.dietPreference
   ];
   return Math.round((fields.filter((value) => value !== null && value !== undefined && value !== '').length / fields.length) * 100);
@@ -34,8 +35,8 @@ const isProfileComplete = (profile) => Boolean(
   && profile.gender
   && profile.phone
   && profile.address
-  && profile.emergencyContact
-  && profile.emergencyPhone
+  && (profile.emergencyContact || profile.emergencyContacts?.[0]?.name)
+  && (profile.emergencyPhone || profile.emergencyContacts?.[0]?.phone)
 );
 
 const completeProfileExpression = {
@@ -46,8 +47,18 @@ const completeProfileExpression = {
     { $ne: ['$profile.gender', null] },
     { $ne: ['$profile.phone', null] },
     { $ne: ['$profile.address', null] },
-    { $ne: ['$profile.emergencyContact', null] },
-    { $ne: ['$profile.emergencyPhone', null] }
+    {
+      $or: [
+        { $and: [{ $ne: ['$profile.emergencyContact', null] }, { $ne: ['$profile.emergencyContact', ''] }] },
+        { $gt: [{ $size: { $ifNull: ['$profile.emergencyContacts', []] } }, 0] }
+      ]
+    },
+    {
+      $or: [
+        { $and: [{ $ne: ['$profile.emergencyPhone', null] }, { $ne: ['$profile.emergencyPhone', ''] }] },
+        { $gt: [{ $size: { $ifNull: ['$profile.emergencyContacts', []] } }, 0] }
+      ]
+    }
   ]
 };
 
@@ -83,6 +94,7 @@ const listUsers = async (query) => {
             $project: {
               name: 1, dob: 1, gender: 1, bloodGroup: 1, height: 1, weight: 1,
               phone: 1, address: 1, emergencyContact: 1, emergencyPhone: 1,
+              emergencyContacts: 1, elderlyCareId: 1, profilePhoto: 1,
               dietPreference: 1, updatedAt: 1
             }
           }
@@ -160,7 +172,7 @@ const listUsers = async (query) => {
   const total = result.total[0]?.count || 0;
   const users = result.rows.map((user) => ({
     id: user._id,
-    elderlyCareId: null,
+    elderlyCareId: user.profile?.elderlyCareId || null,
     name: user.profile?.name || user.name,
     email: user.email,
     phone: user.profile?.phone || null,

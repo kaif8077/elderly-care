@@ -17,6 +17,7 @@ const AdminIdCard = () => {
   const [working, setWorking] = useState(false);
   const [error, setError] = useState('');
   const [message, setMessage] = useState('');
+  const [photoUrl, setPhotoUrl] = useState('');
 
   const load = useCallback(async () => {
     setLoading(true);
@@ -32,6 +33,20 @@ const AdminIdCard = () => {
   }, [userId]);
 
   useEffect(() => { load(); }, [load]);
+  useEffect(() => {
+    let objectUrl = '';
+    if (!data?.card?.hasPhoto) {
+      setPhotoUrl('');
+      return undefined;
+    }
+    adminApi.get(`/id-cards/${userId}/photo`, { responseType: 'blob' })
+      .then((response) => {
+        objectUrl = URL.createObjectURL(response.data);
+        setPhotoUrl(objectUrl);
+      })
+      .catch(() => setPhotoUrl(''));
+    return () => { if (objectUrl) URL.revokeObjectURL(objectUrl); };
+  }, [data?.card?.hasPhoto, userId]);
 
   const runAction = async (action) => {
     const description = action === 'revoke'
@@ -86,7 +101,9 @@ const AdminIdCard = () => {
           <section className="wallet-card wallet-card-front" aria-label="ID card front side">
             <div className="wallet-card-brand"><span><FaShieldAlt /> ELDERLYCARE</span><b>EMERGENCY ID</b></div>
             <div className="wallet-card-main">
-              <span className="wallet-photo" aria-label="Default profile avatar">{card.name.charAt(0).toUpperCase()}</span>
+              <span className="wallet-photo" aria-label="Profile photograph">
+                {photoUrl ? <img src={photoUrl} alt={`${card.name} profile`} /> : card.name.charAt(0).toUpperCase()}
+              </span>
               <div className="wallet-card-person">
                 <div><h2>{card.name}</h2><p>Date of birth<br /><strong>{formatDob(card.dob)}</strong></p></div>
               </div>

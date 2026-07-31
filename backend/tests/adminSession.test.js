@@ -112,6 +112,14 @@ test('profile completeness requires emergency-ready contact fields', () => {
     emergencyContact: 'Contact',
     emergencyPhone: '+910000000001'
   }), true);
+  assert.equal(isProfileComplete({
+    name: 'Structured User',
+    dob: new Date(),
+    gender: 'female',
+    phone: '+910000000000',
+    address: 'Test',
+    emergencyContacts: [{ name: 'Guardian', phone: '+910000000001', relationship: 'Daughter' }]
+  }), true);
 });
 
 test('admin user detail rejects malformed identifiers before querying MongoDB', async () => {

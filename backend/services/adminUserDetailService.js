@@ -26,11 +26,12 @@ const getAdminUserDetail = async (userId) => {
     MedicalReport.find({ userId }).sort({ reportVersion: -1 })
       .select('-snapshotData -pdfUrl').limit(20).lean()
   ]);
+  const primaryEmergency = profile?.emergencyContacts?.[0];
 
   return {
     user: {
       id: user._id,
-      elderlyCareId: null,
+      elderlyCareId: profile?.elderlyCareId || null,
       name: profile?.name || user.name,
       accountName: user.name,
       email: user.email,
@@ -49,22 +50,31 @@ const getAdminUserDetail = async (userId) => {
     profile: profile ? {
       id: profile._id,
       personal: {
+        firstName: profile.firstName,
+        lastName: profile.lastName,
         name: profile.name,
         dob: profile.dob,
         gender: profile.gender,
         bloodGroup: profile.bloodGroup,
         height: profile.height,
         weight: profile.weight,
-        dietPreference: profile.dietPreference
+        dietPreference: profile.dietPreference,
+        preferredLanguage: profile.preferredLanguage || [],
+        otherLanguage: profile.otherLanguage || null,
+        maritalStatus: profile.maritalStatus || null,
+        mobilityStatus: profile.mobilityStatus || null,
+        hasPhoto: Boolean(profile.profilePhoto?.fileId)
       },
       contact: {
         phone: profile.phone,
         address: profile.address
       },
       emergencyContact: {
-        name: profile.emergencyContact,
-        phone: profile.emergencyPhone
+        name: profile.emergencyContact || primaryEmergency?.name,
+        phone: profile.emergencyPhone || primaryEmergency?.phone,
+        relationship: profile.emergencyRelationship || primaryEmergency?.relationship
       },
+      emergencyContacts: profile.emergencyContacts || [],
       medical: {
         medicalHistory: profile.medicalHistory || [],
         medicalHistoryOther: profile.medicalHistoryOther || null,

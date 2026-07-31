@@ -21,6 +21,7 @@ const getCard = async (userId) => {
     QRCode.findOne({ userId, status: 'active', token: { $exists: true, $ne: null } })
       .sort({ createdAt: -1 }).select('_id data status createdAt updatedAt token').lean()
   ]);
+  const primaryEmergency = profile?.emergencyContacts?.[0];
 
   return {
     user: {
@@ -31,14 +32,15 @@ const getCard = async (userId) => {
       isDeleted: user.isDeleted
     },
     card: profile ? {
-      elderlyCareId: `EC-${String(user._id).slice(-8).toUpperCase()}`,
+      elderlyCareId: profile.elderlyCareId || `EC-${String(user._id).slice(-8).toUpperCase()}`,
       name: profile.name,
       dob: profile.dob,
       bloodGroup: profile.bloodGroup || 'Unknown',
-      emergencyContact: profile.emergencyContact,
-      emergencyPhone: profile.emergencyPhone,
+      emergencyContact: profile.emergencyContact || primaryEmergency?.name,
+      emergencyPhone: profile.emergencyPhone || primaryEmergency?.phone,
       allergyWarning: [...(profile.allergies || []), profile.allergiesOther].filter(Boolean).join(', ') || 'None reported',
-      preferredLanguage: 'Not provided',
+      preferredLanguage: [...(profile.preferredLanguage || []), profile.otherLanguage].filter(Boolean).join(', ') || 'Not provided',
+      hasPhoto: Boolean(profile.profilePhoto?.fileId),
       status: user.accountStatus === 'active' && !user.isDeleted ? 'active' : 'inactive',
       lastUpdatedAt: profile.updatedAt,
       qr: qr ? {

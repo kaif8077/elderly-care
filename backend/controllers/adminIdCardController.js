@@ -1,5 +1,8 @@
 const { generateQr, getCard, revokeQr } = require('../services/adminIdCardService');
 const { writeAuditLog } = require('../services/auditService');
+const mongoose = require('mongoose');
+const MedicalProfile = require('../models/MedicalProfile');
+const { bucket } = require('../services/profilePhotoService');
 
 exports.getCard = async (req, res) => {
   try {
@@ -9,6 +12,26 @@ exports.getCard = async (req, res) => {
   } catch (error) {
     console.error('Admin ID card load error:', error.message);
     res.status(500).json({ message: 'Unable to load ID card' });
+  }
+};
+
+exports.getPhoto = async (req, res) => {
+  try {
+    const profile = await MedicalProfile.findOne({ userId: req.params.userId })
+      .sort({ createdAt: -1 }).select('profilePhoto').lean();
+    const photo = profile?.profilePhoto;
+    if (!photo?.fileId) return res.status(404).json({ message: 'Profile photograph not found' });
+    res.set({
+      'Content-Type': photo.contentType,
+      'Content-Length': String(photo.bytes),
+      'Cache-Control': 'private, max-age=300',
+      'Content-Disposition': 'inline; filename="profile-photo"'
+    });
+    return bucket().openDownloadStream(new mongoose.Types.ObjectId(photo.fileId))
+      .on('error', () => { if (!res.headersSent) res.status(404).end(); else res.destroy(); })
+      .pipe(res);
+  } catch (error) {
+    return res.status(500).json({ message: 'Unable to load profile photograph' });
   }
 };
 

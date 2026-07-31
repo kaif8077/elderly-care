@@ -123,6 +123,7 @@ const AdminUserDetail = () => {
         <h2>Account overview</h2>
         <dl>
           <Field label="Account email">{value(user.email)}</Field>
+          <Field label="ElderlyCare ID">{value(user.elderlyCareId)}</Field>
           <Field label="Role">{value(user.role)}</Field>
           <Field label="Email verification">{user.isVerified ? 'Verified' : 'Not verified'}</Field>
           <Field label="Registered">{dateValue(user.createdAt)}</Field>
@@ -163,6 +164,9 @@ const AdminUserDetail = () => {
       <Field label="Height">{personal.height ? `${personal.height} cm` : 'Not provided'}</Field>
       <Field label="Weight">{personal.weight ? `${personal.weight} kg` : 'Not provided'}</Field>
       <Field label="Diet preference">{value(personal.dietPreference)}</Field>
+      <Field label="Preferred language">{listValue(personal.preferredLanguage, personal.otherLanguage)}</Field>
+      <Field label="Mobility">{value(personal.mobilityStatus)}</Field>
+      <Field label="Marital status">{value(personal.maritalStatus)}</Field>
     </dl></section> : null,
     Contact: profile ? <div className="admin-detail-grid">
       <section className="admin-detail-card"><h2>Contact information</h2><dl>
@@ -170,6 +174,7 @@ const AdminUserDetail = () => {
       </dl></section>
       <section className="admin-detail-card"><h2>Emergency contact</h2><dl>
         <Field label="Name">{value(emergency.name)}</Field><Field label="Phone">{value(emergency.phone)}</Field>
+        <Field label="Relationship">{value(emergency.relationship)}</Field>
       </dl></section>
     </div> : null,
     Medical: profile ? <section className="admin-detail-card admin-sensitive-card"><div className="admin-section-warning">Sensitive medical information — access is audit logged.</div><h2>Medical information</h2><dl>
