@@ -7,14 +7,31 @@ exports.generate = async (req, res) => {
   try {
     const profile = await MedicalProfile.findOne({ userId: req.user.id }).sort({ createdAt: -1 });
     if (!profile) return res.status(404).json({ message: 'Complete your medical profile first' });
+    if (profile.consent?.recommendationGeneration === false) return res.status(403).json({ message: 'Enable recommendation consent in Privacy Settings first' });
     const content = await recommendationEngine.generateHealthRecommendations(profile);
     const recommendation = await HealthRecommendation.create({
-      userId: req.user.id, medicalProfileId: profile._id, content, generatedAt: new Date()
+      userId: req.user.id, medicalProfileId: profile._id, content, generatedAt: new Date(),
+      sourceSummary: {
+        conditions: profile.medicalHistory || [], allergies: profile.allergies || [], medications: profile.medications || [],
+        symptoms: profile.currentSymptoms || [], mobilityStatus: profile.mobilityStatus || null, fallRisk: Boolean(profile.fallRisk)
+      }
     });
     return res.status(201).json({ recommendation });
   } catch (error) {
     return res.status(500).json({ message: 'Unable to generate recommendations' });
   }
+};
+
+exports.feedback = async (req, res) => {
+  const relevance = ['helpful', 'not_helpful'].includes(req.body.relevance) ? req.body.relevance : null;
+  if (!relevance) return res.status(400).json({ message: 'Choose helpful or not helpful' });
+  const item = await HealthRecommendation.findOneAndUpdate(
+    { _id: req.params.id, userId: req.user.id },
+    { $set: { feedback: { relevance, comment: String(req.body.comment || '').slice(0, 500) || null, submittedAt: new Date() } } },
+    { new: true }
+  );
+  if (!item) return res.status(404).json({ message: 'Recommendation not found' });
+  return res.json({ message: 'Thank you for the feedback', feedback: item.feedback });
 };
 
 exports.list = async (req, res) => {

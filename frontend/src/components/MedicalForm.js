@@ -33,7 +33,7 @@ const initialValues = {
   firstName: '', lastName: '', dob: null, gender: undefined, bloodGroup: undefined,
   height: null, weight: null, preferredLanguage: [], otherLanguage: '',
   mobilityStatus: undefined, dietPreference: undefined, maritalStatus: undefined,
-  phone: '', address: '', emergencyContacts: [{ name: '', phone: '', relationship: '' }],
+  phone: '', address: '', emergencyContacts: [{ name: '', phone: '', relationship: '', email: '', priority: 1, isPrimary: true, canReceiveAlerts: true, canAccessReports: false, canManageAccount: false, preferredChannel: 'phone' }],
   medicalHistory: [], allergies: [], medications: [], currentSymptoms: [],
   doctorName: '', doctorPhone: '', preferredHospital: '', fallRisk: false,
   hasInsurance: false, insuranceProvider: '', policyNumber: '', reviewConfirmed: false
@@ -68,7 +68,7 @@ const MedicalForm = ({ onSubmissionSuccess }) => {
           : data.preferredLanguage ? [data.preferredLanguage] : [],
         emergencyContacts: data.emergencyContacts?.length
           ? data.emergencyContacts
-          : [{ name: data.emergencyContact || '', phone: data.emergencyPhone || '', relationship: data.emergencyRelationship || '' }]
+          : [{ name: data.emergencyContact || '', phone: data.emergencyPhone || '', relationship: data.emergencyRelationship || '', priority: 1, isPrimary: true, canReceiveAlerts: true, preferredChannel: 'phone' }]
       };
       form.setFieldsValue(loaded);
       setValues(loaded);
@@ -246,10 +246,15 @@ const MedicalForm = ({ onSubmissionSuccess }) => {
                         <Col xs={24} md={8}><Form.Item {...field} name={[field.name, 'name']} label="Contact name" rules={required('Enter contact name')}><Input placeholder="Enter emergency contact name" /></Form.Item></Col>
                         <Col xs={24} md={8}><Form.Item {...field} name={[field.name, 'phone']} label="Contact number" rules={required('Enter contact number')}><Input type="tel" placeholder="Enter emergency contact number" /></Form.Item></Col>
                         <Col xs={24} md={8}><Form.Item {...field} name={[field.name, 'relationship']} label="Relationship" rules={required('Enter relationship')}><Input placeholder="e.g. Son, daughter or spouse" /></Form.Item></Col>
+                        <Col xs={24} md={8}><Form.Item {...field} name={[field.name, 'email']} label="Email"><Input type="email" placeholder="Enter contact email for verification" /></Form.Item></Col>
+                        <Col xs={12} md={4}><Form.Item {...field} name={[field.name, 'priority']} label="Priority"><InputNumber min={1} max={10} style={{ width: '100%' }} /></Form.Item></Col>
+                        <Col xs={12} md={6}><Form.Item {...field} name={[field.name, 'preferredChannel']} label="Preferred channel"><Select options={['phone', 'email', 'sms', 'telegram'].map((value) => ({ value, label: value }))} /></Form.Item></Col>
+                        <Col xs={24} md={6}><Space wrap><Form.Item {...field} name={[field.name, 'isPrimary']} valuePropName="checked"><Checkbox>Primary</Checkbox></Form.Item><Form.Item {...field} name={[field.name, 'canReceiveAlerts']} valuePropName="checked"><Checkbox>Receive alerts</Checkbox></Form.Item></Space></Col>
+                        <Col xs={24}><Space wrap><Form.Item {...field} name={[field.name, 'canAccessReports']} valuePropName="checked"><Checkbox>Can access reports</Checkbox></Form.Item><Form.Item {...field} name={[field.name, 'canManageAccount']} valuePropName="checked"><Checkbox>Can manage account</Checkbox></Form.Item></Space></Col>
                       </Row>
                     </Card>
                   ))}
-                  <Button type="dashed" block icon={<PlusOutlined />} onClick={() => add({ name: '', phone: '', relationship: '' })}>Add another emergency contact</Button>
+                  <Button type="dashed" block icon={<PlusOutlined />} onClick={() => add({ name: '', phone: '', relationship: '', priority: fields.length + 1, canReceiveAlerts: true, preferredChannel: 'phone' })}>Add another emergency contact</Button>
                 </Space>
               )}
             </Form.List>

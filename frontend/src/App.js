@@ -13,6 +13,9 @@ import EmergencyProfile from './pages/EmergencyProfile';
 import About from './pages/About'; 
 import Services from './pages/Services';
 import Contact from './pages/Contact';
+import CareInvitation from './pages/CareInvitation';
+import AlertAcknowledge from './pages/AlertAcknowledge';
+import EmergencyContactVerification from './pages/EmergencyContactVerification';
 import { AdminAuthProvider } from './admin/context/AdminAuthContext';
 import AdminProtectedRoute from './admin/components/AdminProtectedRoute';
 import AdminLogin from './admin/pages/AdminLogin';
@@ -47,6 +50,9 @@ const AppRoutes = () => {
                 <Route path="/reports" element={<ProtectedRoute><MedicalReports /></ProtectedRoute>} />
                 <Route path="/emergency/:token" element={<EmergencyProfile />} />
                 <Route path="/services" element={<Services />} />
+                <Route path="/care-invitation/:token" element={<ProtectedRoute><CareInvitation /></ProtectedRoute>} />
+                <Route path="/alert-acknowledge/:token" element={<AlertAcknowledge />} />
+                <Route path="/verify-emergency-contact/:token" element={<EmergencyContactVerification />} />
                 <Route path="/admin/login" element={<AdminLogin />} />
                 <Route
                     path="/admin"

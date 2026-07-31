@@ -4,7 +4,7 @@ import {
   Alert, Button, Card, Empty, List, Skeleton, Space, Tag, Typography
 } from 'antd';
 import {
-  DownloadOutlined, HeartOutlined, HistoryOutlined, ReloadOutlined
+  DownloadOutlined, HeartOutlined, HistoryOutlined, LikeOutlined, DislikeOutlined, ReloadOutlined
 } from '@ant-design/icons';
 import './Recommendations.css';
 
@@ -66,6 +66,12 @@ const Recommendations = () => {
       setError('Unable to download this recommendation PDF.');
     }
   };
+  const sendFeedback = async (id, relevance) => {
+    try {
+      await axios.patch(`${base}/api/recommendations/health/${id}/feedback`, { relevance }, { headers });
+      await load();
+    } catch (requestError) { setError('Unable to save recommendation feedback.'); }
+  };
 
   const latest = items[0];
   return (
@@ -88,6 +94,11 @@ const Recommendations = () => {
             extra={<Button icon={<DownloadOutlined />} onClick={() => download(latest._id)}>PDF</Button>}
           >
             <div className="recommendation-content">{latest.content}</div>
+            {latest.sourceSummary && <div style={{ marginTop: 16 }}><Text type="secondary">Generated from: </Text><Space wrap>{[
+              ...(latest.sourceSummary.conditions || []), ...(latest.sourceSummary.allergies || []),
+              ...(latest.sourceSummary.medications || []), ...(latest.sourceSummary.symptoms || [])
+            ].slice(0, 8).map((value) => <Tag key={value}>{value}</Tag>)}</Space></div>}
+            <Space style={{ marginTop: 16 }}><Text>Was this guidance relevant?</Text><Button type={latest.feedback?.relevance === 'helpful' ? 'primary' : 'default'} icon={<LikeOutlined />} onClick={() => sendFeedback(latest._id, 'helpful')}>Helpful</Button><Button type={latest.feedback?.relevance === 'not_helpful' ? 'primary' : 'default'} icon={<DislikeOutlined />} onClick={() => sendFeedback(latest._id, 'not_helpful')}>Not helpful</Button></Space>
           </Card>
           {items.length > 1 && (
             <Card size="small" title={<Space><HistoryOutlined />Previous recommendations</Space>} style={{ marginTop: 14 }}>
