@@ -12,10 +12,10 @@ test('emergency alert abuse identifiers are one-way hashes', () => {
   assert.equal(duplicateKey({ qrId: 'qr', ipHash }).length, 64);
 });
 
-test('emergency alert model excludes responder and medical payload fields', () => {
+test('emergency alert model stores limited responder context without medical payloads', () => {
   const paths = EmergencyAlert.schema.paths;
-  assert.equal(paths.responderName, undefined);
-  assert.equal(paths.responderPhone, undefined);
+  assert.ok(paths.responderName);
+  assert.ok(paths.responderPhone);
   assert.equal(paths.latitude, undefined);
   assert.equal(paths.longitude, undefined);
   assert.equal(paths.medicalData, undefined);

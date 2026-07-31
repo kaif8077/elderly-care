@@ -2,6 +2,8 @@ const QRCode = require('../models/QRCode');
 const User = require('../models/User');
 const MedicalProfile = require('../models/MedicalProfile');
 const { generateQr } = require('../services/adminIdCardService');
+const QrAccessLog = require('../models/QrAccessLog');
+const { hashIp } = require('../services/emergencyAlertService');
 
 const calculateAge = (dob) => {
   if (!dob) return null;
@@ -15,15 +17,24 @@ const calculateAge = (dob) => {
   return age >= 0 && age <= 130 ? age : null;
 };
 
+const visibilityLevel = (profile, field) => {
+  const settings = profile.visibilitySettings;
+  if (!settings) return 'public_emergency';
+  return typeof settings.get === 'function' ? settings.get(field) : settings[field];
+};
+const isPublic = (profile, field) => (visibilityLevel(profile, field) || 'public_emergency') === 'public_emergency';
+
 const emergencyProjection = (profile, qr) => ({
   qrId: String(qr._id),
   elderlyCareId: profile.elderlyCareId || `EC-${String(profile.userId).slice(-8).toUpperCase()}`,
-  name: profile.name,
-  approximateAge: calculateAge(profile.dob),
-  bloodGroup: profile.bloodGroup || 'Unknown',
-  severeAllergies: [...(profile.allergies || []), profile.allergiesOther].filter(Boolean),
-  majorConditions: [...(profile.medicalHistory || []), profile.medicalHistoryOther].filter(Boolean),
-  criticalMedications: [...(profile.medications || []), profile.medicationsOther].filter(Boolean),
+  name: isPublic(profile, 'name') ? profile.name : 'ElderlyCare member',
+  approximateAge: isPublic(profile, 'approximateAge') ? calculateAge(profile.dob) : null,
+  bloodGroup: isPublic(profile, 'bloodGroup') ? (profile.bloodGroup || 'Unknown') : 'Hidden',
+  severeAllergies: isPublic(profile, 'allergies') ? [...(profile.allergies || []), profile.allergiesOther].filter(Boolean) : [],
+  majorConditions: isPublic(profile, 'medicalHistory') ? [...(profile.medicalHistory || []), profile.medicalHistoryOther].filter(Boolean) : [],
+  criticalMedications: isPublic(profile, 'medications') ? [...(profile.medications || []), profile.medicationsOther].filter(Boolean) : [],
+  mobilityStatus: isPublic(profile, 'mobilityStatus') ? profile.mobilityStatus : null,
+  preferredLanguage: isPublic(profile, 'preferredLanguage') ? [...(profile.preferredLanguage || []), profile.otherLanguage].filter(Boolean) : [],
   emergencyInstruction: 'Contact the listed guardian and local emergency services when immediate help is needed.',
   emergencyContacts: profile.emergencyContacts?.length
     ? profile.emergencyContacts.map((contact, index) => ({
@@ -99,6 +110,13 @@ exports.getPublicEmergencyProfile = async (req, res) => {
       MedicalProfile.findOne({ userId: qr.userId }).sort({ createdAt: -1 }).lean()
     ]);
     if (!user || user.accountStatus !== 'active' || user.isDeleted || !profile) return res.status(410).json({ message: 'This emergency profile is no longer available.', code: 'EMERGENCY_PROFILE_INACTIVE' });
+    if (profile.consent?.emergencySharing === false) return res.status(403).json({ message: 'Public emergency sharing is disabled by the account owner.', code: 'EMERGENCY_SHARING_DISABLED' });
+    if (profile.consent?.qrAccessLogging !== false) {
+      QrAccessLog.create({
+        qrId: qr._id, userId: qr.userId, event: 'viewed', ipHash: hashIp(req.ip),
+        userAgentFamily: String(req.get('user-agent') || 'Unknown').slice(0, 80)
+      }).catch(() => {});
+    }
     res.set('Cache-Control', 'no-store, private');
     return res.json({ emergencyProfile: emergencyProjection(profile, qr) });
   } catch (error) {

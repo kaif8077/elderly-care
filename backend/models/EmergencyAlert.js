@@ -18,6 +18,19 @@ const emergencyAlertSchema = new mongoose.Schema({
   },
   ipHash: { type: String, required: true, select: false },
   duplicateKey: { type: String, required: true, index: true },
+  emergencyType: { type: String, enum: ['person_found', 'medical_emergency', 'fall', 'lost_confused', 'accident', 'other'], default: 'medical_emergency' },
+  responderName: { type: String, trim: true, maxlength: 80, default: null },
+  responderPhone: { type: String, trim: true, maxlength: 30, default: null },
+  responderMessage: { type: String, trim: true, maxlength: 500, default: null },
+  location: {
+    latitude: { type: Number, min: -90, max: 90, default: null },
+    longitude: { type: Number, min: -180, max: 180, default: null },
+    accuracy: { type: Number, min: 0, max: 100000, default: null },
+    mapUrl: { type: String, default: null }
+  },
+  acknowledgementTokenHash: { type: String, select: false, default: null },
+  acknowledgementAction: { type: String, enum: ['received', 'calling', 'going_to_location', 'services_contacted', 'resolved', null], default: null },
+  acknowledgedBy: { type: mongoose.Schema.Types.ObjectId, ref: 'User', default: null },
   acknowledgedAt: { type: Date, default: null },
   resolvedAt: { type: Date, default: null }
 }, { timestamps: true });

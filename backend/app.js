@@ -68,6 +68,8 @@ app.use('/api/send-sms', smsRoutes);
 app.use('/api/recommendations', recommendationRoutes);
 app.use('/api/emergency-alerts', emergencyAlertRoutes);
 app.use('/api/contact', require('./routes/contactRoutes'));
+app.use('/api/care', require('./routes/careWorkflowRoutes'));
+app.use('/api/medical-documents', require('./routes/medicalDocumentRoutes'));
 
 // ROOT ROUTE ADD KARO - Yeh missing tha
 app.get('/api', (req, res) => {

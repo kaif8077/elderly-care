@@ -15,6 +15,8 @@ const EmergencyProfile = () => {
   const [profile, setProfile] = useState(null);
   const [state, setState] = useState({ loading: true, error: '' });
   const [alertState, setAlertState] = useState({ sending: false, message: '', error: false });
+  const [alertForm, setAlertForm] = useState({ emergencyType: 'medical_emergency', responderName: '', responderPhone: '', responderMessage: '', shareLocation: false });
+  const [location, setLocation] = useState(null);
   const primary = profile?.emergencyContacts?.[0];
 
   useEffect(() => {
@@ -47,7 +49,13 @@ const EmergencyProfile = () => {
     if (!window.confirm('Notify the verified account owner that this emergency QR was activated? No location or medical details will be emailed.')) return;
     setAlertState({ sending: true, message: '', error: false });
     try {
-      const { data } = await api.post(`/api/emergency-alerts/public/${encodeURIComponent(token)}`, {});
+      const { data } = await api.post(`/api/emergency-alerts/public/${encodeURIComponent(token)}`, {
+        emergencyType: alertForm.emergencyType,
+        responderName: alertForm.responderName || undefined,
+        responderPhone: alertForm.responderPhone || undefined,
+        responderMessage: alertForm.responderMessage || undefined,
+        ...(alertForm.shareLocation && location ? { latitude: location.latitude, longitude: location.longitude, locationAccuracy: location.accuracy } : {})
+      });
       setAlertState({ sending: false, message: data.message, error: false });
     } catch (error) {
       setAlertState({
@@ -56,6 +64,16 @@ const EmergencyProfile = () => {
         error: true
       });
     }
+  };
+  const updateAlertForm = (field) => (event) => setAlertForm((current) => ({ ...current, [field]: event.target.type === 'checkbox' ? event.target.checked : event.target.value }));
+  const requestAlertLocation = (event) => {
+    const enabled = event.target.checked;
+    setAlertForm((current) => ({ ...current, shareLocation: enabled }));
+    if (!enabled || !navigator.geolocation) return;
+    navigator.geolocation.getCurrentPosition(({ coords }) => setLocation({ latitude: coords.latitude, longitude: coords.longitude, accuracy: coords.accuracy }), () => {
+      setAlertForm((current) => ({ ...current, shareLocation: false }));
+      setAlertState({ sending: false, message: 'Location permission was unavailable. You can still send the alert without location.', error: true });
+    }, { enableHighAccuracy: true, timeout: 10000, maximumAge: 30000 });
   };
   const shareLocation = () => {
     if (!navigator.geolocation || !primary?.phone) return;
@@ -92,12 +110,27 @@ const EmergencyProfile = () => {
           <article><span>Severe allergies</span><strong>{readableList(profile.severeAllergies)}</strong></article>
           <article><span>Major conditions</span><strong>{readableList(profile.majorConditions)}</strong></article>
           <article><span>Critical medications</span><strong>{readableList(profile.criticalMedications)}</strong></article>
+          {profile.mobilityStatus && <article><span>Mobility needs</span><strong>{profile.mobilityStatus.replaceAll('_', ' ')}</strong></article>}
+          {profile.preferredLanguage?.length > 0 && <article><span>Preferred language</span><strong>{readableList(profile.preferredLanguage)}</strong></article>}
         </div>
       </section>
 
       <section className="emergency-instruction">
         <h2>Emergency instruction</h2>
         <p>{profile.emergencyInstruction}</p>
+      </section>
+
+      <section className="responder-panel" aria-labelledby="responder-title">
+        <h2 id="responder-title">Add responder details (optional)</h2>
+        <p>Review exactly what will be shared with the account owner and verified emergency contacts.</p>
+        <div className="responder-grid">
+          <label>Situation type<select value={alertForm.emergencyType} onChange={updateAlertForm('emergencyType')}><option value="person_found">Person found</option><option value="medical_emergency">Medical emergency</option><option value="fall">Fall</option><option value="lost_confused">Lost or confused person</option><option value="accident">Accident</option><option value="other">Other</option></select></label>
+          <label>Your name (optional)<input value={alertForm.responderName} maxLength="80" onChange={updateAlertForm('responderName')} placeholder="Enter your name" /></label>
+          <label>Your phone (optional)<input value={alertForm.responderPhone} maxLength="30" onChange={updateAlertForm('responderPhone')} placeholder="Enter your phone number" /></label>
+          <label className="responder-message">Situation message (optional)<textarea value={alertForm.responderMessage} maxLength="500" onChange={updateAlertForm('responderMessage')} placeholder="Describe the person's current condition or location." /></label>
+        </div>
+        <label className="location-consent"><input type="checkbox" checked={alertForm.shareLocation} onChange={requestAlertLocation} /> Share my current location with this alert</label>
+        <div className="share-summary"><strong>Information to be shared:</strong> situation type{alertForm.responderName ? ', responder name' : ''}{alertForm.responderPhone ? ', responder phone' : ''}{alertForm.responderMessage ? ', message' : ''}{alertForm.shareLocation && location ? ', current coordinates and map link' : ''}.</div>
       </section>
 
       <section className="emergency-actions" aria-label="Emergency actions">
