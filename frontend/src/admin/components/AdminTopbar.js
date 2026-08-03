@@ -63,7 +63,7 @@ const AdminTopbar = ({ title, onMenu, collapsed, onCollapse }) => {
           onChange={(event) => setSearch(event.target.value)}
           onSearch={searchUsers}
           placeholder="Search users"
-          enterButton
+          enterButton={<SearchOutlined aria-label="Search users" />}
         />
         <Button
           className="admin-ant-mobile"
