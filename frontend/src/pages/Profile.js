@@ -12,8 +12,6 @@ import { AuthContext } from '../context/AuthContext';
 import { toast } from 'react-toastify';
 import UserIdCard from '../components/UserIdCard';
 import Recommendations from '../components/Recommendations';
-import CareCenter from '../components/CareCenter';
-import MedicalDocuments from '../components/MedicalDocuments';
 
 const { Title, Text } = Typography;
 const apiBase = import.meta.env.VITE_BACKEND_URI || 'http://localhost:5000';
@@ -144,9 +142,6 @@ const Profile = () => {
       <Card className="care-section-card" title={<Space><IdcardOutlined />Emergency ID card</Space>}>
         <UserIdCard profile={profile} qrCode={qrCode} photoUrl={photoUrl} />
       </Card>
-
-      <CareCenter />
-      <MedicalDocuments />
 
     </main>
   );
