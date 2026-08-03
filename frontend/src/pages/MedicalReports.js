@@ -1,5 +1,7 @@
 import React, { useCallback, useContext, useEffect, useState } from 'react';
 import axios from 'axios';
+import { Button } from 'antd';
+import { CloseOutlined, DownloadOutlined, EyeOutlined, PlusOutlined } from '@ant-design/icons';
 import { AuthContext } from '../context/AuthContext';
 import './MedicalReports.css';
 
@@ -82,7 +84,7 @@ const MedicalReports = () => {
     <main className="medical-reports-page">
       <header className="medical-reports-header">
         <div><p>ElderlyCare</p><h1>Emergency Medical Summaries</h1><span>Versioned, private snapshots of your submitted medical profile.</span></div>
-        <button onClick={generate} disabled={working}>{working ? 'Working…' : 'Generate new report'}</button>
+        <Button type="primary" ghost icon={<PlusOutlined />} onClick={generate} loading={working}>Generate new report</Button>
       </header>
       {message && <p className="medical-report-message" role="status">{message}</p>}
       {loading ? <div className="report-state">Loading reports…</div>
@@ -92,18 +94,18 @@ const MedicalReports = () => {
               <div><strong>Version {report.reportVersion}</strong>{report.isLatest && <span className="report-latest">Latest</span>}
                 <p>Generated {new Date(report.generatedAt).toLocaleString()}</p></div>
               <span>{report.verificationStatus.replace('_', ' ')}</span>
-              <div><button onClick={() => preview(report._id)}>Preview</button><button onClick={() => download(report)} disabled={working}>Download PDF</button></div>
+              <div><Button icon={<EyeOutlined />} onClick={() => preview(report._id)}>Preview</Button><Button icon={<DownloadOutlined />} onClick={() => download(report)} loading={working}>Download PDF</Button></div>
             </article>)}
           </section>}
 
       {selected && <div className="medical-report-modal"><article role="dialog" aria-modal="true" aria-labelledby="user-report-title">
-        <button className="medical-report-close" onClick={() => setSelected(null)} aria-label="Close preview">×</button>
+        <Button className="medical-report-close" type="text" shape="circle" icon={<CloseOutlined />} onClick={() => setSelected(null)} aria-label="Close preview" />
         <header><p>Emergency Medical Summary</p><h2 id="user-report-title">{selected.snapshotData.personal.name}</h2><span>Version {selected.reportVersion}</span></header>
         <section className="medical-report-critical"><strong>Blood group: {selected.snapshotData.personal.bloodGroup || 'Unknown'}</strong><p>Allergies: {listText(selected.snapshotData.medical.allergies, selected.snapshotData.medical.allergiesOther)}</p></section>
         <section><h3>Medical conditions</h3><p>{listText(selected.snapshotData.medical.medicalHistory, selected.snapshotData.medical.medicalHistoryOther)}</p></section>
         <section><h3>Current medications</h3><p>{listText(selected.snapshotData.medical.medications, selected.snapshotData.medical.medicationsOther)}</p></section>
         <section><h3>Emergency contact</h3><p>{selected.snapshotData.emergencyContacts[0]?.name} · {selected.snapshotData.emergencyContacts[0]?.phone}</p></section>
-        <footer><p>This emergency summary is not a replacement for professional medical advice.</p><button onClick={() => download(selected)}>Download authenticated PDF</button></footer>
+        <footer><p>This emergency summary is not a replacement for professional medical advice.</p><Button type="primary" ghost icon={<DownloadOutlined />} onClick={() => download(selected)}>Download authenticated PDF</Button></footer>
       </article></div>}
     </main>
   );

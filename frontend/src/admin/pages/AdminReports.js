@@ -1,5 +1,6 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import { FaChevronLeft, FaChevronRight, FaDownload, FaFileMedical, FaPrint, FaSyncAlt, FaTimes } from 'react-icons/fa';
+import { Button, Flex } from 'antd';
 import adminApi from '../../services/adminApi';
 import AdminStatusBadge from '../components/AdminStatusBadge';
 import '../styles/AdminReports.css';
@@ -67,7 +68,7 @@ const AdminReports = () => {
     <div className="admin-reports-page">
       <div className="admin-page-actions">
         <div><p>Immutable emergency-summary snapshots and version history.</p><small>{data.pagination.total} saved reports</small></div>
-        <button className="admin-secondary-button" onClick={load} disabled={loading}><FaSyncAlt /> Refresh</button>
+        <Button icon={<FaSyncAlt />} onClick={load} loading={loading}>Refresh</Button>
       </div>
       <section className="admin-filter-panel admin-report-filters">
         <label>Verification
@@ -87,18 +88,18 @@ const AdminReports = () => {
                 <td>{report.userId}</td><td>{new Date(report.generatedAt).toLocaleString()}</td>
                 <td><AdminStatusBadge status={report.reportStatus} /></td>
                 <td><AdminStatusBadge status={report.verificationStatus} /></td>
-                <td><button className="admin-table-action" onClick={() => openReport(report._id)}>Preview</button></td>
+                <td><Button onClick={() => openReport(report._id)}>Preview</Button></td>
               </tr>)}</tbody>
             </table></div>}
-        <div className="admin-pagination"><span>Page {data.pagination.page} of {data.pagination.pages}</span><div>
-          <button aria-label="Previous page" disabled={page <= 1} onClick={() => setPage((current) => current - 1)}><FaChevronLeft /></button>
-          <button aria-label="Next page" disabled={page >= data.pagination.pages} onClick={() => setPage((current) => current + 1)}><FaChevronRight /></button>
-        </div></div>
+        <Flex justify="flex-end" align="center" gap="middle" style={{ padding: '14px 16px', borderTop: '1px solid #e2ebe8' }}><span>Page {data.pagination.page} of {data.pagination.pages}</span><div>
+          <Button aria-label="Previous page" icon={<FaChevronLeft />} disabled={page <= 1} onClick={() => setPage((current) => current - 1)} />
+          <Button aria-label="Next page" icon={<FaChevronRight />} disabled={page >= data.pagination.pages} onClick={() => setPage((current) => current + 1)} />
+        </div></Flex>
       </section>
       {message && <p className="admin-action-message" role="status">{message}</p>}
 
       {selected && <div className="admin-modal-backdrop"><section className="admin-report-preview" role="dialog" aria-modal="true" aria-labelledby="report-preview-title">
-        <button className="admin-report-close" aria-label="Close report preview" onClick={() => setSelected(null)}><FaTimes /></button>
+        <Button className="admin-report-close" type="text" shape="circle" aria-label="Close report preview" icon={<FaTimes />} onClick={() => setSelected(null)} />
         <header><p>Emergency Medical Summary</p><h2 id="report-preview-title">{selected.snapshotData.personal.name}</h2>
           <span>Version {selected.reportVersion} · {new Date(selected.generatedAt).toLocaleString()}</span></header>
         <div className="admin-report-critical"><strong>Blood group: {selected.snapshotData.personal.bloodGroup || 'Unknown'}</strong>
@@ -109,8 +110,8 @@ const AdminReports = () => {
           <section><h3>Emergency contact</h3><p>{selected.snapshotData.emergencyContacts[0]?.name} · {selected.snapshotData.emergencyContacts[0]?.phone}</p></section>
         </div>
         <footer><span>This summary is not a replacement for professional medical advice.</span><div>
-          <button className="admin-secondary-button" onClick={() => window.print()}><FaPrint /> Print</button><button className="admin-secondary-button" onClick={downloadPdf}><FaDownload /> Download PDF</button><button className="admin-secondary-button" onClick={() => verify('needs_correction')}>Needs correction</button>
-          <button className="admin-primary-button" onClick={() => verify('verified')}>Mark verified</button>
+          <Button icon={<FaPrint />} onClick={() => window.print()}>Print</Button><Button icon={<FaDownload />} onClick={downloadPdf}>Download PDF</Button><Button onClick={() => verify('needs_correction')}>Needs correction</Button>
+          <Button type="primary" onClick={() => verify('verified')}>Mark verified</Button>
         </div></footer>
       </section></div>}
     </div>

@@ -5,6 +5,7 @@ import {
   FaSms, FaUserShield
 } from 'react-icons/fa';
 import api from '../services/api';
+import { Button } from 'antd';
 import './EmergencyProfile.css';
 
 const readableList = (items, empty = 'None reported') =>
@@ -134,11 +135,11 @@ const EmergencyProfile = () => {
       </section>
 
       <section className="emergency-actions" aria-label="Emergency actions">
-        {primary?.phone && <a className="action action-primary" href={`tel:${primary.phone}`}><FaPhoneAlt /> Call {primary.name || 'primary contact'}</a>}
-        <button className="action action-alert" type="button" onClick={sendSecureAlert} disabled={alertState.sending}><FaBell /> {alertState.sending ? 'Sending alert...' : 'Send secure alert'}</button>
-        {smsLink && <a className="action" href={smsLink}><FaSms /> Open emergency SMS</a>}
-        {primary?.phone && <button className="action" type="button" onClick={shareLocation}><FaLocationArrow /> Share current location</button>}
-        <a className="action" href="https://www.google.com/maps/search/hospital+near+me" target="_blank" rel="noreferrer"><FaHospital /> Find nearby hospital</a>
+        {primary?.phone && <Button type="primary" size="large" block href={`tel:${primary.phone}`} icon={<FaPhoneAlt />}>Call {primary.name || 'primary contact'}</Button>}
+        <Button size="large" block onClick={sendSecureAlert} loading={alertState.sending} icon={<FaBell />}>Send secure alert</Button>
+        {smsLink && <Button size="large" block href={smsLink} icon={<FaSms />}>Open emergency SMS</Button>}
+        {primary?.phone && <Button size="large" block onClick={shareLocation} icon={<FaLocationArrow />}>Share current location</Button>}
+        <Button size="large" block href="https://www.google.com/maps/search/hospital+near+me" target="_blank" rel="noreferrer" icon={<FaHospital />}>Find nearby hospital</Button>
       </section>
 
       {alertState.message && <div className={`alert-result ${alertState.error ? 'alert-result-error' : ''}`} role="status">{alertState.message}</div>}
