@@ -49,8 +49,8 @@
   text-decoration: none;
 }
 .admin-nav-item svg { flex: 0 0 20px; font-size: 1.05rem; }
-.admin-nav-item.active { background: #fff; color: #125846; font-weight: 800; }
-.admin-nav-item:not(.is-disabled):hover { background: rgba(255,255,255,.12); }
+.admin-nav-item.active { background: #ff6b00; color: #fff; font-weight: 800; }
+.admin-nav-item:not(.is-disabled):hover { background: #ff6b00; color: #fff; }
 .admin-nav-item.is-disabled { opacity: .55; cursor: not-allowed; }
 .admin-nav-item small { margin-left: auto; font-size: .68rem; text-transform: uppercase; }
 
@@ -172,7 +172,7 @@
 .admin-detail-statuses { display: flex; align-items: center; gap: 8px; margin-left: auto; }
 .admin-detail-tabs { display: flex; gap: 5px; margin: 18px 0; padding: 6px; overflow-x: auto; border: 1px solid #e3e8ef; border-radius: 12px; background: #fff; }
 .admin-detail-tabs button { min-height: 42px; padding: 8px 14px; border: 0; border-radius: 8px; background: transparent; color: #667085; font-weight: 800; white-space: nowrap; cursor: pointer; }
-.admin-detail-tabs button.active { background: #0066ff; color: #fff; }
+.admin-detail-tabs button.active { background: #ff6b00; color: #fff; border-color: #ff6b00; }
 .admin-detail-grid { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 18px; }
 .admin-detail-card { padding: 22px; border: 1px solid #e3e8ef; border-radius: 14px; background: #fff; box-shadow: 0 5px 18px rgba(22,68,56,.04); }
 .admin-detail-card h2 { margin: 0 0 18px; font-size: 1.15rem; }

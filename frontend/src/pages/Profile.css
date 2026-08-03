@@ -247,12 +247,12 @@
 }
 
 .download-id-btn:hover {
-  background: #0052cc;
+  background: #ff6b00;
   transform: translateY(-2px);
 }
 
 .download-id-btn:active {
-  background: #0047b3;
+  background: #ff6b00;
   transform: translateY(0);
 }
 

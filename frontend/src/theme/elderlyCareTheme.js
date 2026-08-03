@@ -1,21 +1,31 @@
 const elderlyCareTheme = {
   cssVar: true,
   token: {
-    colorPrimary: '#0066ff', colorPrimaryHover: '#0052cc', colorPrimaryActive: '#0047b3',
-    colorLink: '#0066ff', colorLinkHover: '#0052cc', colorLinkActive: '#0047b3',
+    colorPrimary: '#0066ff', colorPrimaryHover: '#ff6b00', colorPrimaryActive: '#ff6b00',
+    colorLink: '#0066ff', colorLinkHover: '#ff6b00', colorLinkActive: '#ff6b00',
     colorInfo: '#0066ff', colorSuccess: '#0066ff', colorWarning: '#ff6b00', colorError: '#ff6b00',
     colorText: '#1f2937', colorTextSecondary: '#667085', colorBgLayout: '#f6f8fc', colorBgContainer: '#ffffff', colorBorder: '#d8dee9',
     borderRadius: 10, borderRadiusLG: 16, controlHeight: 36, fontSize: 15,
     fontFamily: "'Inter', 'Segoe UI', Arial, sans-serif", boxShadowSecondary: '0 18px 48px rgba(18, 63, 53, 0.12)'
   },
   components: {
-    Button: { fontWeight: 700, primaryShadow: 'none', defaultHoverColor: '#0052cc', defaultHoverBorderColor: '#0052cc' }, Card: { headerBg: '#ffffff' },
+    Button: {
+      fontWeight: 700,
+      primaryShadow: 'none',
+      defaultColor: '#0066ff',
+      defaultBorderColor: '#0066ff',
+      defaultHoverColor: '#ff6b00',
+      defaultHoverBorderColor: '#ff6b00',
+      defaultActiveColor: '#ff6b00',
+      defaultActiveBorderColor: '#ff6b00'
+    },
+    Card: { headerBg: '#ffffff' },
     Layout: { bodyBg: '#f3f7f5', headerBg: '#ffffff', siderBg: '#0066ff' },
     Menu: {
-      itemColor: '#1f2937', itemHoverColor: '#0052cc', itemSelectedColor: '#0066ff',
-      horizontalItemHoverColor: '#0052cc', horizontalItemSelectedColor: '#0066ff',
-      darkItemBg: '#0066ff', darkItemSelectedBg: '#ffffff',
-      darkItemSelectedColor: '#0066ff', darkItemHoverBg: '#0052cc'
+      itemColor: '#1f2937', itemHoverColor: '#ff6b00', itemSelectedColor: '#ff6b00',
+      horizontalItemHoverColor: '#ff6b00', horizontalItemSelectedColor: '#ff6b00',
+      darkItemBg: '#0066ff', darkItemSelectedBg: '#ff6b00',
+      darkItemSelectedColor: '#ffffff', darkItemHoverBg: '#ff6b00'
     },
     Table: { headerBg: '#f3f6fc', headerColor: '#1f2937' }
   }
