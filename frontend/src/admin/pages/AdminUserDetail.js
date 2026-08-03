@@ -1,6 +1,7 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import { FaArrowLeft, FaIdCard, FaQrcode, FaUser } from 'react-icons/fa';
 import { Link, useParams } from 'react-router-dom';
+import { Button, Space } from 'antd';
 import adminApi from '../../services/adminApi';
 import AdminStatusBadge from '../components/AdminStatusBadge';
 
@@ -57,7 +58,7 @@ const AdminUserDetail = () => {
   if (error) return (
     <div className="admin-state-card" role="alert">
       <h2>User unavailable</h2><p>{error}</p>
-      <Link className="admin-secondary-button" to="/admin/users">Back to users</Link>
+      <Link to="/admin/users"><Button>Back to users</Button></Link>
     </div>
   );
 
@@ -141,15 +142,15 @@ const AdminUserDetail = () => {
           <Field label="QR record"><AdminStatusBadge status={qr.status} /></Field>
         </dl>
         <div className="admin-detail-actions">
-          <Link className="admin-primary-button" to={`/admin/id-cards/${userId}`}><FaIdCard /> View ID card</Link>
+          <Link to={`/admin/id-cards/${userId}`}><Button type="primary" icon={<FaIdCard />}>View ID card</Button></Link>
           {user.isDeleted ? (
-            <button className="admin-primary-button" disabled={statusSaving} onClick={restoreAccount}>Restore account</button>
+            <Button type="primary" loading={statusSaving} onClick={restoreAccount}>Restore account</Button>
           ) : user.accountStatus === 'active' ? (
-            <button className="admin-danger-button" disabled={statusSaving} onClick={() => changeStatus('inactive')}>Deactivate account</button>
+            <Button danger loading={statusSaving} onClick={() => changeStatus('inactive')}>Deactivate account</Button>
           ) : (
-            <button className="admin-primary-button" disabled={statusSaving} onClick={() => changeStatus('active')}>Activate account</button>
+            <Button type="primary" loading={statusSaving} onClick={() => changeStatus('active')}>Activate account</Button>
           )}
-          {!user.isDeleted && <button className="admin-danger-button" disabled={statusSaving} onClick={() => setArchiveOpen(true)}>Archive user</button>}
+          {!user.isDeleted && <Button danger disabled={statusSaving} onClick={() => setArchiveOpen(true)}>Archive user</Button>}
         </div>
         {actionMessage && <p className="admin-action-message" role="status">{actionMessage}</p>}
       </section>
@@ -206,9 +207,9 @@ const AdminUserDetail = () => {
         <div className="admin-detail-statuses"><AdminStatusBadge status={user.accountStatus} /><AdminStatusBadge status={user.profileStatus} /></div>
       </header>
 
-      <div className="admin-detail-tabs" role="tablist" aria-label="User record sections">
-        {tabs.map((tab) => <button key={tab} id={`admin-tab-${tab}`} role="tab" aria-controls="admin-user-tabpanel" aria-selected={activeTab === tab} tabIndex={activeTab === tab ? 0 : -1} className={activeTab === tab ? 'active' : ''} onClick={() => setActiveTab(tab)}>{tab}</button>)}
-      </div>
+      <Space wrap role="tablist" aria-label="User record sections" style={{ margin: '18px 0' }}>
+        {tabs.map((tab) => <Button key={tab} id={`admin-tab-${tab}`} role="tab" aria-controls="admin-user-tabpanel" aria-selected={activeTab === tab} tabIndex={activeTab === tab ? 0 : -1} type={activeTab === tab ? 'primary' : 'default'} onClick={() => setActiveTab(tab)}>{tab}</Button>)}
+      </Space>
 
       <div id="admin-user-tabpanel" role="tabpanel" aria-labelledby={`admin-tab-${activeTab}`}>
         {!profile && !['Overview', 'QR'].includes(activeTab)
@@ -235,8 +236,8 @@ const AdminUserDetail = () => {
                 <input autoFocus value={archiveForm.confirmation} onChange={(event) => setArchiveForm((current) => ({ ...current, confirmation: event.target.value }))} />
               </label>
               <div className="admin-modal-actions">
-                <button type="button" className="admin-secondary-button" onClick={() => setArchiveOpen(false)} disabled={statusSaving}>Cancel</button>
-                <button type="submit" className="admin-danger-button" disabled={statusSaving || !archiveForm.reason || archiveForm.confirmation !== 'DELETE'}>{statusSaving ? 'Archiving…' : 'Archive user'}</button>
+                <Button onClick={() => setArchiveOpen(false)} disabled={statusSaving}>Cancel</Button>
+                <Button htmlType="submit" danger loading={statusSaving} disabled={!archiveForm.reason || archiveForm.confirmation !== 'DELETE'}>Archive user</Button>
               </div>
             </form>
           </section>

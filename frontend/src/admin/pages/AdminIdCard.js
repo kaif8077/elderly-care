@@ -2,6 +2,7 @@ import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { FaArrowLeft, FaDownload, FaQrcode, FaShieldAlt, FaSyncAlt, FaTimesCircle } from 'react-icons/fa';
 import html2canvas from 'html2canvas';
 import { Link, useParams } from 'react-router-dom';
+import { Button, Space } from 'antd';
 import adminApi from '../../services/adminApi';
 import AdminStatusBadge from '../components/AdminStatusBadge';
 
@@ -120,9 +121,11 @@ const AdminIdCard = () => {
         <aside className="admin-card-controls">
           <h2>Card controls</h2>
           <p>The QR contains a random revocable token, never a user ID or complete medical record.</p>
-          <button className="admin-primary-button" onClick={downloadImage} disabled={working || !card.qr}><FaDownload /> Download ID card PNG</button>
-          <button className="admin-secondary-button" onClick={() => runAction('regenerate')} disabled={working || user.accountStatus !== 'active'}><FaSyncAlt /> Generate new QR</button>
-          <button className="admin-danger-button" onClick={() => runAction('revoke')} disabled={working || !card.qr}><FaTimesCircle /> Revoke QR</button>
+          <Space direction="vertical" style={{ width: '100%' }}>
+            <Button type="primary" block icon={<FaDownload />} onClick={downloadImage} disabled={working || !card.qr}>Download ID card PNG</Button>
+            <Button block icon={<FaSyncAlt />} onClick={() => runAction('regenerate')} disabled={working || user.accountStatus !== 'active'}>Generate new QR</Button>
+            <Button danger block icon={<FaTimesCircle />} onClick={() => runAction('revoke')} disabled={working || !card.qr}>Revoke QR</Button>
+          </Space>
           {message && <p className="admin-action-message" role="status">{message}</p>}
           <small>Print at 100% scale for the intended wallet-card proportions.</small>
         </aside>

@@ -229,40 +229,6 @@
   margin-top: 20px;
 }
 
-/* Update the download button styles */
-.download-id-btn {
-  padding: 14px 35px;
-  background: #0066ff;
-  color: white;
-  border: none;
-  border-radius: 8px;
-  font-size: 1.1rem;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  margin: 30px auto 0; /* Center the button */
-  display: block; /* Make it a block to center properly */
-  box-shadow: 0 4px 12px rgba(0,102,255,0.25);
-  width: fit-content; /* Only take needed width */
-}
-
-.download-id-btn:hover {
-  background: #ff6b00;
-  transform: translateY(-2px);
-}
-
-.download-id-btn:active {
-  background: #ff6b00;
-  transform: translateY(0);
-}
-
-.download-id-btn:disabled {
-  background: #ccc;
-  cursor: not-allowed;
-  transform: none;
-}
-
-/* Remove the align-self from media query */
 @media (max-width: 992px) {
   .id-card-section {
     flex-direction: column;
@@ -272,12 +238,6 @@
     width: 100%;
     max-width: 400px;
   }
-  
-  /* Remove this:
-  .download-id-btn {
-    align-self: center;
-  }
-  */
 }
 /* ===== Footer Section ===== */
 .footer-section {
@@ -329,4 +289,3 @@
     padding: 20px;
   }
 }
-.profile-photo-panel{display:flex;align-items:center;gap:20px;margin:0 0 28px;padding:20px;border:1px solid #e3e8ef;border-radius:14px;background:#fff}.profile-photo-preview{display:grid;flex:0 0 112px;height:112px;place-items:center;overflow:hidden;border-radius:50%;background:#edf3ff;color:#0066ff;font-size:2.5rem;font-weight:900}.profile-photo-preview img{width:100%;height:100%;object-fit:cover}.profile-photo-panel h2{margin:0 0 6px}.profile-photo-panel p{margin:0 0 14px;color:#667085}.profile-photo-actions{display:flex;flex-wrap:wrap;gap:10px}.profile-photo-upload,.profile-photo-actions button{display:inline-flex;align-items:center;justify-content:center;min-height:44px;padding:9px 15px;border:1px solid #0066ff;border-radius:8px;font:inherit;font-weight:800;cursor:pointer}.profile-photo-upload{background:#0066ff;color:#fff}.profile-photo-upload input{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0,0,0,0)}.profile-photo-actions button{background:#fff;color:#ff6b00;border-color:#ff6b00}.profile-photo-actions button:disabled{opacity:.6}@media(max-width:600px){.profile-photo-panel{align-items:flex-start;flex-direction:column}.profile-photo-preview{width:96px;flex-basis:96px;height:96px}}

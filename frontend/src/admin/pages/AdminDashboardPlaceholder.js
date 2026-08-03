@@ -2,6 +2,7 @@ import React, { useContext, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { AdminAuthContext } from '../context/AdminAuthContext';
 import adminApi from '../../services/adminApi';
+import { Button } from 'antd';
 import '../styles/AdminAuth.css';
 
 const AdminDashboardPlaceholder = () => {
@@ -34,9 +35,7 @@ const AdminDashboardPlaceholder = () => {
           <h1>Admin dashboard</h1>
           <p>Signed in as {admin?.name} ({admin?.role})</p>
         </div>
-        <button className="admin-secondary-button" onClick={handleLogout} disabled={loggingOut}>
-          {loggingOut ? 'Logging out…' : 'Logout'}
-        </button>
+        <Button onClick={handleLogout} loading={loggingOut}>Logout</Button>
       </header>
 
       {admin?.mustChangePassword && (
@@ -52,9 +51,7 @@ const AdminDashboardPlaceholder = () => {
           HttpOnly-cookie sessions, and protected routing are working. Dashboard statistics
           and user management will be added in Phase 2.
         </p>
-        <button className="admin-primary-button admin-inline-button" onClick={verifyPermission}>
-          Verify protected permission
-        </button>
+        <Button type="primary" onClick={verifyPermission}>Verify protected permission</Button>
         {sessionStatus && <p className="admin-session-status" aria-live="polite">{sessionStatus}</p>}
       </section>
     </main>
