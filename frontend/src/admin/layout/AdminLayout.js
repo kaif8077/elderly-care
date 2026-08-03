@@ -42,7 +42,7 @@ const AdminLayout = () => {
         title="ElderlyCare Administration"
         open={mobileOpen}
         onClose={() => setMobileOpen(false)}
-        styles={{ body: { padding: 0, background: '#0066ff' } }}
+        styles={{ body: { padding: 0, background: '#001529' } }}
       >
         <AdminSidebar onClose={() => setMobileOpen(false)} />
       </Drawer>
