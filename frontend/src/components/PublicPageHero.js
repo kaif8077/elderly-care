@@ -23,9 +23,10 @@ const PublicPageHero = ({
   return (
     <section aria-label={`${title} banner`}>
       <Carousel autoplay={backgrounds.length > 1} autoplaySpeed={4500} arrows={backgrounds.length > 1} draggable={backgrounds.length > 1} dots={backgrounds.length > 1}>
-        {backgrounds.map((banner) => (
+        {backgrounds.map((banner, index) => (
           <div key={banner}>
             <Flex
+              className={!image ? `care-home-banner-slide care-home-banner-slide-${index + 1}` : undefined}
               vertical
               justify="center"
               align={centered ? 'center' : 'flex-start'}
