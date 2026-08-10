@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import {
   Button, Card, Col, Empty, Form, Image, Input, List, Modal, Row, Select,
   Space, Typography, Upload, message
@@ -20,7 +20,8 @@ const MedicalDocuments = () => {
   const [items, setItems] = useState([]);
   const [working, setWorking] = useState(false);
   const [preview, setPreview] = useState(null);
-  const [previewLoading, setPreviewLoading] = useState(false);
+  const [previewLoadingId, setPreviewLoadingId] = useState(null);
+  const previewUrlRef = useRef(null);
 
   const load = useCallback(async () => {
     try {
@@ -34,9 +35,9 @@ const MedicalDocuments = () => {
   useEffect(() => {
     load();
     return () => {
-      if (preview?.url) URL.revokeObjectURL(preview.url);
+      if (previewUrlRef.current) URL.revokeObjectURL(previewUrlRef.current);
     };
-  }, [load, preview?.url]);
+  }, [load]);
 
   const upload = async (values) => {
     if (!file) return message.error('Choose a document first.');
@@ -64,21 +65,29 @@ const MedicalDocuments = () => {
   });
 
   const view = async (item) => {
-    setPreviewLoading(true);
+    setPreviewLoadingId(item._id);
     try {
       const response = await fetchDocument(item);
-      const url = URL.createObjectURL(response.data);
+      if (previewUrlRef.current) URL.revokeObjectURL(previewUrlRef.current);
+      const blob = new Blob([response.data], { type: item.contentType });
+      const url = URL.createObjectURL(blob);
+      previewUrlRef.current = url;
       setPreview({ item, url });
     } catch (error) {
       message.error(error.response?.data?.message || 'Unable to preview document.');
     } finally {
-      setPreviewLoading(false);
+      setPreviewLoadingId(null);
     }
   };
 
   const closePreview = () => {
-    if (preview?.url) URL.revokeObjectURL(preview.url);
+    if (previewUrlRef.current) URL.revokeObjectURL(previewUrlRef.current);
+    previewUrlRef.current = null;
     setPreview(null);
+  };
+
+  const openPreview = () => {
+    if (preview?.url) window.open(preview.url, '_blank', 'noopener,noreferrer');
   };
 
   const download = async (item) => {
@@ -159,7 +168,7 @@ const MedicalDocuments = () => {
         renderItem={(item) => (
           <List.Item
             actions={[
-              <Button key="view" type="link" icon={<EyeOutlined />} loading={previewLoading} onClick={() => view(item)}>View</Button>,
+              <Button key="view" type="link" icon={<EyeOutlined />} loading={previewLoadingId === item._id} disabled={Boolean(previewLoadingId) && previewLoadingId !== item._id} onClick={() => view(item)}>View</Button>,
               <Button key="download" type="link" icon={<DownloadOutlined />} onClick={() => download(item)}>Download</Button>,
               <Button key="delete" danger type="link" icon={<DeleteOutlined />} onClick={() => remove(item)}>Delete</Button>
             ]}
@@ -176,9 +185,11 @@ const MedicalDocuments = () => {
         open={Boolean(preview)}
         title={preview?.item.displayName || 'Document preview'}
         onCancel={closePreview}
-        width={820}
+        width="min(1200px, 96vw)"
+        styles={{ body: { padding: 0, background: '#eef2f7' } }}
         footer={[
-          <Button key="cancel" onClick={closePreview}>Cancel</Button>,
+          <Button key="close" onClick={closePreview}>Close</Button>,
+          <Button key="open" icon={<EyeOutlined />} onClick={openPreview}>Open full screen</Button>,
           <Button key="download" type="primary" icon={<DownloadOutlined />} onClick={() => download(preview.item)}>
             Download
           </Button>
@@ -188,8 +199,8 @@ const MedicalDocuments = () => {
         {preview?.item.contentType === 'application/pdf' ? (
           <iframe
             title={preview.item.displayName}
-            src={preview.url}
-            style={{ width: '100%', height: '65vh', border: 0 }}
+            src={`${preview.url}#view=FitH&toolbar=1&navpanes=0`}
+            style={{ display: 'block', width: '100%', height: '78vh', minHeight: 520, border: 0, background: '#fff' }}
           />
         ) : preview ? (
           <Space direction="vertical" align="center" style={{ width: '100%' }}>
