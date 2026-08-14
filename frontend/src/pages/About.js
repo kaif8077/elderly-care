@@ -3,7 +3,8 @@ import {
   Timeline, Typography
 } from 'antd';
 import {
-  CheckCircleOutlined, LockOutlined, QrcodeOutlined
+  FormOutlined, LockOutlined, MobileOutlined, QrcodeOutlined,
+  SafetyCertificateOutlined, TeamOutlined
 } from '@ant-design/icons';
 import aboutCareImage from '../assests/about-care.jpg';
 import aboutHero from '../assests/about-hero.jpg';
@@ -15,19 +16,34 @@ const { Title, Paragraph, Text } = Typography;
 
 const principles = [
   {
-    icon: <CheckCircleOutlined />,
-    title: 'Easy to understand',
-    text: 'Clear labels, larger touch targets, structured steps, and responsive screens reduce effort for older adults and families.'
+    icon: <QrcodeOutlined />,
+    title: 'Emergency ready',
+    text: 'Essential permitted details remain easier to reach through a secure, revocable QR card.'
   },
   {
     icon: <LockOutlined />,
     title: 'Private by design',
-    text: 'Authenticated profiles and reports remain separate from the limited emergency information available through a QR scan.'
+    text: 'Protected records stay separate from the limited information shared during an emergency.'
   },
   {
-    icon: <QrcodeOutlined />,
-    title: 'Ready for emergencies',
-    text: 'A revocable QR and wallet-style ID card make permitted emergency details easier to reach when communication is difficult.'
+    icon: <SafetyCertificateOutlined />,
+    title: 'Accessible for all',
+    text: 'Clear steps, readable content, and large actions help older adults, families, and responders.'
+  },
+  {
+    icon: <TeamOutlined />,
+    title: 'Family connected',
+    text: 'Emergency contacts and caregivers can coordinate around one trusted source of information.'
+  },
+  {
+    icon: <FormOutlined />,
+    title: 'Current and useful',
+    text: 'Structured sections make medical, contact, and mobility information easier to review and update.'
+  },
+  {
+    icon: <MobileOutlined />,
+    title: 'Mobile first',
+    text: 'Responsive screens keep emergency actions practical across phones, tablets, and desktops.'
   }
 ];
 
@@ -87,7 +103,7 @@ const About = () => (
           </Flex>
           <Row gutter={[20, 20]} style={{ marginTop: 24 }}>
             {principles.map((item) => (
-              <Col xs={24} md={8} key={item.title}>
+              <Col xs={24} sm={12} md={8} xl={4} key={item.title}>
                 <Card hoverable style={{ height: '100%' }}>
                   <Space direction="vertical" size={14}>
                     <Button type="primary" shape="circle" size="large" icon={item.icon} />
