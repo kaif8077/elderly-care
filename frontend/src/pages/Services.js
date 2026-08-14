@@ -1,13 +1,19 @@
 import { useEffect, useState } from 'react';
 import {
-  Alert, Button, Card, Col, Flex, Layout, List, Menu, Row, Space,
+  Alert, Button, Card, Col, Flex, Image, Layout, List, Menu, Row, Space,
   Tag, Typography
 } from 'antd';
 import {
-  CheckCircleOutlined, FilePdfOutlined, HeartOutlined, IdcardOutlined,
+  CheckCircleOutlined, FilePdfOutlined, FileProtectOutlined, HeartOutlined, IdcardOutlined,
   MedicineBoxOutlined, QrcodeOutlined, SafetyCertificateOutlined
 } from '@ant-design/icons';
 import servicesHero from '../assests/elderlycare-services.png';
+import medicalProfileImage from '../assests/service-medical-profile.png';
+import emergencyQrImage from '../assests/service-emergency-qr.png';
+import idCardImage from '../assests/service-id-card.png';
+import medicalSummaryImage from '../assests/service-medical-summary.png';
+import healthGuidanceImage from '../assests/service-health-guidance.png';
+import secureDocumentsImage from '../assests/service-secure-documents.png';
 import PublicPageHero from '../components/PublicPageHero';
 import PublicFooter from '../components/PublicFooter';
 
@@ -19,6 +25,7 @@ const services = [
     id: 'medical-profile',
     icon: <MedicineBoxOutlined />,
     title: 'Medical Profile',
+    image: medicalProfileImage,
     summary: 'Keep the elderly person’s essential personal, contact, and medical information organized in one protected account.',
     detail: 'The guided form separates personal details, address, emergency contacts, medical conditions, allergies, medicines, symptoms, doctors, and hospital preferences into manageable steps.',
     points: [
@@ -33,6 +40,7 @@ const services = [
     id: 'emergency-qr',
     icon: <QrcodeOutlined />,
     title: 'Emergency QR Access',
+    image: emergencyQrImage,
     summary: 'Give responders fast access to a limited emergency view without exposing the complete private medical profile.',
     detail: 'The QR code contains a revocable secure link rather than medical records. The public page can show essential details such as blood group, severe allergies, critical conditions, and trusted contact actions.',
     points: [
@@ -47,6 +55,7 @@ const services = [
     id: 'elder-id-card',
     icon: <IdcardOutlined />,
     title: 'ElderlyCare ID Card',
+    image: idCardImage,
     summary: 'Create a compact emergency card that can be carried in a wallet and printed when needed.',
     detail: 'The single-sided card combines the person’s photograph, ElderlyCare number, date of birth, status, and secure QR in a clear wallet-card format.',
     points: [
@@ -60,7 +69,8 @@ const services = [
   {
     id: 'medical-reports',
     icon: <FilePdfOutlined />,
-    title: 'Medical Reports',
+    title: 'Emergency Medical Summary',
+    image: medicalSummaryImage,
     summary: 'Generate a structured Emergency Medical Summary that can be viewed privately and downloaded as a PDF.',
     detail: 'Each generated report keeps a snapshot of the information used at that time, allowing the latest report and previous versions to remain available without silently changing historical records.',
     points: [
@@ -75,6 +85,7 @@ const services = [
     id: 'health-guidance',
     icon: <HeartOutlined />,
     title: 'Health Recommendations',
+    image: healthGuidanceImage,
     summary: 'Receive a concise set of practical health and safety suggestions based on the saved medical profile.',
     detail: 'Recommendations focus on necessary medication, allergy, mobility, fall-risk, and wellness considerations. Saved versions can be reviewed later or downloaded as a PDF.',
     points: [
@@ -84,6 +95,21 @@ const services = [
       'PDF generation for private reference'
     ],
     audience: 'Account owners and caregivers looking for clear reminders that complement, but never replace, professional medical advice.'
+  },
+  {
+    id: 'secure-documents',
+    icon: <FileProtectOutlined />,
+    title: 'Secure Medical Documents',
+    image: secureDocumentsImage,
+    summary: 'Keep important prescriptions and medical documents attached to the protected elderly profile.',
+    detail: 'Authenticated users can upload supported files, organize them by category, preview permitted documents, download them when needed, and remove outdated files securely.',
+    points: [
+      'Protected document upload and access',
+      'File type and size validation',
+      'Organized document categories',
+      'Private preview, download, and deletion'
+    ],
+    audience: 'Older adults and trusted caregivers who need important medical documents available without publishing them through emergency QR access.'
   }
 ];
 
@@ -136,8 +162,19 @@ const Services = () => {
             </Col>
 
             <Col xs={24} lg={16}>
-              <Card style={{ height: '100%' }}>
-                <Space direction="vertical" size={18} style={{ width: '100%' }}>
+              <Card
+                style={{ height: '100%', overflow: 'hidden' }}
+                styles={{ body: { padding: 0 } }}
+              >
+                <Image
+                  key={activeService.id}
+                  src={activeService.image}
+                  alt={`${activeService.title} service`}
+                  preview={false}
+                  width="100%"
+                  style={{ display: 'block', width: '100%', height: 360, objectFit: 'cover' }}
+                />
+                <Space direction="vertical" size={18} style={{ width: '100%', padding: 24, boxSizing: 'border-box' }}>
                   <Tag color="blue">SELECTED SERVICE</Tag>
                   <Space wrap>
                     <Button type="primary" shape="circle" size="large" icon={activeService.icon} aria-label={activeService.title} />

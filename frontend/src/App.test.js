@@ -144,7 +144,9 @@ test('secondary public pages use the single about hero and About omits the team 
   expect(services).toContain('selectedKeys={[activeId]}');
   expect(services).toContain("elderlycare-services.png");
   expect(services).toContain('image={servicesHero}');
-  expect(services).not.toContain('activeService.image');
+  expect(services).toContain('activeService.image');
+  expect(services).toContain('Secure Medical Documents');
+  expect(services).toContain('service-secure-documents.png');
   expect(services).toContain('activeService.detail');
   expect(services).not.toContain('Create an account');
   expect(services).not.toContain('>Contact us</Button>');
