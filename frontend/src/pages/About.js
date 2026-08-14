@@ -103,7 +103,7 @@ const About = () => (
           </Flex>
           <Row gutter={[20, 20]} style={{ marginTop: 24 }}>
             {principles.map((item) => (
-              <Col xs={24} sm={12} md={8} xl={4} key={item.title}>
+              <Col xs={24} sm={12} md={8} key={item.title}>
                 <Card hoverable style={{ height: '100%' }}>
                   <Space direction="vertical" size={14}>
                     <Button type="primary" shape="circle" size="large" icon={item.icon} />
