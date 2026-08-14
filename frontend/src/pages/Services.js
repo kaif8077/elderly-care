@@ -1,18 +1,13 @@
 import { useEffect, useState } from 'react';
 import {
-  Alert, Button, Card, Col, Flex, Image, Layout, List, Menu, Row, Space,
+  Alert, Button, Card, Col, Flex, Layout, List, Menu, Row, Space,
   Tag, Typography
 } from 'antd';
 import {
   CheckCircleOutlined, FilePdfOutlined, HeartOutlined, IdcardOutlined,
   MedicineBoxOutlined, QrcodeOutlined, SafetyCertificateOutlined
 } from '@ant-design/icons';
-import formImage from '../assests/form.png';
-import recommendationsImage from '../assests/recommendation.png';
-import qrImage from '../assests/qr_id_card.png';
-import secureImage from '../assests/secure.png';
-import reportImage from '../assests/print.png';
-import aboutHero from '../assests/about-hero.jpg';
+import servicesHero from '../assests/elderlycare-services.png';
 import PublicPageHero from '../components/PublicPageHero';
 import PublicFooter from '../components/PublicFooter';
 
@@ -24,7 +19,6 @@ const services = [
     id: 'medical-profile',
     icon: <MedicineBoxOutlined />,
     title: 'Medical Profile',
-    image: formImage,
     summary: 'Keep the elderly person’s essential personal, contact, and medical information organized in one protected account.',
     detail: 'The guided form separates personal details, address, emergency contacts, medical conditions, allergies, medicines, symptoms, doctors, and hospital preferences into manageable steps.',
     points: [
@@ -39,7 +33,6 @@ const services = [
     id: 'emergency-qr',
     icon: <QrcodeOutlined />,
     title: 'Emergency QR Access',
-    image: secureImage,
     summary: 'Give responders fast access to a limited emergency view without exposing the complete private medical profile.',
     detail: 'The QR code contains a revocable secure link rather than medical records. The public page can show essential details such as blood group, severe allergies, critical conditions, and trusted contact actions.',
     points: [
@@ -54,7 +47,6 @@ const services = [
     id: 'elder-id-card',
     icon: <IdcardOutlined />,
     title: 'ElderlyCare ID Card',
-    image: qrImage,
     summary: 'Create a compact emergency card that can be carried in a wallet and printed when needed.',
     detail: 'The single-sided card combines the person’s photograph, ElderlyCare number, date of birth, status, and secure QR in a clear wallet-card format.',
     points: [
@@ -69,7 +61,6 @@ const services = [
     id: 'medical-reports',
     icon: <FilePdfOutlined />,
     title: 'Medical Reports',
-    image: reportImage,
     summary: 'Generate a structured Emergency Medical Summary that can be viewed privately and downloaded as a PDF.',
     detail: 'Each generated report keeps a snapshot of the information used at that time, allowing the latest report and previous versions to remain available without silently changing historical records.',
     points: [
@@ -84,7 +75,6 @@ const services = [
     id: 'health-guidance',
     icon: <HeartOutlined />,
     title: 'Health Recommendations',
-    image: recommendationsImage,
     summary: 'Receive a concise set of practical health and safety suggestions based on the saved medical profile.',
     detail: 'Recommendations focus on necessary medication, allergy, mobility, fall-risk, and wellness considerations. Saved versions can be reviewed later or downloaded as a PDF.',
     points: [
@@ -102,7 +92,6 @@ const Services = () => {
   const initialId = services.some(({ id }) => id === hashKey) ? hashKey : services[0].id;
   const [activeId, setActiveId] = useState(initialId);
   const activeService = services.find(({ id }) => id === activeId) || services[0];
-  const activeIndex = services.findIndex(({ id }) => id === activeService.id);
 
   useEffect(() => {
     if (window.location.hash !== `#${activeId}`) {
@@ -115,7 +104,7 @@ const Services = () => {
       <Content>
         <PublicPageHero
           title="Services"
-          image={aboutHero}
+          image={servicesHero}
           compact
           centered
           headingOnly
@@ -147,38 +136,25 @@ const Services = () => {
             </Col>
 
             <Col xs={24} lg={16}>
-              <Card style={{ height: '100%', overflow: 'hidden' }} styles={{ body: { padding: 0 } }}>
-                <Flex
-                  vertical
-                  align="center"
-                  justify="center"
-                  gap={14}
-                  style={{ minHeight: 360, height: '100%', padding: 28, background: '#edf3ff' }}
-                >
-                  <Tag color="blue">SELECTED SERVICE {activeIndex + 1} OF {services.length}</Tag>
-                  <Image
-                    key={activeService.id}
-                    src={activeService.image}
-                    alt={`${activeService.title} service`}
-                    preview={false}
-                    width="100%"
-                    style={{ maxHeight: 290, objectFit: 'contain' }}
-                  />
-                </Flex>
-              </Card>
-            </Col>
-          </Row>
-
-          <Card>
-            <Row gutter={[32, 24]}>
-              <Col xs={24} lg={15}>
-                <Space direction="vertical" size={14}>
+              <Card style={{ height: '100%' }}>
+                <Space direction="vertical" size={18} style={{ width: '100%' }}>
+                  <Tag color="blue">SELECTED SERVICE</Tag>
                   <Space wrap>
-                    <Button type="primary" shape="circle" icon={activeService.icon} aria-label={activeService.title} />
+                    <Button type="primary" shape="circle" size="large" icon={activeService.icon} aria-label={activeService.title} />
                     <Title level={2} style={{ margin: 0 }}>{activeService.title}</Title>
                   </Space>
                   <Paragraph style={{ margin: 0, fontSize: 17 }}>{activeService.summary}</Paragraph>
                   <Paragraph type="secondary" style={{ margin: 0, lineHeight: 1.8 }}>{activeService.detail}</Paragraph>
+                  <Title level={4} style={{ marginBottom: 0 }}>Included features</Title>
+                  <List
+                    split={false}
+                    dataSource={activeService.points}
+                    renderItem={(point) => (
+                      <List.Item>
+                        <Text><CheckCircleOutlined style={{ color: '#0066ff', marginRight: 10 }} />{point}</Text>
+                      </List.Item>
+                    )}
+                  />
                   <Alert
                     type={activeService.id === 'health-guidance' ? 'warning' : 'info'}
                     showIcon
@@ -187,26 +163,14 @@ const Services = () => {
                       ? 'Recommendations do not replace professional medical advice.'
                       : 'Private profile information remains protected behind authentication.'}
                   />
+                  <Card size="small" style={{ background: '#f8faff' }}>
+                    <Text strong>Designed for: </Text>
+                    <Text type="secondary">{activeService.audience}</Text>
+                  </Card>
                 </Space>
-              </Col>
-              <Col xs={24} lg={9}>
-                <Title level={4}>Included features</Title>
-                <List
-                  split={false}
-                  dataSource={activeService.points}
-                  renderItem={(point) => (
-                    <List.Item>
-                      <Text><CheckCircleOutlined style={{ color: '#0066ff', marginRight: 10 }} />{point}</Text>
-                    </List.Item>
-                  )}
-                />
-              </Col>
-            </Row>
-            <Card size="small" style={{ marginTop: 22, background: '#f8faff' }}>
-              <Text strong>Designed for: </Text>
-              <Text type="secondary">{activeService.audience}</Text>
-            </Card>
-          </Card>
+              </Card>
+            </Col>
+          </Row>
         </Flex>
       </Content>
       <PublicFooter />
