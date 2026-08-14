@@ -128,7 +128,7 @@ test('home uses two restored banners while secondary pages keep a single image',
 });
 
 test('secondary public pages use the single about hero and About omits the team section', () => {
-  ['About', 'Services', 'Contact'].forEach((page) => {
+  ['About', 'Contact'].forEach((page) => {
     const source = fs.readFileSync(path.join(__dirname, 'pages', `${page}.js`), 'utf8');
     expect(source).toContain("about-hero.jpg");
     expect(source).toContain('image={aboutHero}');
@@ -142,7 +142,9 @@ test('secondary public pages use the single about hero and About omits the team 
   const services = fs.readFileSync(path.join(__dirname, 'pages', 'Services.js'), 'utf8');
   expect(services).toContain('title="All services"');
   expect(services).toContain('selectedKeys={[activeId]}');
-  expect(services).toContain('activeService.image');
+  expect(services).toContain("elderlycare-services.png");
+  expect(services).toContain('image={servicesHero}');
+  expect(services).not.toContain('activeService.image');
   expect(services).toContain('activeService.detail');
   expect(services).not.toContain('Create an account');
   expect(services).not.toContain('>Contact us</Button>');
