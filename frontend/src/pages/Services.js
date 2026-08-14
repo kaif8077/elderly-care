@@ -7,7 +7,7 @@ import {
   CheckCircleOutlined, FilePdfOutlined, FileProtectOutlined, HeartOutlined, IdcardOutlined,
   MedicineBoxOutlined, QrcodeOutlined, SafetyCertificateOutlined
 } from '@ant-design/icons';
-import servicesHero from '../assests/elderlycare-services.png';
+import aboutHero from '../assests/about-hero.jpg';
 import medicalProfileImage from '../assests/service-medical-profile.png';
 import emergencyQrImage from '../assests/service-emergency-qr.png';
 import idCardImage from '../assests/service-id-card.png';
@@ -130,7 +130,7 @@ const Services = () => {
       <Content>
         <PublicPageHero
           title="Services"
-          image={servicesHero}
+          image={aboutHero}
           compact
           centered
           headingOnly
@@ -172,9 +172,16 @@ const Services = () => {
                   alt={`${activeService.title} service`}
                   preview={false}
                   width="100%"
-                  style={{ display: 'block', width: '100%', height: 360, objectFit: 'cover' }}
+                  style={{ display: 'block', width: '100%', height: '100%', minHeight: 360, objectFit: 'cover' }}
                 />
-                <Space direction="vertical" size={18} style={{ width: '100%', padding: 24, boxSizing: 'border-box' }}>
+              </Card>
+            </Col>
+          </Row>
+
+          <Card style={{ width: '100%' }}>
+            <Row gutter={[32, 24]}>
+              <Col xs={24} lg={15}>
+                <Space direction="vertical" size={16} style={{ width: '100%' }}>
                   <Tag color="blue">SELECTED SERVICE</Tag>
                   <Space wrap>
                     <Button type="primary" shape="circle" size="large" icon={activeService.icon} aria-label={activeService.title} />
@@ -182,16 +189,6 @@ const Services = () => {
                   </Space>
                   <Paragraph style={{ margin: 0, fontSize: 17 }}>{activeService.summary}</Paragraph>
                   <Paragraph type="secondary" style={{ margin: 0, lineHeight: 1.8 }}>{activeService.detail}</Paragraph>
-                  <Title level={4} style={{ marginBottom: 0 }}>Included features</Title>
-                  <List
-                    split={false}
-                    dataSource={activeService.points}
-                    renderItem={(point) => (
-                      <List.Item>
-                        <Text><CheckCircleOutlined style={{ color: '#0066ff', marginRight: 10 }} />{point}</Text>
-                      </List.Item>
-                    )}
-                  />
                   <Alert
                     type={activeService.id === 'health-guidance' ? 'warning' : 'info'}
                     showIcon
@@ -200,14 +197,26 @@ const Services = () => {
                       ? 'Recommendations do not replace professional medical advice.'
                       : 'Private profile information remains protected behind authentication.'}
                   />
-                  <Card size="small" style={{ background: '#f8faff' }}>
-                    <Text strong>Designed for: </Text>
-                    <Text type="secondary">{activeService.audience}</Text>
-                  </Card>
                 </Space>
-              </Card>
-            </Col>
-          </Row>
+              </Col>
+              <Col xs={24} lg={9}>
+                <Title level={4}>Included features</Title>
+                <List
+                  split={false}
+                  dataSource={activeService.points}
+                  renderItem={(point) => (
+                    <List.Item>
+                      <Text><CheckCircleOutlined style={{ color: '#0066ff', marginRight: 10 }} />{point}</Text>
+                    </List.Item>
+                  )}
+                />
+              </Col>
+            </Row>
+            <Card size="small" style={{ marginTop: 22, background: '#f8faff' }}>
+              <Text strong>Designed for: </Text>
+              <Text type="secondary">{activeService.audience}</Text>
+            </Card>
+          </Card>
         </Flex>
       </Content>
       <PublicFooter />
