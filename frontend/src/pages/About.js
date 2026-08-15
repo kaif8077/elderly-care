@@ -74,16 +74,16 @@ const About = () => (
               </Card>
             </Col>
             <Col xs={24} lg={13}>
-              <Title level={2} className="care-eyebrow">OUR PURPOSE</Title>
-              <h6 id="about-purpose" className="care-section-heading care-section-heading-left care-secondary-heading">Helping families prepare before an emergency happens</h6>
+              <Title level={2} className="care-eyebrow">WHY ELDERLYCARE EXISTS</Title>
+              <h6 id="about-purpose" className="care-section-heading care-section-heading-left care-secondary-heading">Keeping trusted information ready when every moment matters</h6>
               <Paragraph type="secondary" className="care-section-subheading care-section-subheading-left">
-                ElderlyCare was created to make important health and contact information easier to organize, update, and reach when an older adult needs assistance. Families can maintain one structured profile instead of relying on scattered papers, messages, or memory.
+                During an emergency, an older adult may be unable to explain their medical conditions, allergies, medicines, or whom to contact. ElderlyCare gives families a simple way to prepare this essential information before it is urgently needed.
               </Paragraph>
               <Paragraph type="secondary">
-                The platform brings together medical conditions, allergies, medicines, emergency contacts, doctors, hospital preferences, reports, and a printable emergency ID card in a clear workflow designed for everyday use.
+                A structured profile keeps health details, emergency contacts, doctors, hospital preferences, secure documents, and personalized recommendations organized in one place. A printable ElderlyCare ID card and QR-based emergency view help permitted information reach a responder quickly.
               </Paragraph>
               <Paragraph type="secondary">
-                Privacy remains central to the experience. Account owners control their protected records, while a revocable QR can show responders only the limited emergency details needed to provide timely help.
+                The complete record remains protected inside the account. The QR code contains a secure, revocable link and shares only limited emergency information, helping families balance faster assistance with the older adult's privacy and dignity.
               </Paragraph>
               <Divider />
               <Timeline items={[
