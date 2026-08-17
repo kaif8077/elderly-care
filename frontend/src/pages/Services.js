@@ -8,12 +8,12 @@ import {
   MedicineBoxOutlined, QrcodeOutlined, SafetyCertificateOutlined
 } from '@ant-design/icons';
 import aboutHero from '../assests/about-hero.jpg';
-import medicalProfileImage from '../assests/service-medical-profile.png';
-import emergencyQrImage from '../assests/service-emergency-qr.png';
-import idCardImage from '../assests/service-id-card.png';
-import medicalSummaryImage from '../assests/service-medical-summary.png';
-import healthGuidanceImage from '../assests/service-health-guidance.png';
-import secureDocumentsImage from '../assests/service-secure-documents.png';
+import medicalProfileImage from '../assests/service-medical-profile.jpg';
+import emergencyQrImage from '../assests/service-emergency-qr.jpg';
+import idCardImage from '../assests/service-id-card.jpg';
+import medicalSummaryImage from '../assests/service-medical-summary.jpg';
+import healthGuidanceImage from '../assests/service-health-guidance.jpg';
+import secureDocumentsImage from '../assests/service-secure-documents.jpg';
 import PublicPageHero from '../components/PublicPageHero';
 import PublicFooter from '../components/PublicFooter';
 
@@ -125,6 +125,13 @@ const Services = () => {
     }
   }, [activeId]);
 
+  useEffect(() => {
+    services.forEach(({ image }) => {
+      const preloadImage = new window.Image();
+      preloadImage.src = image;
+    });
+  }, []);
+
   return (
     <Layout>
       <Content>
@@ -171,6 +178,8 @@ const Services = () => {
                   src={activeService.image}
                   alt={`${activeService.title} service`}
                   preview={false}
+                  loading="eager"
+                  fetchPriority="high"
                   width="100%"
                   style={{ display: 'block', width: '100%', aspectRatio: '1693 / 929', objectFit: 'cover' }}
                 />
