@@ -84,7 +84,9 @@ const EmergencyProfile = () => {
     try {
       const { data } = await api.post(`/api/emergency-alerts/public/${encodeURIComponent(token)}`, {
         emergencyType: values.emergencyType,
-        responderName: values.responderName.trim(),
+        responderName: values.responderName?.trim() || undefined,
+        responderPhone: values.responderPhone?.trim() || undefined,
+        responderMessage: values.responderMessage?.trim() || undefined,
         ...(locationState.location ? {
           latitude: locationState.location.latitude,
           longitude: locationState.location.longitude,
@@ -173,8 +175,14 @@ const EmergencyProfile = () => {
               { value: 'other', label: 'Other' }
             ]} />
           </Form.Item>
-          <Form.Item name="responderName" label="Scanner name" rules={[{ required: true, whitespace: true, message: 'Enter your name' }]}>
-            <Input maxLength={80} placeholder="Enter scanner name" />
+          <Form.Item name="responderName" label="Name (optional)">
+            <Input maxLength={80} placeholder="Enter your name" />
+          </Form.Item>
+          <Form.Item name="responderPhone" label="Phone (optional)">
+            <Input maxLength={30} inputMode="tel" placeholder="Enter your phone number" />
+          </Form.Item>
+          <Form.Item name="responderMessage" label="Message (optional)">
+            <Input.TextArea rows={3} maxLength={500} showCount placeholder="Enter a short message" />
           </Form.Item>
           <Button type="primary" danger size="large" block icon={<SendOutlined />} loading={sending || locationState.loading} onClick={sendEmergencyAlert}>Send Emergency Email Alert</Button>
         </Form>
