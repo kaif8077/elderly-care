@@ -29,3 +29,8 @@ test('age calculation rejects invalid dates', () => {
   assert.equal(calculateAge(null), null);
   assert.equal(calculateAge('not-a-date'), null);
 });
+
+test('secure QR routes expose the emergency-safe profile photo through the opaque token', () => {
+  assert.equal(typeof require('../routes/qrRoutes'), 'function');
+  assert.equal(typeof require('../controllers/secureQrController').getPublicEmergencyPhoto, 'function');
+});

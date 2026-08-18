@@ -193,3 +193,14 @@ test('reports are hidden from the member profile and admin routes', () => {
   expect(adminUser).not.toContain("'Reports'");
   expect(adminUser).not.toContain('Saved reports');
 });
+
+test('public emergency profile uses a mobile safe view with location alerts and first-aid safety', () => {
+  const source = fs.readFileSync(path.join(__dirname, 'pages', 'EmergencyProfile.js'), 'utf8');
+  expect(source).toContain('ElderlyCare safe view');
+  expect(source).toContain('Emergency Help');
+  expect(source).toContain('Generate First Aid & Medication Guidance');
+  expect(source).toContain('navigator.geolocation.getCurrentPosition');
+  expect(source).toContain('locationAccuracy');
+  expect(source).toContain('Send Emergency Email Alert');
+  expect(source).toContain('Do not change a dose');
+});
