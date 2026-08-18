@@ -1,12 +1,11 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import {
-  Alert, Avatar, Button, Card, Checkbox, Descriptions, Divider, Flex, Form,
-  Input, Modal, Progress, Select, Space, Tag, Typography, message
+  Alert, Avatar, Button, Card, Descriptions, Divider, Flex, Modal, Progress,
+  Space, Tag, Typography, message
 } from 'antd';
 import {
-  AlertOutlined, CheckCircleFilled, EnvironmentOutlined, LockOutlined,
-  PhoneOutlined, SendOutlined
+  AlertOutlined, CheckCircleFilled, LockOutlined, PhoneOutlined, SendOutlined
 } from '@ant-design/icons';
 import api from '../services/api';
 import './EmergencyProfile.css';
@@ -23,7 +22,6 @@ const EmergencyProfile = () => {
   const [sending, setSending] = useState(false);
   const [photoUrl, setPhotoUrl] = useState('');
   const [locationState, setLocationState] = useState({ loading: false, location: null, error: '' });
-  const [form] = Form.useForm();
   const primary = profile?.emergencyContacts?.[0];
   const secondary = profile?.emergencyContacts?.[1];
 
@@ -70,15 +68,11 @@ const EmergencyProfile = () => {
   };
 
   const sendEmergencyAlert = async () => {
-    const values = form.getFieldsValue();
     setSending(true);
     try {
       const { data } = await api.post(`/api/emergency-alerts/public/${encodeURIComponent(token)}`, {
-        emergencyType: values.emergencyType || 'medical_emergency',
-        responderName: values.responderName?.trim() || undefined,
-        responderPhone: values.responderPhone?.trim() || undefined,
-        responderMessage: values.responderMessage?.trim() || undefined,
-        ...(values.shareLocation !== false && locationState.location ? {
+        emergencyType: 'medical_emergency',
+        ...(locationState.location ? {
           latitude: locationState.location.latitude,
           longitude: locationState.location.longitude,
           locationAccuracy: locationState.location.accuracy
@@ -86,7 +80,6 @@ const EmergencyProfile = () => {
       });
       message.success(data.message);
       setHelpOpen(false);
-      form.resetFields();
     } catch (error) {
       message.error(error.response?.data?.message || 'Unable to send the alert. Call the emergency contact directly.');
     } finally {
@@ -155,17 +148,7 @@ const EmergencyProfile = () => {
       </section>
 
       <Modal title="Send emergency help alert" open={helpOpen} onCancel={() => setHelpOpen(false)} footer={null} destroyOnHidden>
-        <Form form={form} layout="vertical" initialValues={{ emergencyType: 'medical_emergency', shareLocation: true }} className="emergency-help-form">
-          <Form.Item name="emergencyType" label="Situation type"><Select options={[['medical_emergency', 'Medical emergency'], ['fall', 'Fall'], ['person_found', 'Person found'], ['lost_confused', 'Lost or confused person'], ['accident', 'Accident'], ['other', 'Other']].map(([value, label]) => ({ value, label }))} /></Form.Item>
-          <Flex gap={12} wrap="wrap"><Form.Item name="responderName" label="Your name (optional)" style={{ flex: '1 1 190px' }}><Input maxLength={80} placeholder="Enter your name" /></Form.Item><Form.Item name="responderPhone" label="Your phone (optional)" style={{ flex: '1 1 190px' }}><Input maxLength={30} inputMode="tel" placeholder="Enter your phone" /></Form.Item></Flex>
-          <Form.Item name="responderMessage" label="Situation message (optional)"><Input.TextArea rows={3} maxLength={500} showCount placeholder="Describe the person's condition or location" /></Form.Item>
-          <Form.Item name="shareLocation" valuePropName="checked"><Checkbox disabled={!locationState.location}>Include my current location and Google Maps link in the email alert</Checkbox></Form.Item>
-          {locationState.loading && <Alert type="info" showIcon message="Requesting your current location…" />}
-          {locationState.location && <Alert type="success" showIcon icon={<EnvironmentOutlined />} message="Current location is ready to share" description={`Accuracy approximately ${Math.round(locationState.location.accuracy || 0)} metres. You can uncheck location before sending.`} />}
-          {locationState.error && <Alert type="warning" showIcon message={locationState.error} action={<Button onClick={requestLocation}>Try again</Button>} />}
-          <Paragraph type="secondary" className="emergency-share-preview">The email will contain the situation, optional responder details, and—only when enabled—the current coordinates and Google Maps link.</Paragraph>
-          <Button type="primary" danger size="large" block icon={<SendOutlined />} loading={sending} onClick={sendEmergencyAlert}>Send Emergency Email Alert</Button>
-        </Form>
+        <Button type="primary" danger size="large" block icon={<SendOutlined />} loading={sending || locationState.loading} onClick={sendEmergencyAlert}>Send Emergency Email Alert</Button>
       </Modal>
 
       <Modal title="First Aid & Medication Safety" open={guidanceOpen} onCancel={() => setGuidanceOpen(false)} footer={<Button type="primary" onClick={() => setGuidanceOpen(false)}>Close</Button>}>
