@@ -29,9 +29,17 @@ const emergencyAlertSchema = new mongoose.Schema({
     mapUrl: { type: String, default: null }
   },
   acknowledgementTokenHash: { type: String, select: false, default: null },
+  acknowledgementTokenExpiresAt: { type: Date, select: false, default: null },
   acknowledgementAction: { type: String, enum: ['received', 'calling', 'going_to_location', 'services_contacted', 'resolved', null], default: null },
   acknowledgedBy: { type: mongoose.Schema.Types.ObjectId, ref: 'User', default: null },
   acknowledgedAt: { type: Date, default: null },
+  acknowledgementHistory: [{
+    action: { type: String, enum: ['received', 'calling', 'going_to_location', 'services_contacted', 'resolved'], required: true },
+    actorType: { type: String, enum: ['public_link', 'account'], required: true },
+    actorId: { type: mongoose.Schema.Types.ObjectId, ref: 'User', default: null },
+    actorName: { type: String, trim: true, maxlength: 100, default: null },
+    createdAt: { type: Date, default: Date.now }
+  }],
   resolvedAt: { type: Date, default: null }
 }, { timestamps: true });
 

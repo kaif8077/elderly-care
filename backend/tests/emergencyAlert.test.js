@@ -20,3 +20,20 @@ test('emergency alert model stores limited responder context without medical pay
   assert.equal(paths.longitude, undefined);
   assert.equal(paths.medicalData, undefined);
 });
+
+test('emergency alert model supports expiring acknowledgement links and an action timeline', () => {
+  const paths = EmergencyAlert.schema.paths;
+  assert.ok(paths.acknowledgementTokenHash);
+  assert.ok(paths.acknowledgementTokenExpiresAt);
+  assert.ok(paths.acknowledgementHistory);
+  const historySchema = paths.acknowledgementHistory.schema.paths;
+  assert.ok(historySchema.action);
+  assert.ok(historySchema.actorType);
+  assert.ok(historySchema.actorId);
+  assert.ok(historySchema.createdAt);
+});
+
+test('user and admin emergency alert routes register successfully', () => {
+  assert.equal(typeof require('../routes/emergencyAlertRoutes'), 'function');
+  assert.equal(typeof require('../routes/adminEmergencyAlertRoutes'), 'function');
+});
