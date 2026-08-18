@@ -196,13 +196,18 @@ test('reports are hidden from the member profile and admin routes', () => {
 
 test('public emergency profile uses a mobile safe view with location alerts and first-aid safety', () => {
   const source = fs.readFileSync(path.join(__dirname, 'pages', 'EmergencyProfile.js'), 'utf8');
-  expect(source).toContain('ElderlyCare safe view');
+  expect(source).toContain('Fetching Data');
+  expect(source).toContain('Retrieving secure information');
+  expect(source).toContain('>Verified</Tag>');
+  expect(source).not.toContain('ElderlyCare safe view');
+  expect(source).not.toContain('Only emergency-safe information is shown');
   expect(source).toContain('Emergency Help');
   expect(source).toContain('Generate First Aid & Medication Guidance');
   expect(source).toContain('navigator.geolocation.getCurrentPosition');
   expect(source).toContain('locationAccuracy');
   expect(source).toContain('Send Emergency Email Alert');
-  expect(source).toContain('Do not change a dose');
+  expect(source).not.toContain('Show this list and available medicine packaging');
+  expect(source).not.toContain('This guidance does not replace emergency services');
   expect(source).toContain("responseType: 'blob'");
   expect(source).toContain('URL.createObjectURL');
 });
