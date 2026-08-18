@@ -16,6 +16,7 @@ import Contact from './pages/Contact';
 import CareInvitation from './pages/CareInvitation';
 import AlertAcknowledge from './pages/AlertAcknowledge';
 import EmergencyContactVerification from './pages/EmergencyContactVerification';
+import EmergencyAlerts from './pages/EmergencyAlerts';
 import { AdminAuthProvider } from './admin/context/AdminAuthContext';
 import AdminProtectedRoute from './admin/components/AdminProtectedRoute';
 import AdminLogin from './admin/pages/AdminLogin';
@@ -27,6 +28,7 @@ import AdminUserDetail from './admin/pages/AdminUserDetail';
 import AdminIdCard from './admin/pages/AdminIdCard';
 import AdminAuditLogs from './admin/pages/AdminAuditLogs';
 import AdminContacts from './admin/pages/AdminContacts';
+import AdminEmergencyAlerts from './admin/pages/AdminEmergencyAlerts';
 import ProtectedRoute from './components/ProtectedRoute';
 import './App.css';
 
@@ -47,6 +49,7 @@ const AppRoutes = () => {
                 <Route path="/contact" element={<Contact />} />
                 <Route path="/profile" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
                 <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
+                <Route path="/emergency-alerts" element={<ProtectedRoute><EmergencyAlerts /></ProtectedRoute>} />
                 <Route path="/reports" element={<ProtectedRoute><MedicalReports /></ProtectedRoute>} />
                 <Route path="/emergency/:token" element={<EmergencyProfile />} />
                 <Route path="/services" element={<Services />} />
@@ -60,6 +63,7 @@ const AppRoutes = () => {
                 >
                     <Route path="dashboard" element={<AdminDashboard />} />
                     <Route path="users" element={<AdminUsers />} />
+                    <Route path="emergency-alerts" element={<AdminEmergencyAlerts />} />
                     <Route path="users/:userId" element={<AdminUserDetail />} />
                     <Route path="id-cards/:userId" element={<AdminIdCard />} />
                     <Route path="audit-logs" element={<AdminAuditLogs />} />

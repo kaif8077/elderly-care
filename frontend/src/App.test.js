@@ -154,14 +154,15 @@ test('secondary public pages use the single about hero and About omits the team 
   expect(home).toContain("why-choose-us-v2.jpg");
 });
 
-test('admin navigation removes feedback and retains requested modules', () => {
+test('admin navigation retains requested modules and emergency alert monitoring', () => {
   const sidebar = fs.readFileSync(path.join(__dirname, 'admin', 'components', 'AdminSidebar.js'), 'utf8');
-  ['Dashboard', 'Users', 'Audit Logs', 'Contact Us'].forEach((label) => expect(sidebar).toContain(`label: '${label}'`));
-  ['Feedback', 'Medical Profiles', 'Reports', 'ID Cards', 'QR Management', 'Emergency Alerts', 'Documents'].forEach((label) => expect(sidebar).not.toContain(`label: '${label}'`));
+  ['Dashboard', 'Users', 'Emergency Alerts', 'Audit Logs', 'Contact Us'].forEach((label) => expect(sidebar).toContain(`label: '${label}'`));
+  ['Feedback', 'Medical Profiles', 'Reports', 'ID Cards', 'QR Management', 'Documents'].forEach((label) => expect(sidebar).not.toContain(`label: '${label}'`));
   const app = fs.readFileSync(path.join(__dirname, 'App.js'), 'utf8');
   expect(app).toContain('path="contacts"');
+  expect(app).toContain('path="emergency-alerts"');
   expect(app).not.toContain('path="feedback"');
-  ['AdminUsers', 'AdminAuditLogs'].forEach((page) => {
+  ['AdminUsers', 'AdminEmergencyAlerts', 'AdminAuditLogs'].forEach((page) => {
     const source = fs.readFileSync(path.join(__dirname, 'admin', 'pages', `${page}.js`), 'utf8');
     expect(source).toContain('<Table');
     expect(source).toContain("from 'antd'");

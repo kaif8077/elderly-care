@@ -2,12 +2,13 @@ import React from 'react';
 import { Menu, Typography } from 'antd';
 import { useLocation, useNavigate } from 'react-router-dom';
 import {
-  AuditOutlined, DashboardOutlined, MessageOutlined, UserOutlined
+  AlertOutlined, AuditOutlined, DashboardOutlined, MessageOutlined, UserOutlined
 } from '@ant-design/icons';
 
 const entries = [
   { key: '/admin/dashboard', label: 'Dashboard', icon: <DashboardOutlined /> },
   { key: '/admin/users', label: 'Users', icon: <UserOutlined /> },
+  { key: '/admin/emergency-alerts', label: 'Emergency Alerts', icon: <AlertOutlined /> },
   { key: '/admin/audit-logs', label: 'Audit Logs', icon: <AuditOutlined /> },
   { key: '/admin/contacts', label: 'Contact Us', icon: <MessageOutlined /> }
 ];

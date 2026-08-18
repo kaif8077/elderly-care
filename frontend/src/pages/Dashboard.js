@@ -5,6 +5,7 @@ import { AuthContext } from '../context/AuthContext';
 import MedicalForm from '../components/MedicalForm';
 import QRCodeDisplay from '../components/QRCodeDisplay';
 import Recommendations from '../components/Recommendations';
+import EmergencyAlertSummary from '../components/EmergencyAlertSummary';
 
 const { Title, Paragraph } = Typography;
 
@@ -22,6 +23,7 @@ const Dashboard = () => {
           </div>
         </div>
       </Card>
+      <EmergencyAlertSummary />
       <Card id="medical-form" className="care-section-card">
         <MedicalForm onSubmissionSuccess={() => navigate('/profile')} />
       </Card>

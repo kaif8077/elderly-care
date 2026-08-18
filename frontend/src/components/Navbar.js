@@ -4,7 +4,7 @@ import {
   Avatar, Button, Drawer, Dropdown, Flex, Grid, Image, Layout, Menu, Space, Typography, message
 } from 'antd';
 import {
-  AppstoreOutlined, ContactsOutlined, HomeOutlined, InfoCircleOutlined,
+  AlertOutlined, AppstoreOutlined, ContactsOutlined, HomeOutlined, InfoCircleOutlined,
   LoginOutlined, LogoutOutlined, MenuOutlined, ProfileOutlined,
   UserAddOutlined, UserOutlined
 } from '@ant-design/icons';
@@ -50,6 +50,7 @@ const Navbar = () => {
     ? [
         { key: '/profile', icon: <ProfileOutlined />, label: 'My Profile' },
         { key: '/dashboard', icon: <AppstoreOutlined />, label: 'Dashboard' },
+        { key: '/emergency-alerts', icon: <AlertOutlined />, label: 'Emergency Alerts' },
         { type: 'divider' },
         { key: 'logout', icon: <LogoutOutlined />, label: 'Logout', danger: true }
       ]

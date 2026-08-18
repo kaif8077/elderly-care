@@ -9,6 +9,7 @@ const { Sider, Header, Content } = Layout;
 const titles = {
   '/admin/dashboard': 'Dashboard',
   '/admin/users': 'Users',
+  '/admin/emergency-alerts': 'Emergency alerts',
   '/admin/audit-logs': 'Audit logs',
   '/admin/contacts': 'Contact messages'
 };
