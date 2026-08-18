@@ -206,6 +206,10 @@ test('public emergency profile uses a mobile safe view with location alerts and 
   expect(source).toContain('navigator.geolocation.getCurrentPosition');
   expect(source).toContain('locationAccuracy');
   expect(source).toContain('Send Emergency Email Alert');
+  expect(source).not.toContain('Situation type');
+  expect(source).not.toContain('Your name (optional)');
+  expect(source).not.toContain('Situation message (optional)');
+  expect(source).not.toContain('Current location is ready to share');
   expect(source).not.toContain('Show this list and available medicine packaging');
   expect(source).not.toContain('This guidance does not replace emergency services');
   expect(source).toContain("responseType: 'blob'");
