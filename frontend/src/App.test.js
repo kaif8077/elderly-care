@@ -203,4 +203,18 @@ test('public emergency profile uses a mobile safe view with location alerts and 
   expect(source).toContain('locationAccuracy');
   expect(source).toContain('Send Emergency Email Alert');
   expect(source).toContain('Do not change a dose');
+  expect(source).toContain("responseType: 'blob'");
+  expect(source).toContain('URL.createObjectURL');
+});
+
+test('member profile uses a responsive Ant Design desktop summary without removing core modules', () => {
+  const source = fs.readFileSync(path.join(__dirname, 'pages', 'Profile.js'), 'utf8');
+  expect(source).toContain('<Row gutter={[20, 20]}');
+  expect(source).toContain('Health information');
+  expect(source).toContain('Emergency contact');
+  expect(source).toContain('Profile resources');
+  expect(source).toContain('<Collapse items={detailItems}');
+  expect(source).toContain('<Recommendations />');
+  expect(source).toContain('<UserIdCard');
+  expect(source).toContain('<MedicalDocuments />');
 });

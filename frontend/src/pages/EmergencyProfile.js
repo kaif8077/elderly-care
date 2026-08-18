@@ -12,7 +12,6 @@ import api from '../services/api';
 import './EmergencyProfile.css';
 
 const { Title, Paragraph, Text } = Typography;
-const apiBase = import.meta.env.VITE_BACKEND_URI || 'http://localhost:5000';
 const readableList = (items, empty = 'None reported') => Array.isArray(items) && items.length ? items.join(', ') : empty;
 
 const EmergencyProfile = () => {
@@ -22,11 +21,11 @@ const EmergencyProfile = () => {
   const [helpOpen, setHelpOpen] = useState(false);
   const [guidanceOpen, setGuidanceOpen] = useState(false);
   const [sending, setSending] = useState(false);
+  const [photoUrl, setPhotoUrl] = useState('');
   const [locationState, setLocationState] = useState({ loading: false, location: null, error: '' });
   const [form] = Form.useForm();
   const primary = profile?.emergencyContacts?.[0];
   const secondary = profile?.emergencyContacts?.[1];
-  const photoUrl = `${apiBase}/api/qr/public/${encodeURIComponent(token)}/photo`;
 
   useEffect(() => {
     let active = true;
@@ -34,6 +33,22 @@ const EmergencyProfile = () => {
       .then(({ data }) => { if (active) { setProfile(data.emergencyProfile); setState({ loading: false, error: '' }); } })
       .catch((error) => { if (active) setState({ loading: false, error: error.response?.data?.message || error.message || 'Unable to open this emergency profile.' }); });
     return () => { active = false; };
+  }, [token]);
+
+  useEffect(() => {
+    let active = true;
+    let objectUrl = '';
+    api.get(`/api/qr/public/${encodeURIComponent(token)}/photo`, { responseType: 'blob' })
+      .then(({ data }) => {
+        if (!active || !data?.size) return;
+        objectUrl = URL.createObjectURL(data);
+        setPhotoUrl(objectUrl);
+      })
+      .catch(() => { if (active) setPhotoUrl(''); });
+    return () => {
+      active = false;
+      if (objectUrl) URL.revokeObjectURL(objectUrl);
+    };
   }, [token]);
 
   const requestLocation = () => {
@@ -101,7 +116,7 @@ const EmergencyProfile = () => {
 
         <Card className="emergency-profile-card" styles={{ body: { padding: 0 } }}>
           <Flex align="center" gap={16} className="emergency-person">
-            <Avatar size={86} src={photoUrl}>{profile.name?.charAt(0)}</Avatar>
+            <Avatar size={86} src={photoUrl || undefined}>{profile.name?.charAt(0)}</Avatar>
             <div>
               <Title level={3}>{profile.name}</Title>
               <Paragraph>{profile.approximateAge !== null ? `${profile.approximateAge} years` : 'Age hidden'} · {readableList(profile.preferredLanguage, 'Language not specified')}</Paragraph>
