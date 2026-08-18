@@ -2,11 +2,11 @@ import React, { useEffect, useMemo, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import {
   Alert, Avatar, Button, Card, Checkbox, Descriptions, Divider, Flex, Form,
-  Input, Modal, Select, Space, Spin, Tag, Typography, message
+  Input, Modal, Progress, Select, Space, Tag, Typography, message
 } from 'antd';
 import {
-  AlertOutlined, CheckCircleFilled, EnvironmentOutlined, HeartOutlined,
-  MedicineBoxOutlined, PhoneOutlined, SafetyCertificateOutlined, SendOutlined
+  AlertOutlined, CheckCircleFilled, EnvironmentOutlined, LockOutlined,
+  PhoneOutlined, SendOutlined
 } from '@ant-design/icons';
 import api from '../services/api';
 import './EmergencyProfile.css';
@@ -103,14 +103,26 @@ const EmergencyProfile = () => {
     ...(profile?.preferredLanguage?.length ? [{ key: 'language', label: 'Preferred language', children: readableList(profile.preferredLanguage) }] : [])
   ], [profile]);
 
-  if (state.loading) return <main className="emergency-shell"><Card className="emergency-loading"><Spin size="large" /><Text>Loading emergency information…</Text></Card></main>;
+  if (state.loading) return (
+    <main className="emergency-shell emergency-fetching-shell">
+      <Card className="emergency-loading">
+        <Flex vertical align="center" gap={18}>
+          <div className="emergency-lock" aria-hidden="true"><LockOutlined /></div>
+          <div className="emergency-fetching-copy">
+            <Text strong>Fetching Data</Text>
+            <Text type="secondary">Retrieving secure information…</Text>
+          </div>
+          <Progress percent={75} showInfo strokeColor="#238636" trailColor="#e7ebf0" />
+        </Flex>
+      </Card>
+    </main>
+  );
   if (state.error) return <main className="emergency-shell"><Alert type="error" showIcon message="Emergency profile unavailable" description={state.error} /></main>;
 
   return (
     <main className="emergency-shell">
       <section className="emergency-mobile-panel" aria-labelledby="emergency-profile-title">
         <Flex vertical align="center" gap={4} className="emergency-page-heading">
-          <Text className="emergency-brand"><SafetyCertificateOutlined /> ElderlyCare safe view</Text>
           <Title id="emergency-profile-title" level={2}>Emergency Profile</Title>
         </Flex>
 
@@ -120,7 +132,7 @@ const EmergencyProfile = () => {
             <div>
               <Title level={3}>{profile.name}</Title>
               <Paragraph>{profile.approximateAge !== null ? `${profile.approximateAge} years` : 'Age hidden'} · {readableList(profile.preferredLanguage, 'Language not specified')}</Paragraph>
-              <Tag icon={<CheckCircleFilled />} color="success">Verified emergency card</Tag>
+              <Tag icon={<CheckCircleFilled />} color="success">Verified</Tag>
             </div>
           </Flex>
           <Descriptions bordered size="small" column={1} items={emergencyDetails} className="emergency-medical-details" />
@@ -130,7 +142,7 @@ const EmergencyProfile = () => {
           {[primary, secondary].filter(Boolean).map((contact, index) => (
             <Flex key={`${contact.phone}-${index}`} align="center" justify="space-between" gap={12} className="emergency-contact-row">
               <div><Text strong>{contact.name || `Contact ${index + 1}`}</Text><br /><Text type="secondary">{contact.relationship || 'Emergency contact'} · {contact.phone}</Text></div>
-              <Button type={index === 0 ? 'primary' : 'default'} href={`tel:${contact.phone}`} icon={<PhoneOutlined />}>Call</Button>
+              <Button type={index === 0 ? 'primary' : 'default'} href={`tel:${contact.phone}`}>Call <PhoneOutlined /></Button>
             </Flex>
           ))}
           {!primary && <Text type="secondary">No emergency contact is available.</Text>}
@@ -138,14 +150,11 @@ const EmergencyProfile = () => {
 
         <Space direction="vertical" size={12} className="emergency-primary-actions">
           <Button danger type="primary" size="large" block icon={<AlertOutlined />} onClick={openEmergencyHelp}>Emergency Help</Button>
-          <Button size="large" block icon={<MedicineBoxOutlined />} onClick={() => setGuidanceOpen(true)}>Generate First Aid & Medication Guidance</Button>
+          <Button size="large" block onClick={() => setGuidanceOpen(true)}>Generate First Aid & Medication Guidance</Button>
         </Space>
-
-        <Alert className="emergency-privacy" type="info" showIcon message="Only emergency-safe information is shown" description="Insurance, address, documents, and the complete medical record remain protected. Call local emergency services when there is immediate danger." />
       </section>
 
       <Modal title="Send emergency help alert" open={helpOpen} onCancel={() => setHelpOpen(false)} footer={null} destroyOnHidden>
-        <Alert type="warning" showIcon message="Call local emergency services immediately for a life-threatening situation." />
         <Form form={form} layout="vertical" initialValues={{ emergencyType: 'medical_emergency', shareLocation: true }} className="emergency-help-form">
           <Form.Item name="emergencyType" label="Situation type"><Select options={[['medical_emergency', 'Medical emergency'], ['fall', 'Fall'], ['person_found', 'Person found'], ['lost_confused', 'Lost or confused person'], ['accident', 'Accident'], ['other', 'Other']].map(([value, label]) => ({ value, label }))} /></Form.Item>
           <Flex gap={12} wrap="wrap"><Form.Item name="responderName" label="Your name (optional)" style={{ flex: '1 1 190px' }}><Input maxLength={80} placeholder="Enter your name" /></Form.Item><Form.Item name="responderPhone" label="Your phone (optional)" style={{ flex: '1 1 190px' }}><Input maxLength={30} inputMode="tel" placeholder="Enter your phone" /></Form.Item></Flex>
@@ -160,16 +169,14 @@ const EmergencyProfile = () => {
       </Modal>
 
       <Modal title="First Aid & Medication Safety" open={guidanceOpen} onCancel={() => setGuidanceOpen(false)} footer={<Button type="primary" onClick={() => setGuidanceOpen(false)}>Close</Button>}>
-        <Alert type="error" showIcon message="This guidance does not replace emergency services or a trained medical professional." />
         <Divider orientation="left">Immediate safety steps</Divider>
         <Space direction="vertical" size={10}>
-          <Text><HeartOutlined /> Check that the scene is safe, check responsiveness and breathing, and call the local emergency number for any immediate danger.</Text>
-          <Text><PhoneOutlined /> Put the emergency dispatcher on speaker and follow their instructions. Provide care only within your training.</Text>
-          <Text><SafetyCertificateOutlined /> Keep the person still and comfortable. Do not move them if a head, neck, back, or serious fall injury is suspected unless the area is unsafe.</Text>
+          <Text>Check that the scene is safe, check responsiveness and breathing, and call the local emergency number for any immediate danger.</Text>
+          <Text>Put the emergency dispatcher on speaker and follow their instructions. Provide care only within your training.</Text>
+          <Text>Keep the person still and comfortable. Do not move them if a head, neck, back, or serious fall injury is suspected unless the area is unsafe.</Text>
         </Space>
         <Divider orientation="left">Medication safety</Divider>
         <Card size="small"><Text strong>Recorded conditions:</Text><Paragraph>{readableList(profile.majorConditions)}</Paragraph><Text strong>Recorded critical medications:</Text><Paragraph>{readableList(profile.criticalMedications)}</Paragraph><Text strong>Recorded allergies:</Text><Paragraph>{readableList(profile.severeAllergies)}</Paragraph></Card>
-        <Alert className="medication-warning" type="warning" showIcon message="Show this list and available medicine packaging to responders. Do not change a dose, give an unknown medicine, or give anything by mouth to an unconscious or confused person." />
       </Modal>
     </main>
   );
