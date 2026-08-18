@@ -1,8 +1,8 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import {
-  Alert, Avatar, Button, Card, Descriptions, Divider, Flex, Modal, Progress,
-  Space, Tag, Typography, message
+  Alert, Avatar, Button, Card, Descriptions, Divider, Flex, Form, Input, Modal,
+  Progress, Select, Space, Tag, Typography, message
 } from 'antd';
 import {
   AlertOutlined, CheckCircleFilled, LockOutlined, PhoneOutlined, SendOutlined
@@ -17,32 +17,43 @@ const EmergencyProfile = () => {
   const { token } = useParams();
   const [profile, setProfile] = useState(null);
   const [state, setState] = useState({ loading: true, error: '' });
+  const [loadingProgress, setLoadingProgress] = useState(0);
   const [helpOpen, setHelpOpen] = useState(false);
   const [guidanceOpen, setGuidanceOpen] = useState(false);
   const [sending, setSending] = useState(false);
   const [photoUrl, setPhotoUrl] = useState('');
   const [locationState, setLocationState] = useState({ loading: false, location: null, error: '' });
+  const [form] = Form.useForm();
   const primary = profile?.emergencyContacts?.[0];
   const secondary = profile?.emergencyContacts?.[1];
 
   useEffect(() => {
     let active = true;
-    api.get(`/api/qr/public/${encodeURIComponent(token)}`)
-      .then(({ data }) => { if (active) { setProfile(data.emergencyProfile); setState({ loading: false, error: '' }); } })
-      .catch((error) => { if (active) setState({ loading: false, error: error.response?.data?.message || error.message || 'Unable to open this emergency profile.' }); });
-    return () => { active = false; };
-  }, [token]);
-
-  useEffect(() => {
-    let active = true;
     let objectUrl = '';
-    api.get(`/api/qr/public/${encodeURIComponent(token)}/photo`, { responseType: 'blob' })
+    let completedRequests = 0;
+    const markComplete = () => {
+      completedRequests += 1;
+      if (active) setLoadingProgress(completedRequests * 50);
+    };
+
+    setLoadingProgress(0);
+    const profileRequest = api.get(`/api/qr/public/${encodeURIComponent(token)}`)
+      .then(({ data }) => { if (active) setProfile(data.emergencyProfile); })
+      .finally(markComplete);
+    const photoRequest = api.get(`/api/qr/public/${encodeURIComponent(token)}/photo`, { responseType: 'blob' })
       .then(({ data }) => {
         if (!active || !data?.size) return;
         objectUrl = URL.createObjectURL(data);
         setPhotoUrl(objectUrl);
       })
-      .catch(() => { if (active) setPhotoUrl(''); });
+      .catch(() => { if (active) setPhotoUrl(''); })
+      .finally(markComplete);
+
+    Promise.all([profileRequest, photoRequest])
+      .then(() => { if (active) setState({ loading: false, error: '' }); })
+      .catch((error) => {
+        if (active) setState({ loading: false, error: error.response?.data?.message || error.message || 'Unable to open this emergency profile.' });
+      });
     return () => {
       active = false;
       if (objectUrl) URL.revokeObjectURL(objectUrl);
@@ -68,10 +79,12 @@ const EmergencyProfile = () => {
   };
 
   const sendEmergencyAlert = async () => {
+    const values = await form.validateFields();
     setSending(true);
     try {
       const { data } = await api.post(`/api/emergency-alerts/public/${encodeURIComponent(token)}`, {
-        emergencyType: 'medical_emergency',
+        emergencyType: values.emergencyType,
+        responderName: values.responderName.trim(),
         ...(locationState.location ? {
           latitude: locationState.location.latitude,
           longitude: locationState.location.longitude,
@@ -80,6 +93,7 @@ const EmergencyProfile = () => {
       });
       message.success(data.message);
       setHelpOpen(false);
+      form.resetFields();
     } catch (error) {
       message.error(error.response?.data?.message || 'Unable to send the alert. Call the emergency contact directly.');
     } finally {
@@ -105,7 +119,7 @@ const EmergencyProfile = () => {
             <Text strong>Fetching Data</Text>
             <Text type="secondary">Retrieving secure information…</Text>
           </div>
-          <Progress percent={75} showInfo strokeColor="#238636" trailColor="#e7ebf0" />
+          <Progress percent={loadingProgress} showInfo strokeColor="#0066ff" trailColor="#e7ebf0" />
         </Flex>
       </Card>
     </main>
@@ -148,7 +162,22 @@ const EmergencyProfile = () => {
       </section>
 
       <Modal title="Send emergency help alert" open={helpOpen} onCancel={() => setHelpOpen(false)} footer={null} destroyOnHidden>
-        <Button type="primary" danger size="large" block icon={<SendOutlined />} loading={sending || locationState.loading} onClick={sendEmergencyAlert}>Send Emergency Email Alert</Button>
+        <Form form={form} layout="vertical" initialValues={{ emergencyType: 'medical_emergency' }} requiredMark={false}>
+          <Form.Item name="emergencyType" label="Situation" rules={[{ required: true, message: 'Select the situation' }]}>
+            <Select placeholder="Select situation" options={[
+              { value: 'medical_emergency', label: 'Medical emergency' },
+              { value: 'accident', label: 'Accident' },
+              { value: 'person_found', label: 'Person found' },
+              { value: 'fall', label: 'Fall' },
+              { value: 'lost_confused', label: 'Lost or confused person' },
+              { value: 'other', label: 'Other' }
+            ]} />
+          </Form.Item>
+          <Form.Item name="responderName" label="Scanner name" rules={[{ required: true, whitespace: true, message: 'Enter your name' }]}>
+            <Input maxLength={80} placeholder="Enter scanner name" />
+          </Form.Item>
+          <Button type="primary" danger size="large" block icon={<SendOutlined />} loading={sending || locationState.loading} onClick={sendEmergencyAlert}>Send Emergency Email Alert</Button>
+        </Form>
       </Modal>
 
       <Modal title="First Aid & Medication Safety" open={guidanceOpen} onCancel={() => setGuidanceOpen(false)} footer={<Button type="primary" onClick={() => setGuidanceOpen(false)}>Close</Button>}>
