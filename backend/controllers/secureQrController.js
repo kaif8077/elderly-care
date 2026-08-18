@@ -4,6 +4,8 @@ const MedicalProfile = require('../models/MedicalProfile');
 const { generateQr } = require('../services/adminIdCardService');
 const QrAccessLog = require('../models/QrAccessLog');
 const { hashIp } = require('../services/emergencyAlertService');
+const mongoose = require('mongoose');
+const { bucket } = require('../services/profilePhotoService');
 
 const calculateAge = (dob) => {
   if (!dob) return null;
@@ -46,6 +48,33 @@ const emergencyProjection = (profile, qr) => ({
     : [{ name: profile.emergencyContact, phone: profile.emergencyPhone, relationship: profile.emergencyRelationship, priority: 1 }],
   lastUpdatedAt: profile.updatedAt
 });
+
+exports.getPublicEmergencyPhoto = async (req, res) => {
+  try {
+    const qr = await QRCode.findOne({ token: req.params.token, status: 'active' }).select('userId').lean();
+    if (!qr) return res.status(410).json({ message: 'This emergency QR code is unavailable.' });
+    const [user, profile] = await Promise.all([
+      User.findById(qr.userId).select('accountStatus isDeleted').lean(),
+      MedicalProfile.findOne({ userId: qr.userId }).sort({ createdAt: -1 }).select('profilePhoto consent').lean()
+    ]);
+    if (!user || user.accountStatus !== 'active' || user.isDeleted || !profile || profile.consent?.emergencySharing === false) {
+      return res.status(410).json({ message: 'This emergency photograph is unavailable.' });
+    }
+    const photo = profile.profilePhoto;
+    if (!photo?.fileId) return res.status(404).json({ message: 'Profile photograph not found.' });
+    res.set({
+      'Cache-Control': 'no-store, private',
+      'Content-Type': photo.contentType,
+      'Content-Length': String(photo.bytes),
+      'Content-Disposition': 'inline; filename="emergency-profile-photo"'
+    });
+    return bucket().openDownloadStream(new mongoose.Types.ObjectId(photo.fileId))
+      .on('error', () => { if (!res.headersSent) res.status(404).end(); else res.destroy(); })
+      .pipe(res);
+  } catch (error) {
+    return res.status(500).json({ message: 'Unable to load the emergency photograph.' });
+  }
+};
 
 exports.createQRCode = async (req, res) => {
   const userId = req.body.userId;

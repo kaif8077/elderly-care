@@ -1,159 +1,161 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import {
-  FaBell, FaExclamationTriangle, FaHospital, FaLocationArrow, FaPhoneAlt,
-  FaSms, FaUserShield
-} from 'react-icons/fa';
+  Alert, Avatar, Button, Card, Checkbox, Descriptions, Divider, Flex, Form,
+  Input, Modal, Select, Space, Spin, Tag, Typography, message
+} from 'antd';
+import {
+  AlertOutlined, CheckCircleFilled, EnvironmentOutlined, HeartOutlined,
+  MedicineBoxOutlined, PhoneOutlined, SafetyCertificateOutlined, SendOutlined
+} from '@ant-design/icons';
 import api from '../services/api';
-import { Button } from 'antd';
 import './EmergencyProfile.css';
 
-const readableList = (items, empty = 'None reported') =>
-  Array.isArray(items) && items.length ? items.join(', ') : empty;
+const { Title, Paragraph, Text } = Typography;
+const apiBase = import.meta.env.VITE_BACKEND_URI || 'http://localhost:5000';
+const readableList = (items, empty = 'None reported') => Array.isArray(items) && items.length ? items.join(', ') : empty;
 
 const EmergencyProfile = () => {
   const { token } = useParams();
   const [profile, setProfile] = useState(null);
   const [state, setState] = useState({ loading: true, error: '' });
-  const [alertState, setAlertState] = useState({ sending: false, message: '', error: false });
-  const [alertForm, setAlertForm] = useState({ emergencyType: 'medical_emergency', responderName: '', responderPhone: '', responderMessage: '', shareLocation: false });
-  const [location, setLocation] = useState(null);
+  const [helpOpen, setHelpOpen] = useState(false);
+  const [guidanceOpen, setGuidanceOpen] = useState(false);
+  const [sending, setSending] = useState(false);
+  const [locationState, setLocationState] = useState({ loading: false, location: null, error: '' });
+  const [form] = Form.useForm();
   const primary = profile?.emergencyContacts?.[0];
+  const secondary = profile?.emergencyContacts?.[1];
+  const photoUrl = `${apiBase}/api/qr/public/${encodeURIComponent(token)}/photo`;
 
   useEffect(() => {
     let active = true;
     api.get(`/api/qr/public/${encodeURIComponent(token)}`)
-      .then(({ data }) => {
-        if (active) {
-          setProfile(data.emergencyProfile);
-          setState({ loading: false, error: '' });
-        }
-      })
-      .catch((error) => {
-        if (active) {
-          setState({
-            loading: false,
-            error: error.response?.data?.message || error.message || 'Unable to open this emergency profile.'
-          });
-        }
-      });
+      .then(({ data }) => { if (active) { setProfile(data.emergencyProfile); setState({ loading: false, error: '' }); } })
+      .catch((error) => { if (active) setState({ loading: false, error: error.response?.data?.message || error.message || 'Unable to open this emergency profile.' }); });
     return () => { active = false; };
   }, [token]);
 
-  const smsLink = useMemo(() => {
-    if (!primary?.phone || !profile) return null;
-    const message = `Emergency assistance may be needed for ${profile.name} (${profile.elderlyCareId}).`;
-    return `sms:${primary.phone}?body=${encodeURIComponent(message)}`;
-  }, [primary, profile]);
+  const requestLocation = () => {
+    if (!navigator.geolocation) {
+      setLocationState({ loading: false, location: null, error: 'Location is not supported on this device.' });
+      return;
+    }
+    setLocationState({ loading: true, location: null, error: '' });
+    navigator.geolocation.getCurrentPosition(
+      ({ coords }) => setLocationState({ loading: false, location: { latitude: coords.latitude, longitude: coords.longitude, accuracy: coords.accuracy }, error: '' }),
+      () => setLocationState({ loading: false, location: null, error: 'Location permission was unavailable. You can still send the alert without location.' }),
+      { enableHighAccuracy: true, timeout: 10000, maximumAge: 30000 }
+    );
+  };
 
-  const sendSecureAlert = async () => {
-    if (!window.confirm('Notify the verified account owner that this emergency QR was activated? No location or medical details will be emailed.')) return;
-    setAlertState({ sending: true, message: '', error: false });
+  const openEmergencyHelp = () => {
+    setHelpOpen(true);
+    requestLocation();
+  };
+
+  const sendEmergencyAlert = async () => {
+    const values = form.getFieldsValue();
+    setSending(true);
     try {
       const { data } = await api.post(`/api/emergency-alerts/public/${encodeURIComponent(token)}`, {
-        emergencyType: alertForm.emergencyType,
-        responderName: alertForm.responderName || undefined,
-        responderPhone: alertForm.responderPhone || undefined,
-        responderMessage: alertForm.responderMessage || undefined,
-        ...(alertForm.shareLocation && location ? { latitude: location.latitude, longitude: location.longitude, locationAccuracy: location.accuracy } : {})
+        emergencyType: values.emergencyType || 'medical_emergency',
+        responderName: values.responderName?.trim() || undefined,
+        responderPhone: values.responderPhone?.trim() || undefined,
+        responderMessage: values.responderMessage?.trim() || undefined,
+        ...(values.shareLocation !== false && locationState.location ? {
+          latitude: locationState.location.latitude,
+          longitude: locationState.location.longitude,
+          locationAccuracy: locationState.location.accuracy
+        } : {})
       });
-      setAlertState({ sending: false, message: data.message, error: false });
+      message.success(data.message);
+      setHelpOpen(false);
+      form.resetFields();
     } catch (error) {
-      setAlertState({
-        sending: false,
-        message: error.response?.data?.message || 'Unable to send the alert. Please call the contact directly.',
-        error: true
-      });
+      message.error(error.response?.data?.message || 'Unable to send the alert. Call the emergency contact directly.');
+    } finally {
+      setSending(false);
     }
   };
-  const updateAlertForm = (field) => (event) => setAlertForm((current) => ({ ...current, [field]: event.target.type === 'checkbox' ? event.target.checked : event.target.value }));
-  const requestAlertLocation = (event) => {
-    const enabled = event.target.checked;
-    setAlertForm((current) => ({ ...current, shareLocation: enabled }));
-    if (!enabled || !navigator.geolocation) return;
-    navigator.geolocation.getCurrentPosition(({ coords }) => setLocation({ latitude: coords.latitude, longitude: coords.longitude, accuracy: coords.accuracy }), () => {
-      setAlertForm((current) => ({ ...current, shareLocation: false }));
-      setAlertState({ sending: false, message: 'Location permission was unavailable. You can still send the alert without location.', error: true });
-    }, { enableHighAccuracy: true, timeout: 10000, maximumAge: 30000 });
-  };
-  const shareLocation = () => {
-    if (!navigator.geolocation || !primary?.phone) return;
-    navigator.geolocation.getCurrentPosition(({ coords }) => {
-      const map = `https://maps.google.com/?q=${coords.latitude},${coords.longitude}`;
-      window.location.href = `sms:${primary.phone}?body=${encodeURIComponent(
-        `Emergency location for ${profile.name}: ${map}`
-      )}`;
-    }, () => {
-      window.alert('Location permission was unavailable. Please call the emergency contact directly.');
-    }, { enableHighAccuracy: true, timeout: 10000, maximumAge: 30000 });
-  };
 
-  if (state.loading) {
-    return <main className="emergency-shell" aria-busy="true"><div className="emergency-state">Loading emergency information...</div></main>;
-  }
-  if (state.error) {
-    return <main className="emergency-shell"><div className="emergency-state emergency-error"><FaExclamationTriangle /><h1>Emergency profile unavailable</h1><p>{state.error}</p></div></main>;
-  }
+  const emergencyDetails = useMemo(() => [
+    { key: 'blood', label: 'Blood group', children: <Text strong>{profile?.bloodGroup || 'Unknown'}</Text> },
+    { key: 'conditions', label: 'Known conditions', children: readableList(profile?.majorConditions) },
+    { key: 'allergies', label: 'Allergies', children: readableList(profile?.severeAllergies) },
+    { key: 'medications', label: 'Critical medications', children: readableList(profile?.criticalMedications) },
+    ...(profile?.mobilityStatus ? [{ key: 'mobility', label: 'Mobility needs', children: profile.mobilityStatus.replaceAll('_', ' ') }] : []),
+    ...(profile?.preferredLanguage?.length ? [{ key: 'language', label: 'Preferred language', children: readableList(profile.preferredLanguage) }] : [])
+  ], [profile]);
+
+  if (state.loading) return <main className="emergency-shell"><Card className="emergency-loading"><Spin size="large" /><Text>Loading emergency information…</Text></Card></main>;
+  if (state.error) return <main className="emergency-shell"><Alert type="error" showIcon message="Emergency profile unavailable" description={state.error} /></main>;
 
   return (
     <main className="emergency-shell">
-      <header className="emergency-header">
-        <span className="emergency-brand"><FaUserShield /> ElderlyCare</span>
-        <span className="emergency-status">Active emergency card</span>
-        <h1>{profile.name}</h1>
-        <p>{profile.elderlyCareId}{profile.approximateAge !== null ? ` - Approx. age ${profile.approximateAge}` : ''}</p>
-      </header>
+      <section className="emergency-mobile-panel" aria-labelledby="emergency-profile-title">
+        <Flex vertical align="center" gap={4} className="emergency-page-heading">
+          <Text className="emergency-brand"><SafetyCertificateOutlined /> ElderlyCare safe view</Text>
+          <Title id="emergency-profile-title" level={2}>Emergency Profile</Title>
+        </Flex>
 
-      <section className="critical-panel" aria-labelledby="critical-title">
-        <h2 id="critical-title"><FaExclamationTriangle /> Critical information</h2>
-        <div className="critical-grid">
-          <article><span>Blood group</span><strong>{profile.bloodGroup}</strong></article>
-          <article><span>Severe allergies</span><strong>{readableList(profile.severeAllergies)}</strong></article>
-          <article><span>Major conditions</span><strong>{readableList(profile.majorConditions)}</strong></article>
-          <article><span>Critical medications</span><strong>{readableList(profile.criticalMedications)}</strong></article>
-          {profile.mobilityStatus && <article><span>Mobility needs</span><strong>{profile.mobilityStatus.replaceAll('_', ' ')}</strong></article>}
-          {profile.preferredLanguage?.length > 0 && <article><span>Preferred language</span><strong>{readableList(profile.preferredLanguage)}</strong></article>}
-        </div>
+        <Card className="emergency-profile-card" styles={{ body: { padding: 0 } }}>
+          <Flex align="center" gap={16} className="emergency-person">
+            <Avatar size={86} src={photoUrl}>{profile.name?.charAt(0)}</Avatar>
+            <div>
+              <Title level={3}>{profile.name}</Title>
+              <Paragraph>{profile.approximateAge !== null ? `${profile.approximateAge} years` : 'Age hidden'} · {readableList(profile.preferredLanguage, 'Language not specified')}</Paragraph>
+              <Tag icon={<CheckCircleFilled />} color="success">Verified emergency card</Tag>
+            </div>
+          </Flex>
+          <Descriptions bordered size="small" column={1} items={emergencyDetails} className="emergency-medical-details" />
+        </Card>
+
+        <Card title="Emergency contacts" className="emergency-contact-card">
+          {[primary, secondary].filter(Boolean).map((contact, index) => (
+            <Flex key={`${contact.phone}-${index}`} align="center" justify="space-between" gap={12} className="emergency-contact-row">
+              <div><Text strong>{contact.name || `Contact ${index + 1}`}</Text><br /><Text type="secondary">{contact.relationship || 'Emergency contact'} · {contact.phone}</Text></div>
+              <Button type={index === 0 ? 'primary' : 'default'} href={`tel:${contact.phone}`} icon={<PhoneOutlined />}>Call</Button>
+            </Flex>
+          ))}
+          {!primary && <Text type="secondary">No emergency contact is available.</Text>}
+        </Card>
+
+        <Space direction="vertical" size={12} className="emergency-primary-actions">
+          <Button danger type="primary" size="large" block icon={<AlertOutlined />} onClick={openEmergencyHelp}>Emergency Help</Button>
+          <Button size="large" block icon={<MedicineBoxOutlined />} onClick={() => setGuidanceOpen(true)}>Generate First Aid & Medication Guidance</Button>
+        </Space>
+
+        <Alert className="emergency-privacy" type="info" showIcon message="Only emergency-safe information is shown" description="Insurance, address, documents, and the complete medical record remain protected. Call local emergency services when there is immediate danger." />
       </section>
 
-      <section className="emergency-instruction">
-        <h2>Emergency instruction</h2>
-        <p>{profile.emergencyInstruction}</p>
-      </section>
+      <Modal title="Send emergency help alert" open={helpOpen} onCancel={() => setHelpOpen(false)} footer={null} destroyOnHidden>
+        <Alert type="warning" showIcon message="Call local emergency services immediately for a life-threatening situation." />
+        <Form form={form} layout="vertical" initialValues={{ emergencyType: 'medical_emergency', shareLocation: true }} className="emergency-help-form">
+          <Form.Item name="emergencyType" label="Situation type"><Select options={[['medical_emergency', 'Medical emergency'], ['fall', 'Fall'], ['person_found', 'Person found'], ['lost_confused', 'Lost or confused person'], ['accident', 'Accident'], ['other', 'Other']].map(([value, label]) => ({ value, label }))} /></Form.Item>
+          <Flex gap={12} wrap="wrap"><Form.Item name="responderName" label="Your name (optional)" style={{ flex: '1 1 190px' }}><Input maxLength={80} placeholder="Enter your name" /></Form.Item><Form.Item name="responderPhone" label="Your phone (optional)" style={{ flex: '1 1 190px' }}><Input maxLength={30} inputMode="tel" placeholder="Enter your phone" /></Form.Item></Flex>
+          <Form.Item name="responderMessage" label="Situation message (optional)"><Input.TextArea rows={3} maxLength={500} showCount placeholder="Describe the person's condition or location" /></Form.Item>
+          <Form.Item name="shareLocation" valuePropName="checked"><Checkbox disabled={!locationState.location}>Include my current location and Google Maps link in the email alert</Checkbox></Form.Item>
+          {locationState.loading && <Alert type="info" showIcon message="Requesting your current location…" />}
+          {locationState.location && <Alert type="success" showIcon icon={<EnvironmentOutlined />} message="Current location is ready to share" description={`Accuracy approximately ${Math.round(locationState.location.accuracy || 0)} metres. You can uncheck location before sending.`} />}
+          {locationState.error && <Alert type="warning" showIcon message={locationState.error} action={<Button onClick={requestLocation}>Try again</Button>} />}
+          <Paragraph type="secondary" className="emergency-share-preview">The email will contain the situation, optional responder details, and—only when enabled—the current coordinates and Google Maps link.</Paragraph>
+          <Button type="primary" danger size="large" block icon={<SendOutlined />} loading={sending} onClick={sendEmergencyAlert}>Send Emergency Email Alert</Button>
+        </Form>
+      </Modal>
 
-      <section className="responder-panel" aria-labelledby="responder-title">
-        <h2 id="responder-title">Add responder details (optional)</h2>
-        <p>Review exactly what will be shared with the account owner and verified emergency contacts.</p>
-        <div className="responder-grid">
-          <label>Situation type<select value={alertForm.emergencyType} onChange={updateAlertForm('emergencyType')}><option value="person_found">Person found</option><option value="medical_emergency">Medical emergency</option><option value="fall">Fall</option><option value="lost_confused">Lost or confused person</option><option value="accident">Accident</option><option value="other">Other</option></select></label>
-          <label>Your name (optional)<input value={alertForm.responderName} maxLength="80" onChange={updateAlertForm('responderName')} placeholder="Enter your name" /></label>
-          <label>Your phone (optional)<input value={alertForm.responderPhone} maxLength="30" onChange={updateAlertForm('responderPhone')} placeholder="Enter your phone number" /></label>
-          <label className="responder-message">Situation message (optional)<textarea value={alertForm.responderMessage} maxLength="500" onChange={updateAlertForm('responderMessage')} placeholder="Describe the person's current condition or location." /></label>
-        </div>
-        <label className="location-consent"><input type="checkbox" checked={alertForm.shareLocation} onChange={requestAlertLocation} /> Share my current location with this alert</label>
-        <div className="share-summary"><strong>Information to be shared:</strong> situation type{alertForm.responderName ? ', responder name' : ''}{alertForm.responderPhone ? ', responder phone' : ''}{alertForm.responderMessage ? ', message' : ''}{alertForm.shareLocation && location ? ', current coordinates and map link' : ''}.</div>
-      </section>
-
-      <section className="emergency-actions" aria-label="Emergency actions">
-        {primary?.phone && <Button type="primary" size="large" block href={`tel:${primary.phone}`} icon={<FaPhoneAlt />}>Call {primary.name || 'primary contact'}</Button>}
-        <Button size="large" block onClick={sendSecureAlert} loading={alertState.sending} icon={<FaBell />}>Send secure alert</Button>
-        {smsLink && <Button size="large" block href={smsLink} icon={<FaSms />}>Open emergency SMS</Button>}
-        {primary?.phone && <Button size="large" block onClick={shareLocation} icon={<FaLocationArrow />}>Share current location</Button>}
-        <Button size="large" block href="https://www.google.com/maps/search/hospital+near+me" target="_blank" rel="noreferrer" icon={<FaHospital />}>Find nearby hospital</Button>
-      </section>
-
-      {alertState.message && <div className={`alert-result ${alertState.error ? 'alert-result-error' : ''}`} role="status">{alertState.message}</div>}
-
-      <section className="emergency-contact-card">
-        <h2>Emergency contact</h2>
-        {primary ? <p><strong>{primary.name}</strong><br /><a href={`tel:${primary.phone}`}>{primary.phone}</a></p> : <p>No contact is available.</p>}
-      </section>
-
-      <footer className="emergency-privacy">
-        <strong>Privacy notice</strong>
-        <p>This limited page shows emergency-use information only. Insurance, address, documents, and complete medical reports are not publicly exposed.</p>
-        <p>Call local emergency services when there is immediate danger. This summary is not medical advice.</p>
-      </footer>
+      <Modal title="First Aid & Medication Safety" open={guidanceOpen} onCancel={() => setGuidanceOpen(false)} footer={<Button type="primary" onClick={() => setGuidanceOpen(false)}>Close</Button>}>
+        <Alert type="error" showIcon message="This guidance does not replace emergency services or a trained medical professional." />
+        <Divider orientation="left">Immediate safety steps</Divider>
+        <Space direction="vertical" size={10}>
+          <Text><HeartOutlined /> Check that the scene is safe, check responsiveness and breathing, and call the local emergency number for any immediate danger.</Text>
+          <Text><PhoneOutlined /> Put the emergency dispatcher on speaker and follow their instructions. Provide care only within your training.</Text>
+          <Text><SafetyCertificateOutlined /> Keep the person still and comfortable. Do not move them if a head, neck, back, or serious fall injury is suspected unless the area is unsafe.</Text>
+        </Space>
+        <Divider orientation="left">Medication safety</Divider>
+        <Card size="small"><Text strong>Recorded conditions:</Text><Paragraph>{readableList(profile.majorConditions)}</Paragraph><Text strong>Recorded critical medications:</Text><Paragraph>{readableList(profile.criticalMedications)}</Paragraph><Text strong>Recorded allergies:</Text><Paragraph>{readableList(profile.severeAllergies)}</Paragraph></Card>
+        <Alert className="medication-warning" type="warning" showIcon message="Show this list and available medicine packaging to responders. Do not change a dose, give an unknown medicine, or give anything by mouth to an unconscious or confused person." />
+      </Modal>
     </main>
   );
 };

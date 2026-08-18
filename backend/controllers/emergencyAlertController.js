@@ -120,6 +120,7 @@ exports.createPublicAlert = async (req, res) => {
         to: recipients,
         elderlyCareId: profile?.elderlyCareId || `EC-${String(qr.userId).slice(-8).toUpperCase()}`,
         activatedAt, emergencyType, responderMessage: body.responderMessage, mapUrl,
+        locationAccuracy: hasLocation ? Number(body.locationAccuracy) || null : null,
         acknowledgementUrl: `${frontend}/alert-acknowledge/${acknowledgementToken}`
       });
       alert.deliveryStatuses = [{ channel: 'email', status: 'sent', providerId: delivery?.id || null }];
