@@ -51,7 +51,7 @@ const AdminAuditLogs = () => {
       <Alert type="info" showIcon message="Administrative activity" description="Passwords, tokens, and complete medical records are not stored in audit logs." />
       {error && <Alert type="error" showIcon message={error} action={<Button onClick={load}>Retry</Button>} />}
       <Card>
-        <Space wrap>
+        <Space className="admin-filter-toolbar admin-audit-toolbar" wrap>
           <Space.Compact className="care-inline-action">
             <Input value={search} onChange={(event) => setSearch(event.target.value)} onPressEnter={() => updateQuery({ search: search.trim() })} prefix={<SearchOutlined />} placeholder="Action, resource, or reason" allowClear />
             <Button type="primary" onClick={() => updateQuery({ search: search.trim() })}>Search</Button>

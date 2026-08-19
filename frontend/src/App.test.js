@@ -177,7 +177,7 @@ test('admin navigation retains requested modules and emergency alert monitoring'
   expect(app).not.toContain('path="feedback"');
   expect(sidebar).toContain('admin-portal-brand');
   expect(sidebar).toContain('admin-portal-logout');
-  expect(topbar).toContain('admin-portal-avatar');
+  expect(topbar).not.toContain('admin-portal-avatar');
   expect(topbar).not.toContain('Dropdown');
   expect(topbar).not.toContain('Input.Search');
   expect(topbar).not.toContain('admin?.name');

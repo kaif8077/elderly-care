@@ -1,6 +1,6 @@
-import { Avatar, Button, Typography } from 'antd';
+import { Button, Typography } from 'antd';
 import {
-  MenuFoldOutlined, MenuOutlined, MenuUnfoldOutlined, UserOutlined
+  MenuFoldOutlined, MenuOutlined, MenuUnfoldOutlined
 } from '@ant-design/icons';
 
 const AdminTopbar = ({ title, onMenu, collapsed, onCollapse }) => (
@@ -13,7 +13,6 @@ const AdminTopbar = ({ title, onMenu, collapsed, onCollapse }) => (
         <Typography.Title level={4}>{title}</Typography.Title>
       </div>
     </div>
-    <Avatar size={36} icon={<UserOutlined />} className="admin-portal-avatar" aria-label="Signed-in administrator" />
   </div>
 );
 
