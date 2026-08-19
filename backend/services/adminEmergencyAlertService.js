@@ -31,7 +31,7 @@ const serialize = (alert, profileByUser = new Map()) => {
 
 const listAlerts = async (query) => {
   const page = Math.max(Number.parseInt(query.page, 10) || 1, 1);
-  const limit = Math.min(Math.max(Number.parseInt(query.limit, 10) || 20, 5), 100);
+  const limit = Math.min(Math.max(Number.parseInt(query.limit, 10) || 10, 5), 100);
   const match = {};
   if (query.status === 'open') match.status = { $nin: ['resolved', 'false_alarm'] };
   else if (ALLOWED_STATUSES.includes(query.status)) match.status = query.status;

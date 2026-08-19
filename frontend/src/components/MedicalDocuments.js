@@ -137,7 +137,7 @@ const MedicalDocuments = () => {
 
   return (
     <Card className="care-section-card member-documents-card" title="Your documents" extra={<Button type="primary" onClick={() => setUploadOpen(true)}>Upload document</Button>}>
-      <Table rowKey="_id" columns={columns} dataSource={items} scroll={{ x: 760 }} pagination={{ pageSize: 6, showSizeChanger: false }} locale={{ emptyText: <Empty description="No documents uploaded" /> }} />
+      <Table rowKey="_id" columns={columns} dataSource={items} scroll={{ x: 760 }} pagination={{ defaultPageSize: 10, pageSizeOptions: [10, 20, 50], showSizeChanger: true }} locale={{ emptyText: <Empty description="No documents uploaded" /> }} />
 
       <Modal title="Upload secure document" open={uploadOpen} onCancel={() => setUploadOpen(false)} footer={null} destroyOnHidden>
       <Form form={form} layout="vertical" size="middle" onFinish={upload}>

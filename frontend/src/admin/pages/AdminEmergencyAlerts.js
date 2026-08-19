@@ -11,7 +11,7 @@ const statusColor = (status) => status === 'resolved' ? 'blue' : status === 'fai
 
 const AdminEmergencyAlerts = () => {
   const [searchParams, setSearchParams] = useSearchParams();
-  const [data, setData] = useState({ alerts: [], pagination: { page: 1, limit: 20, total: 0 } });
+  const [data, setData] = useState({ alerts: [], pagination: { page: 1, limit: 10, total: 0 } });
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [detail, setDetail] = useState(null);
@@ -27,7 +27,7 @@ const AdminEmergencyAlerts = () => {
 
   const load = useCallback(async () => {
     setLoading(true); setError('');
-    try { setData((await adminApi.get('/emergency-alerts', { params: query })).data); }
+    try { setData((await adminApi.get('/emergency-alerts', { params: { limit: 10, ...query } })).data); }
     catch (requestError) { setError(requestError.response?.data?.message || 'Unable to load emergency alerts.'); }
     finally { setLoading(false); }
   }, [query]);

@@ -274,10 +274,10 @@ test('member pages use a shared responsive portal and compact Ant Design buttons
   expect(layout).not.toContain("split('#')");
   expect(layout).toContain('MenuFoldOutlined');
   expect(layout).toContain('member-portal-main-collapsed');
-  expect(layout).toContain('BellOutlined');
-  expect(layout).toContain('<Dropdown');
+  expect(layout).not.toContain('BellOutlined');
+  expect(layout).not.toContain('<Dropdown');
   expect(layout).toContain('member-global-search');
-  expect(layout).toContain("{user?.name || 'Member'}");
+  expect(layout).toContain('>Search</Button>');
   expect(layout).toContain("responseType: 'blob'");
   expect(entry).toContain('componentSize="small"');
   expect(theme).toContain('controlHeight: 30');

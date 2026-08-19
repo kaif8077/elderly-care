@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import {
-  Alert, Button, Card, Col, Descriptions, Empty, List, Modal, Pagination, Row, Select, Space, Spin, Tag, Timeline, Typography, message
+  Alert, Button, Card, Col, Descriptions, Drawer, Empty, List, Pagination, Row, Select, Space, Spin, Tag, Timeline, Typography, message
 } from 'antd';
 import { AlertOutlined, EnvironmentOutlined, PhoneOutlined, ReloadOutlined } from '@ant-design/icons';
 import { useSearchParams } from 'react-router-dom';
@@ -86,10 +86,10 @@ const EmergencyAlerts = () => {
           <Pagination current={data.pagination.page} total={data.pagination.total} pageSize={data.pagination.limit} hideOnSinglePage onChange={(next) => setSearchParams({ page: String(next), ...(status ? { status } : {}) })} />
         </Spin>
       </Card>
-      <Modal open={Boolean(selectedId)} width={760} title="Emergency alert details" footer={null} onCancel={() => setSearchParams({ page: String(page), ...(status ? { status } : {}) })}>
+      <Drawer open={Boolean(selectedId)} width={720} title="Emergency alert details" onClose={() => setSearchParams({ page: String(page), ...(status ? { status } : {}) })}>
         <Spin spinning={detailLoading}>
           {detail && <Space direction="vertical" size={18} style={{ width: '100%' }}>
-            <Descriptions bordered size="small" column={{ xs: 1, sm: 2 }} items={[
+            <Descriptions bordered size="small" column={1} items={[
               { key: 'person', label: 'Elderly person', children: detail.elderlyPerson?.name || '—' },
               { key: 'type', label: 'Situation', children: readable(detail.emergencyType) },
               { key: 'status', label: 'Status', children: <Tag color={statusColor(detail.status)}>{readable(detail.status)}</Tag> },
@@ -99,10 +99,10 @@ const EmergencyAlerts = () => {
               { key: 'message', label: 'Responder message', span: 2, children: detail.responderMessage || 'Not provided' }
             ]} />
             <Card size="small" title="Alert timeline"><Timeline items={timeline} /></Card>
-            {!['resolved', 'false_alarm'].includes(detail.status) && <Card size="small" title="Update your response"><Space wrap><Select value={action} onChange={setAction} placeholder="Choose an action" style={{ minWidth: 260 }} options={ACTIONS} /><Button type="primary" loading={saving} disabled={!action} onClick={acknowledge}>Save acknowledgement</Button></Space></Card>}
+            {!['resolved', 'false_alarm'].includes(detail.status) && <Card size="small" title="Update your response"><Space.Compact className="care-inline-action"><Select value={action} onChange={setAction} placeholder="Choose an action" style={{ minWidth: 320 }} options={ACTIONS} /><Button type="primary" loading={saving} disabled={!action} onClick={acknowledge}>Save acknowledgement</Button></Space.Compact></Card>}
           </Space>}
         </Spin>
-      </Modal>
+      </Drawer>
     </main>
   );
 };

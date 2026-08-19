@@ -29,7 +29,7 @@ const AdminUsers = () => {
     setLoading(true);
     setError('');
     try {
-      setData((await adminApi.get('/users', { params: query })).data);
+      setData((await adminApi.get('/users', { params: { limit: 10, ...query } })).data);
     } catch (requestError) {
       setError(requestError.response?.data?.message || 'Unable to load users.');
     } finally {
@@ -57,7 +57,7 @@ const AdminUsers = () => {
       {error && <Alert type="error" showIcon message={error} action={<Button onClick={load}>Retry</Button>} />}
       <Card>
         <Space className="admin-users-toolbar" wrap>
-          <Space.Compact>
+          <Space.Compact className="care-inline-action">
             <Input value={search} onChange={(event) => setSearch(event.target.value)} onPressEnter={() => updateQuery({ search: search.trim() })} prefix={<SearchOutlined />} placeholder="Name, email, or phone" allowClear />
             <Button type="primary" onClick={() => updateQuery({ search: search.trim() })}>Search</Button>
           </Space.Compact>

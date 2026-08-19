@@ -3,7 +3,7 @@ const Contact = require('../models/Contact');
 const escapeRegExp = (value) => String(value || '').replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 const pagination = (query) => ({
   page: Math.max(1, Number.parseInt(query.page, 10) || 1),
-  limit: Math.min(100, Math.max(10, Number.parseInt(query.limit, 10) || 20))
+  limit: Math.min(100, Math.max(10, Number.parseInt(query.limit, 10) || 10))
 });
 
 const list = (Model, fields) => async (req, res) => {
