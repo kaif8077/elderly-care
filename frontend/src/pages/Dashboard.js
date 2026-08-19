@@ -1,14 +1,10 @@
 import React, { useContext, useEffect, useMemo, useState } from 'react';
-import { Button, Card, Col, Flex, Progress, Row, Skeleton, Space, Tag, Typography } from 'antd';
+import { Button, Card, Col, Flex, Progress, Row, Skeleton, Typography } from 'antd';
 import {
-  ContactsOutlined, EditOutlined, FileProtectOutlined, HeartOutlined,
-  MedicineBoxOutlined, ProfileOutlined, QrcodeOutlined, SafetyCertificateOutlined
+  ContactsOutlined, EditOutlined, MedicineBoxOutlined, ProfileOutlined, QrcodeOutlined
 } from '@ant-design/icons';
 import { useNavigate } from 'react-router-dom';
 import { AuthContext } from '../context/AuthContext';
-import MedicalForm from '../components/MedicalForm';
-import QRCodeDisplay from '../components/QRCodeDisplay';
-import Recommendations from '../components/Recommendations';
 import EmergencyAlertSummary from '../components/EmergencyAlertSummary';
 import api from '../services/api';
 
@@ -47,10 +43,10 @@ const Dashboard = () => {
   }, [summary.profile]);
 
   const overviewCards = [
-    { key: 'profile', icon: <ProfileOutlined />, label: 'Health profile', value: `${completion}%`, detail: 'complete', action: () => document.getElementById('medical-form')?.scrollIntoView({ behavior: 'smooth' }) },
+    { key: 'profile', icon: <ProfileOutlined />, label: 'Health profile', value: `${completion}%`, detail: 'complete', action: () => navigate('/medical-profile') },
     { key: 'contacts', icon: <ContactsOutlined />, label: 'Emergency contacts', value: summary.profile?.emergencyContacts?.length || 0, detail: 'saved', action: () => navigate('/profile') },
     { key: 'medical', icon: <MedicineBoxOutlined />, label: 'Medical details', value: summary.profile?.medicalHistory?.length || 0, detail: 'conditions', action: () => navigate('/profile') },
-    { key: 'qr', icon: <QrcodeOutlined />, label: 'Emergency QR', value: summary.qrReady ? 'Active' : 'Pending', detail: summary.qrReady ? 'ready to scan' : 'generate below', action: () => document.getElementById('qr')?.scrollIntoView({ behavior: 'smooth' }) }
+    { key: 'qr', icon: <QrcodeOutlined />, label: 'Emergency ID', value: summary.qrReady ? 'Active' : 'Pending', detail: summary.qrReady ? 'ready to scan' : 'ready to generate', action: () => navigate('/emergency') }
   ];
 
   return (
@@ -65,7 +61,7 @@ const Dashboard = () => {
           <Col xs={24} md={9}>
             <Flex justify="space-between"><Text strong>Profile completion</Text><Text strong>{completion}%</Text></Flex>
             <Progress percent={completion} showInfo={false} strokeColor="#0066ff" />
-            <Button type="primary" icon={<EditOutlined />} onClick={() => document.getElementById('medical-form')?.scrollIntoView({ behavior: 'smooth' })}>
+            <Button type="primary" icon={<EditOutlined />} onClick={() => navigate('/medical-profile')}>
               {summary.profile ? 'Update profile' : 'Complete profile'}
             </Button>
           </Col>
@@ -88,19 +84,6 @@ const Dashboard = () => {
       )}
 
       <EmergencyAlertSummary />
-      <Card id="medical-form" className="care-section-card member-content-card" title={<Space><SafetyCertificateOutlined />Medical profile</Space>} extra={<Tag color="blue">Secure</Tag>}>
-        <MedicalForm onSubmissionSuccess={() => navigate('/profile')} />
-      </Card>
-      <section id="qr"><QRCodeDisplay /></section>
-      <Card id="health-recommendations" className="care-section-card member-content-card" title={<Space><HeartOutlined />Health recommendations</Space>}>
-        <Recommendations />
-      </Card>
-      <Card className="care-section-card member-help-card">
-        <Flex align="center" justify="space-between" gap={16} wrap="wrap">
-          <Space><FileProtectOutlined /><Text>Review your full profile, emergency ID card, and secure documents.</Text></Space>
-          <Button onClick={() => navigate('/profile')}>Open profile</Button>
-        </Flex>
-      </Card>
     </main>
   );
 };

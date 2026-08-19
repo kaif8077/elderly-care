@@ -62,13 +62,16 @@ test('medical profile form saves steps and supports structured emergency contact
   expect(source).toContain('Missing or invalid:');
 });
 
-test('dashboard uses a full-width QR flow without legacy quick-action cards', () => {
+test('dashboard is an overview and routes member tools to dedicated pages', () => {
   const source = fs.readFileSync(path.join(__dirname, 'pages', 'Dashboard.js'), 'utf8');
-  expect(source).toContain('<QRCodeDisplay />');
   expect(source).toContain('Profile completion');
   expect(source).toContain('member-overview-grid');
+  expect(source).toContain("navigate('/medical-profile')");
+  expect(source).toContain("navigate('/emergency')");
+  expect(source).not.toContain('<MedicalForm');
+  expect(source).not.toContain('<QRCodeDisplay');
+  expect(source).not.toContain('<Recommendations');
   expect(source).not.toContain('const actions=');
-  expect(source).not.toContain('Emergency ID card');
   expect(source).not.toContain('Open my profile');
   const qrSource = fs.readFileSync(path.join(__dirname, 'components', 'QRCodeDisplay.js'), 'utf8');
   expect(qrSource).not.toContain('The QR contains a secure access link, not your complete medical record.');
@@ -223,17 +226,16 @@ test('public emergency profile uses a mobile safe view with location alerts and 
   expect(source).toContain('URL.createObjectURL');
 });
 
-test('member profile uses a responsive Ant Design desktop summary without removing core modules', () => {
+test('member profile uses a responsive Ant Design summary containing saved details only', () => {
   const source = fs.readFileSync(path.join(__dirname, 'pages', 'Profile.js'), 'utf8');
   expect(source).toContain('member-profile-header');
   expect(source).toContain('member-profile-grid');
   expect(source).toContain('Health information');
   expect(source).toContain('Emergency contact');
-  expect(source).toContain('Profile resources');
   expect(source).toContain('<Collapse items={detailItems}');
-  expect(source).toContain('<Recommendations />');
-  expect(source).toContain('<UserIdCard');
-  expect(source).toContain('<MedicalDocuments />');
+  expect(source).not.toContain('<Recommendations');
+  expect(source).not.toContain('<UserIdCard');
+  expect(source).not.toContain('<MedicalDocuments');
 });
 
 test('member pages use a shared responsive portal and compact Ant Design buttons', () => {
@@ -245,6 +247,25 @@ test('member pages use a shared responsive portal and compact Ant Design buttons
   expect(layout).toContain('member-bottom-nav');
   expect(layout).toContain('Emergency Alerts');
   expect(layout).toContain('<Outlet />');
+  expect(layout).not.toContain("split('#')");
   expect(theme).toContain('controlHeight: 34');
   expect(theme).toContain("itemSelectedBg: '#edf3ff'");
+});
+
+test('member tools are separated into focused route pages', () => {
+  const app = fs.readFileSync(path.join(__dirname, 'App.js'), 'utf8');
+  expect(app).toContain('path="/medical-profile"');
+  expect(app).toContain('path="/recommendations"');
+  expect(app).toContain('path="/emergency"');
+  expect(app).toContain('path="/documents"');
+  const medical = fs.readFileSync(path.join(__dirname, 'pages', 'MedicalProfilePage.js'), 'utf8');
+  const recommendations = fs.readFileSync(path.join(__dirname, 'pages', 'RecommendationsPage.js'), 'utf8');
+  const documents = fs.readFileSync(path.join(__dirname, 'pages', 'DocumentsPage.js'), 'utf8');
+  const emergency = fs.readFileSync(path.join(__dirname, 'pages', 'MemberEmergencyPage.js'), 'utf8');
+  expect(medical).toContain('<MedicalForm');
+  expect(medical).not.toContain('QRCodeDisplay');
+  expect(recommendations).toContain('<Recommendations />');
+  expect(documents).toContain('<MedicalDocuments />');
+  expect(emergency).toContain('<UserIdCard');
+  expect(emergency).toContain("api.post('/api/qr'");
 });
