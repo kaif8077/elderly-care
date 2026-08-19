@@ -18,7 +18,7 @@ const AdminReports = () => {
   const load = useCallback(async () => {
     setLoading(true);
     try {
-      const response = await adminApi.get('/reports', { params: { page, limit: 20, verificationStatus: status || undefined } });
+      const response = await adminApi.get('/reports', { params: { page, limit: 10, verificationStatus: status || undefined } });
       setData(response.data);
     } catch (error) {
       setMessage(error.response?.data?.message || 'Unable to load medical reports.');

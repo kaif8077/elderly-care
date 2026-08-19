@@ -60,7 +60,7 @@ const createReport = async ({ userId, generatedBy }) => {
 
 const parsePage = (page, limit) => ({
   page: Math.max(Number.parseInt(page, 10) || 1, 1),
-  limit: Math.min(Math.max(Number.parseInt(limit, 10) || 20, 5), 50)
+  limit: Math.min(Math.max(Number.parseInt(limit, 10) || 10, 5), 50)
 });
 
 const listReports = async ({ match, page, limit, includeSnapshot = false }) => {

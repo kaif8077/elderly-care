@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useState } from 'react';
 import {
-  Alert, Button, Card, Empty, Input, Modal, Space, Table, Typography
+  Alert, Button, Card, Descriptions, Drawer, Empty, Input, Space, Table, Typography
 } from 'antd';
 import { EyeOutlined, ReloadOutlined, SearchOutlined } from '@ant-design/icons';
 import adminApi from '../../services/adminApi';
@@ -8,11 +8,11 @@ import adminApi from '../../services/adminApi';
 const { Paragraph, Text } = Typography;
 
 const AdminSubmissionsTable = ({ endpoint, type }) => {
-  const [data, setData] = useState({ items: [], pagination: { page: 1, pages: 1, total: 0, limit: 20 } });
+  const [data, setData] = useState({ items: [], pagination: { page: 1, pages: 1, total: 0, limit: 10 } });
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [search, setSearch] = useState('');
-  const [query, setQuery] = useState({ page: 1, limit: 20, search: '' });
+  const [query, setQuery] = useState({ page: 1, limit: 10, search: '' });
   const [selected, setSelected] = useState(null);
 
   const load = useCallback(async () => {
@@ -43,7 +43,7 @@ const AdminSubmissionsTable = ({ endpoint, type }) => {
     <Space direction="vertical" size={18} style={{ width: '100%' }}>
       {error && <Alert type="error" showIcon message={error} action={<Button onClick={load}>Retry</Button>} />}
       <Card>
-        <Space.Compact style={{ width: '100%', maxWidth: 520 }}>
+        <Space.Compact className="care-inline-action" style={{ width: '100%', maxWidth: 680 }}>
           <Input value={search} onChange={(event) => setSearch(event.target.value)} onPressEnter={() => setQuery((current) => ({ ...current, page: 1, search: search.trim() }))} prefix={<SearchOutlined />} placeholder="Search name, email, or message" allowClear />
           <Button type="primary" onClick={() => setQuery((current) => ({ ...current, page: 1, search: search.trim() }))}>Search</Button>
           <Button icon={<ReloadOutlined />} onClick={load}>Refresh</Button>
@@ -68,15 +68,18 @@ const AdminSubmissionsTable = ({ endpoint, type }) => {
           }}
         />
       </Card>
-      <Modal title="Contact message" open={Boolean(selected)} onCancel={() => setSelected(null)} footer={<Button onClick={() => setSelected(null)}>Close</Button>}>
-        {selected && <Space direction="vertical" size={14} style={{ width: '100%' }}>
-          <div><Text type="secondary">Name</Text><br /><Text strong>{selected.name}</Text></div>
-          <div><Text type="secondary">Email</Text><br /><a href={`mailto:${selected.email}`}>{selected.email}</a></div>
-          <div><Text type="secondary">Phone</Text><br />{selected.phone ? <a href={`tel:${selected.phone}`}>{selected.phone}</a> : 'Not provided'}</div>
-          <div><Text type="secondary">Message</Text><Paragraph>{selected.message}</Paragraph></div>
-          <Text type="secondary">Submitted {new Date(selected.createdAt).toLocaleString()}</Text>
+      <Drawer width={720} title="Contact message details" open={Boolean(selected)} onClose={() => setSelected(null)}>
+        {selected && <Space direction="vertical" size={18} style={{ width: '100%' }}>
+          <Descriptions bordered size="small" column={1} items={[
+            { key: 'name', label: 'Name', children: selected.name },
+            { key: 'email', label: 'Email', children: <a href={`mailto:${selected.email}`}>{selected.email}</a> },
+            { key: 'phone', label: 'Phone', children: selected.phone ? <a href={`tel:${selected.phone}`}>{selected.phone}</a> : 'Not provided' },
+            { key: 'submitted', label: 'Submitted', children: new Date(selected.createdAt).toLocaleString() },
+            { key: 'message', label: 'Message', children: <Paragraph style={{ margin: 0, whiteSpace: 'pre-wrap' }}>{selected.message}</Paragraph> }
+          ]} />
+          <Card size="small" title="Submission information"><Text type="secondary">Received through the public ElderlyCare Contact Us form.</Text></Card>
         </Space>}
-      </Modal>
+      </Drawer>
     </Space>
   );
 };

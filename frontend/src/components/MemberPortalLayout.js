@@ -1,10 +1,10 @@
 import { useContext, useEffect, useRef, useState } from 'react';
 import { Outlet, useLocation, useNavigate } from 'react-router-dom';
 import {
-  Avatar, Badge, Button, Drawer, Dropdown, Grid, Input, Layout, Menu, Space, message
+  Avatar, Button, Drawer, Grid, Input, Layout, Menu, Space, message
 } from 'antd';
 import {
-  AlertOutlined, BellOutlined, DownOutlined, FileProtectOutlined, HeartOutlined, HomeOutlined, LogoutOutlined,
+  AlertOutlined, FileProtectOutlined, HeartOutlined, HomeOutlined, LogoutOutlined,
   MenuFoldOutlined, MenuOutlined, MenuUnfoldOutlined, ProfileOutlined, QrcodeOutlined,
   SafetyCertificateOutlined, SearchOutlined, UserOutlined
 } from '@ant-design/icons';
@@ -33,6 +33,7 @@ const MemberPortalLayout = () => {
   const screens = useBreakpoint();
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [collapsed, setCollapsed] = useState(false);
+  const [searchText, setSearchText] = useState('');
   const [photoUrl, setPhotoUrl] = useState('');
   const photoUrlRef = useRef('');
   const desktop = screens.lg;
@@ -68,13 +69,6 @@ const MemberPortalLayout = () => {
     navigate('/', { replace: true });
   };
 
-  const accountItems = [
-    { key: 'profile', label: 'My Profile', icon: <UserOutlined /> },
-    { type: 'divider' },
-    { key: 'logout', label: 'Logout', icon: <LogoutOutlined />, danger: true }
-  ];
-
-  const handleAccountAction = ({ key }) => key === 'logout' ? handleLogout() : navigate('/profile');
   const handleSearch = (value) => {
     const query = value.trim().toLowerCase();
     const match = portalItems.find(({ label }) => label.toLowerCase().includes(query));
@@ -100,15 +94,9 @@ const MemberPortalLayout = () => {
           {!desktop && <Button type="text" icon={<MenuOutlined />} aria-label="Open member menu" onClick={() => setDrawerOpen(true)} />}
           {!desktop && <img className="member-mobile-logo" src={logo} alt="ElderlyCare" />}
           {desktop && <Button type="text" icon={collapsed ? <MenuUnfoldOutlined /> : <MenuFoldOutlined />} aria-label={collapsed ? 'Show sidebar' : 'Hide sidebar'} onClick={() => setCollapsed((value) => !value)} />}
-          {desktop && <Input className="member-global-search" prefix={<SearchOutlined />} placeholder="Search anything..." allowClear onPressEnter={(event) => handleSearch(event.currentTarget.value)} />}
+          {desktop && <Space.Compact className="member-global-search"><Input value={searchText} onChange={(event) => setSearchText(event.target.value)} prefix={<SearchOutlined />} placeholder="Search anything..." allowClear onPressEnter={() => handleSearch(searchText)} /><Button type="primary" onClick={() => handleSearch(searchText)}>Search</Button></Space.Compact>}
           <Space className="member-header-actions">
-            <Badge dot color="#ff6b00"><Button type="text" icon={<BellOutlined />} aria-label="Notifications" onClick={() => navigate('/emergency-alerts')} /></Badge>
-            <Dropdown menu={{ items: accountItems, onClick: handleAccountAction }} trigger={['click']}>
-              <Button type="text" className="member-account-summary">
-                <Avatar size="small" src={photoUrl || undefined} icon={<UserOutlined />} aria-label="Member profile photograph" />
-                {desktop && <><span>{user?.name || 'Member'}</span><DownOutlined /></>}
-              </Button>
-            </Dropdown>
+            <Button type="text" className="member-account-summary" aria-label="Open profile" onClick={() => navigate('/profile')}><Avatar size="small" src={photoUrl || undefined} icon={<UserOutlined />} /></Button>
           </Space>
         </Header>
         <Content className="member-portal-content"><Outlet /></Content>

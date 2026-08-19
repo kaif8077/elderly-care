@@ -4,7 +4,7 @@ const escapeRegex = (value) => String(value).replace(/[.*+?^${}()|[\]\\]/g, '\\$
 
 const parseAuditQuery = (query) => ({
   page: Math.max(Number.parseInt(query.page, 10) || 1, 1),
-  limit: Math.min(Math.max(Number.parseInt(query.limit, 10) || 20, 5), 100)
+  limit: Math.min(Math.max(Number.parseInt(query.limit, 10) || 10, 5), 100)
 });
 
 const listAuditLogs = async (query) => {

@@ -135,12 +135,12 @@ const Profile = () => {
       </Card>
 
       <Row gutter={[18, 18]} align="stretch" className="member-profile-grid">
-        <Col xs={24} lg={11}>
+        <Col xs={24} lg={16}>
           <Card title="Profile sections" className="member-panel-card member-profile-sections">
             <Collapse items={detailItems} ghost />
           </Card>
         </Col>
-        <Col xs={24} lg={13}>
+        <Col xs={24} lg={8}>
           <Space direction="vertical" size={18} style={{ width: '100%' }}>
             <Card title="Health information" className="member-panel-card">
               <Descriptions size="small" column={1} items={[
