@@ -60,6 +60,9 @@ test('medical profile form saves steps and supports structured emergency contact
   expect(source).toContain('stepFields[step]');
   expect(source).toContain('setValues(form.getFieldsValue(true))');
   expect(source).toContain('Missing or invalid:');
+  expect(source).toContain('medical-step-card');
+  expect(source).toContain('medical-contact-permissions');
+  expect(source).not.toContain('icon={<UploadOutlined />}');
 });
 
 test('dashboard is an overview and routes member tools to dedicated pages', () => {
@@ -243,6 +246,7 @@ test('member pages use a shared responsive portal and compact Ant Design buttons
   const layout = fs.readFileSync(path.join(__dirname, 'components', 'MemberPortalLayout.js'), 'utf8');
   const entry = fs.readFileSync(path.join(__dirname, 'index.js'), 'utf8');
   const theme = fs.readFileSync(path.join(__dirname, 'theme', 'elderlyCareTheme.js'), 'utf8');
+  const controls = fs.readFileSync(path.join(__dirname, 'theme', 'formControls.css'), 'utf8');
   expect(app).toContain('<MemberPortalLayout />');
   expect(app).toContain('!isMemberRoute');
   expect(layout).toContain('member-bottom-nav');
@@ -256,7 +260,11 @@ test('member pages use a shared responsive portal and compact Ant Design buttons
   expect(layout).not.toContain('<Dropdown');
   expect(entry).toContain('componentSize="small"');
   expect(theme).toContain('controlHeight: 30');
+  expect(theme).toContain('fontWeight: 400');
   expect(theme).toContain("itemSelectedBg: '#edf3ff'");
+  expect(controls).toContain('.medical-form{width:min(100%,980px)');
+  expect(controls).toContain('background:#0066ff!important');
+  expect(controls).toContain('background:#ff6b00!important');
 });
 
 test('member tools are separated into focused route pages', () => {
