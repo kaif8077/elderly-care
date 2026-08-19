@@ -107,22 +107,22 @@ const Profile = () => {
   return (
     <main className="care-page member-profile-page">
       <Flex align="center" justify="space-between" gap={16} wrap="wrap" className="member-page-title">
-        <div><Title level={2}>My Profile</Title><Text type="secondary">Review your health and emergency information.</Text></div>
+        <div><Title level={2}>My Profile</Title><Text type="secondary">Review and update your personal, medical, and emergency information.</Text></div>
+        <Button onClick={() => navigate('/medical-profile')}>Edit profile</Button>
       </Flex>
 
       <Card className="member-profile-header">
         <Row gutter={[24, 20]} align="middle">
-          <Col xs={24} md={7}>
-            <Flex vertical align="center" gap={8} className="member-profile-identity">
+          <Col xs={24} md={10}>
+            <Flex align="center" gap={18} className="member-profile-identity">
               <div className="member-profile-photo-edit">
                 <Avatar size={128} src={photoUrl} icon={<UserOutlined />} />
                 <Button type="primary" shape="circle" icon={<EditOutlined />} aria-label="Edit profile photograph" onClick={() => navigate('/medical-profile')} />
               </div>
-              <Title level={3}>{profile.name}</Title>
-              <Text type="secondary">{age !== null ? `Age: ${age}` : `DOB: ${formatDate(profile.dob)}`} · {show(profile.gender)}</Text>
+              <div><Title level={3}>{profile.name}</Title><Text type="secondary">{age !== null ? `Age: ${age}` : `DOB: ${formatDate(profile.dob)}`} · {show(profile.gender)}</Text></div>
             </Flex>
           </Col>
-          <Col xs={24} md={17}>
+          <Col xs={24} md={14}>
             <Descriptions className="member-profile-summary" size="small" column={{ xs: 1, sm: 2 }} items={[
               { key: 'member', label: 'ElderlyCare ID', children: show(profile.elderlyCareId) },
               { key: 'blood', label: 'Blood group', children: <Tag color="orange">{show(profile.bloodGroup)}</Tag> },
@@ -135,12 +135,12 @@ const Profile = () => {
       </Card>
 
       <Row gutter={[18, 18]} align="stretch" className="member-profile-grid">
-        <Col xs={24} lg={16}>
-          <Card title="Complete profile details" className="member-panel-card">
+        <Col xs={24} lg={11}>
+          <Card title="Profile sections" className="member-panel-card member-profile-sections">
             <Collapse items={detailItems} ghost />
           </Card>
         </Col>
-        <Col xs={24} lg={8}>
+        <Col xs={24} lg={13}>
           <Space direction="vertical" size={18} style={{ width: '100%' }}>
             <Card title="Health information" className="member-panel-card">
               <Descriptions size="small" column={1} items={[

@@ -87,8 +87,9 @@ const Recommendations = () => {
 
       {error && <Alert type="error" showIcon message={error} closable onClose={() => setError('')} />}
       {loading ? <Skeleton active paragraph={{ rows: 5 }} /> : latest ? (
-        <>
+        <div className="recommendations-workspace">
           <Card
+            className="recommendation-latest-card"
             size="small"
             title={<Space><Tag color="blue">Latest</Tag><Text>{new Date(latest.generatedAt).toLocaleString()}</Text></Space>}
             extra={<Button icon={<DownloadOutlined />} onClick={() => download(latest._id)}>PDF</Button>}
@@ -100,8 +101,8 @@ const Recommendations = () => {
             ].slice(0, 8).map((value) => <Tag key={value}>{value}</Tag>)}</Space></div>}
             <Space style={{ marginTop: 16 }}><Text>Was this guidance relevant?</Text><Button type={latest.feedback?.relevance === 'helpful' ? 'primary' : 'default'} icon={<LikeOutlined />} onClick={() => sendFeedback(latest._id, 'helpful')}>Helpful</Button><Button type={latest.feedback?.relevance === 'not_helpful' ? 'primary' : 'default'} icon={<DislikeOutlined />} onClick={() => sendFeedback(latest._id, 'not_helpful')}>Not helpful</Button></Space>
           </Card>
-          {items.length > 1 && (
-            <Card size="small" title={<Space><HistoryOutlined />Previous recommendations</Space>} style={{ marginTop: 14 }}>
+          <Card className="recommendation-history-card" size="small" title={<Space><HistoryOutlined />Recommendation history</Space>}>
+            {items.length > 1 ? (
               <List
                 dataSource={items.slice(1)}
                 renderItem={(item) => (
@@ -110,9 +111,9 @@ const Recommendations = () => {
                   </List.Item>
                 )}
               />
-            </Card>
-          )}
-        </>
+            ) : <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} description="No previous recommendations" />}
+          </Card>
+        </div>
       ) : (
         <Empty description="Complete your medical profile, then generate your first recommendation.">
           <Button type="primary" onClick={generate} loading={working}>Generate recommendation</Button>

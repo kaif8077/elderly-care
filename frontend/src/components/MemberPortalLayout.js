@@ -1,12 +1,12 @@
 import { useContext, useEffect, useRef, useState } from 'react';
 import { Outlet, useLocation, useNavigate } from 'react-router-dom';
 import {
-  Avatar, Button, Drawer, Grid, Layout, Menu, Space, message
+  Avatar, Badge, Button, Drawer, Dropdown, Grid, Input, Layout, Menu, Space, message
 } from 'antd';
 import {
-  AlertOutlined, FileProtectOutlined, HeartOutlined, HomeOutlined, LogoutOutlined,
+  AlertOutlined, BellOutlined, DownOutlined, FileProtectOutlined, HeartOutlined, HomeOutlined, LogoutOutlined,
   MenuFoldOutlined, MenuOutlined, MenuUnfoldOutlined, ProfileOutlined, QrcodeOutlined,
-  SafetyCertificateOutlined, UserOutlined
+  SafetyCertificateOutlined, SearchOutlined, UserOutlined
 } from '@ant-design/icons';
 import { AuthContext } from '../context/AuthContext';
 import api from '../services/api';
@@ -68,6 +68,20 @@ const MemberPortalLayout = () => {
     navigate('/', { replace: true });
   };
 
+  const accountItems = [
+    { key: 'profile', label: 'My Profile', icon: <UserOutlined /> },
+    { type: 'divider' },
+    { key: 'logout', label: 'Logout', icon: <LogoutOutlined />, danger: true }
+  ];
+
+  const handleAccountAction = ({ key }) => key === 'logout' ? handleLogout() : navigate('/profile');
+  const handleSearch = (value) => {
+    const query = value.trim().toLowerCase();
+    const match = portalItems.find(({ label }) => label.toLowerCase().includes(query));
+    if (match) navigate(match.key);
+    else if (query) message.info('No matching portal page found.');
+  };
+
   const menu = <Menu mode="inline" selectedKeys={[selectedKey]} items={portalItems} onClick={openRoute} />;
   return (
     <Layout className="member-portal-shell">
@@ -86,10 +100,15 @@ const MemberPortalLayout = () => {
           {!desktop && <Button type="text" icon={<MenuOutlined />} aria-label="Open member menu" onClick={() => setDrawerOpen(true)} />}
           {!desktop && <img className="member-mobile-logo" src={logo} alt="ElderlyCare" />}
           {desktop && <Button type="text" icon={collapsed ? <MenuUnfoldOutlined /> : <MenuFoldOutlined />} aria-label={collapsed ? 'Show sidebar' : 'Hide sidebar'} onClick={() => setCollapsed((value) => !value)} />}
+          {desktop && <Input className="member-global-search" prefix={<SearchOutlined />} placeholder="Search anything..." allowClear onPressEnter={(event) => handleSearch(event.currentTarget.value)} />}
           <Space className="member-header-actions">
-            <div className="member-account-summary">
-              <Avatar size="small" src={photoUrl || undefined} icon={<UserOutlined />} aria-label="Member profile photograph" />
-            </div>
+            <Badge dot color="#ff6b00"><Button type="text" icon={<BellOutlined />} aria-label="Notifications" onClick={() => navigate('/emergency-alerts')} /></Badge>
+            <Dropdown menu={{ items: accountItems, onClick: handleAccountAction }} trigger={['click']}>
+              <Button type="text" className="member-account-summary">
+                <Avatar size="small" src={photoUrl || undefined} icon={<UserOutlined />} aria-label="Member profile photograph" />
+                {desktop && <><span>{user?.name || 'Member'}</span><DownOutlined /></>}
+              </Button>
+            </Dropdown>
           </Space>
         </Header>
         <Content className="member-portal-content"><Outlet /></Content>
