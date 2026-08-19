@@ -123,7 +123,7 @@ const MedicalDocuments = () => {
 
   return (
     <Card className="care-section-card" title="Secure medical documents">
-      <Form form={form} layout="vertical" onFinish={upload}>
+      <Form form={form} layout="vertical" size="middle" onFinish={upload}>
         <Row gutter={[16, 8]} align="bottom">
           <Col xs={24} sm={12} lg={6}>
             <Form.Item name="displayName" label="Document name" rules={[{ required: true }]}>
@@ -146,7 +146,7 @@ const MedicalDocuments = () => {
                 accept=".pdf,.jpg,.jpeg,.png,.webp"
                 showUploadList={false}
               >
-                <Button block icon={<UploadOutlined />}>
+                <Button block size="middle" icon={<UploadOutlined />}>
                   {file ? file.name : 'Choose file'}
                 </Button>
               </Upload>
@@ -154,7 +154,7 @@ const MedicalDocuments = () => {
           </Col>
           <Col xs={24} sm={12} lg={6}>
             <Form.Item label="Upload document">
-              <Button block type="primary" htmlType="submit" loading={working}>
+              <Button block type="primary" size="middle" htmlType="submit" loading={working}>
                 Upload securely
               </Button>
             </Form.Item>

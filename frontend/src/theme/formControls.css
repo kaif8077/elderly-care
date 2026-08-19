@@ -5,6 +5,7 @@
 .medical-step-card{border-color:#e5eaf1;background:#fbfcfe}
 .medical-step-card>.ant-card-body{padding:20px}
 .medical-step-card .ant-form-item{margin-bottom:14px}
+.medical-step-card .ant-form-item-label{padding-inline-end:14px;text-align:left}
 .medical-step-card h4.ant-typography{margin:0 0 16px;color:#0066ff}
 .medical-step-card .ant-card{background:#fff}
 .medical-contact-permissions{min-height:46px;align-items:center}.medical-contact-permissions .ant-form-item{margin-bottom:0}
@@ -27,6 +28,7 @@
 
 /* Text buttons lose decorative icons; icon-only navigation controls remain usable. */
 .ant-btn:has(>span:not(.anticon))>.anticon{display:none}
+.member-profile-photo-edit{position:relative}.member-profile-photo-edit>.ant-btn{position:absolute;right:1px;bottom:5px}
 
 @media(max-width:767px){
   .medical-step-card>.ant-card-body{padding:14px}

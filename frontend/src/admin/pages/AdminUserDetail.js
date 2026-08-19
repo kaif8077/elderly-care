@@ -69,21 +69,6 @@ const AdminUserDetail = () => {
   const medical = profile?.medical;
   const insurance = profile?.insurance;
 
-  const changeStatus = async (status) => {
-    if (!window.confirm(`Change this account to ${status}?${status !== 'active' ? ' Existing sessions and active QR access will be revoked.' : ''}`)) return;
-    setStatusSaving(true);
-    setActionMessage('');
-    try {
-      await adminApi.patch(`/users/${userId}/status`, { status });
-      setActionMessage(`Account changed to ${status}.`);
-      await load();
-    } catch (requestError) {
-      setActionMessage(requestError.response?.data?.message || 'Unable to update account status.');
-    } finally {
-      setStatusSaving(false);
-    }
-  };
-
   const archiveAccount = async (event) => {
     event.preventDefault();
     const reason = archiveForm.reason === 'Other'
@@ -143,13 +128,7 @@ const AdminUserDetail = () => {
         </dl>
         <div className="admin-detail-actions">
           <Link to={`/admin/id-cards/${userId}`}><Button type="primary" icon={<FaIdCard />}>View ID card</Button></Link>
-          {user.isDeleted ? (
-            <Button type="primary" loading={statusSaving} onClick={restoreAccount}>Restore account</Button>
-          ) : user.accountStatus === 'active' ? (
-            <Button danger loading={statusSaving} onClick={() => changeStatus('inactive')}>Deactivate account</Button>
-          ) : (
-            <Button type="primary" loading={statusSaving} onClick={() => changeStatus('active')}>Activate account</Button>
-          )}
+          {user.isDeleted && <Button type="primary" loading={statusSaving} onClick={restoreAccount}>Restore account</Button>}
           {!user.isDeleted && <Button danger disabled={statusSaving} onClick={() => setArchiveOpen(true)}>Archive user</Button>}
         </div>
         {actionMessage && <p className="admin-action-message" role="status">{actionMessage}</p>}
@@ -204,7 +183,7 @@ const AdminUserDetail = () => {
       <header className="admin-detail-hero">
         <span className="admin-detail-avatar"><FaUser aria-hidden="true" /></span>
         <div><p className="admin-eyebrow">User record</p><h1>{user.name}</h1><p>{user.email}</p></div>
-        <div className="admin-detail-statuses"><AdminStatusBadge status={user.accountStatus} /><AdminStatusBadge status={user.profileStatus} /></div>
+        <div className="admin-detail-statuses"><AdminStatusBadge status={user.profileStatus} /></div>
       </header>
 
       <Space wrap role="tablist" aria-label="User record sections" style={{ margin: '18px 0' }}>

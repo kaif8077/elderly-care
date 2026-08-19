@@ -48,7 +48,6 @@ const AdminUsers = () => {
     { title: 'Blood group', dataIndex: 'bloodGroup', key: 'bloodGroup', render: (value) => value || '—' },
     { title: 'Profile', dataIndex: 'profileCompletion', key: 'profileCompletion', width: 150, render: (value) => <Progress percent={value || 0} size="small" strokeColor="#0066ff" /> },
     { title: 'QR', dataIndex: 'qrStatus', key: 'qrStatus', render: (value) => <Tag color={tagColor(value)}>{value || 'missing'}</Tag> },
-    { title: 'Account', dataIndex: 'accountStatus', key: 'accountStatus', render: (value) => <Tag color={tagColor(value)}>{value}</Tag> },
     { title: 'Registered', dataIndex: 'createdAt', key: 'createdAt', render: (value) => value ? new Date(value).toLocaleDateString() : '—' },
     { title: 'Action', key: 'action', fixed: 'right', render: (_, user) => <Link to={`/admin/users/${user.id}`}><Button type="link" icon={<EyeOutlined />}>View</Button></Link> }
   ];
@@ -62,7 +61,6 @@ const AdminUsers = () => {
             <Input value={search} onChange={(event) => setSearch(event.target.value)} onPressEnter={() => updateQuery({ search: search.trim() })} prefix={<SearchOutlined />} placeholder="Name, email, or phone" allowClear />
             <Button type="primary" onClick={() => updateQuery({ search: search.trim() })}>Search</Button>
           </Space.Compact>
-          <Select allowClear value={query.accountStatus} onChange={(value) => updateQuery({ accountStatus: value })} placeholder="Account status" style={{ width: 150 }} options={['active', 'inactive', 'suspended', 'archived'].map((value) => ({ value, label: value }))} />
           <Select allowClear value={query.profileStatus} onChange={(value) => updateQuery({ profileStatus: value })} placeholder="Profile status" style={{ width: 150 }} options={['complete', 'incomplete'].map((value) => ({ value, label: value }))} />
           <Select allowClear value={query.bloodGroup} onChange={(value) => updateQuery({ bloodGroup: value })} placeholder="Blood group" style={{ width: 140 }} options={bloodGroups.map((value) => ({ value, label: value }))} />
           <Select allowClear value={query.qrStatus} onChange={(value) => updateQuery({ qrStatus: value })} placeholder="QR status" style={{ width: 140 }} options={['active', 'revoked', 'generated', 'missing'].map((value) => ({ value, label: value }))} />

@@ -62,6 +62,9 @@ test('medical profile form saves steps and supports structured emergency contact
   expect(source).toContain('Missing or invalid:');
   expect(source).toContain('medical-step-card');
   expect(source).toContain('medical-contact-permissions');
+  expect(source).toContain("layout={screens.md ? 'horizontal' : 'vertical'}");
+  expect(source).toContain("size={screens.md ? 'middle' : 'small'}");
+  expect(source).toContain('size="middle" loading={saving}');
   expect(source).not.toContain('icon={<UploadOutlined />}');
 });
 
@@ -235,6 +238,11 @@ test('member profile uses a responsive Ant Design summary containing saved detai
   expect(source).toContain('member-profile-grid');
   expect(source).toContain('Health information');
   expect(source).toContain('Emergency contact');
+  expect(source).not.toContain('Active profile');
+  expect(source).not.toContain('>Edit profile</Button>');
+  expect(source).toContain('aria-label="Edit profile photograph"');
+  expect(source).not.toContain('<HeartOutlined />Health information');
+  expect(source).not.toContain('<PhoneOutlined />Emergency contact');
   expect(source).toContain('<Collapse items={detailItems}');
   expect(source).not.toContain('<Recommendations');
   expect(source).not.toContain('<UserIdCard');
@@ -258,6 +266,8 @@ test('member pages use a shared responsive portal and compact Ant Design buttons
   expect(layout).toContain('member-portal-main-collapsed');
   expect(layout).not.toContain('BellOutlined');
   expect(layout).not.toContain('<Dropdown');
+  expect(layout).not.toContain("<strong>{user?.name");
+  expect(layout).toContain("responseType: 'blob'");
   expect(entry).toContain('componentSize="small"');
   expect(theme).toContain('controlHeight: 30');
   expect(theme).toContain('fontWeight: 400');
@@ -265,6 +275,19 @@ test('member pages use a shared responsive portal and compact Ant Design buttons
   expect(controls).toContain('.medical-form{width:min(100%,980px)');
   expect(controls).toContain('background:#0066ff!important');
   expect(controls).toContain('background:#ff6b00!important');
+});
+
+test('account activation controls are absent from the admin interface', () => {
+  const dashboard = fs.readFileSync(path.join(__dirname, 'admin', 'pages', 'AdminDashboard.js'), 'utf8');
+  const users = fs.readFileSync(path.join(__dirname, 'admin', 'pages', 'AdminUsers.js'), 'utf8');
+  const detail = fs.readFileSync(path.join(__dirname, 'admin', 'pages', 'AdminUserDetail.js'), 'utf8');
+  expect(dashboard).not.toContain("['Active users'");
+  expect(dashboard).not.toContain("['Inactive users'");
+  expect(users).not.toContain("title: 'Account'");
+  expect(users).not.toContain('placeholder="Account status"');
+  expect(detail).not.toContain('Deactivate account');
+  expect(detail).not.toContain('Activate account');
+  expect(detail).not.toContain('changeStatus');
 });
 
 test('member tools are separated into focused route pages', () => {

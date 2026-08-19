@@ -123,7 +123,7 @@ const AdminIdCard = () => {
           <p>The QR contains a random revocable token, never a user ID or complete medical record.</p>
           <Space direction="vertical" style={{ width: '100%' }}>
             <Button type="primary" block icon={<FaDownload />} onClick={downloadImage} disabled={working || !card.qr}>Download ID card PNG</Button>
-            <Button block icon={<FaSyncAlt />} onClick={() => runAction('regenerate')} disabled={working || user.accountStatus !== 'active'}>Generate new QR</Button>
+            <Button block icon={<FaSyncAlt />} onClick={() => runAction('regenerate')} disabled={working || user.isDeleted}>Generate new QR</Button>
             <Button danger block icon={<FaTimesCircle />} onClick={() => runAction('revoke')} disabled={working || !card.qr}>Revoke QR</Button>
           </Space>
           {message && <p className="admin-action-message" role="status">{message}</p>}

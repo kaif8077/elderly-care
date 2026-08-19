@@ -1,4 +1,4 @@
-import { useContext, useState } from 'react';
+import { useContext, useEffect, useRef, useState } from 'react';
 import { Outlet, useLocation, useNavigate } from 'react-router-dom';
 import {
   Avatar, Button, Drawer, Grid, Layout, Menu, Space, message
@@ -9,6 +9,7 @@ import {
   SafetyCertificateOutlined, UserOutlined
 } from '@ant-design/icons';
 import { AuthContext } from '../context/AuthContext';
+import api from '../services/api';
 import logo from '../assests/logo.png';
 import './MemberPortalLayout.css';
 
@@ -32,8 +33,29 @@ const MemberPortalLayout = () => {
   const screens = useBreakpoint();
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [collapsed, setCollapsed] = useState(false);
+  const [photoUrl, setPhotoUrl] = useState('');
+  const photoUrlRef = useRef('');
   const desktop = screens.lg;
   const selectedKey = portalItems.find(({ key }) => key === location.pathname)?.key || '/dashboard';
+
+  useEffect(() => {
+    if (!user?._id) return undefined;
+    let active = true;
+    api.get(`/api/medical/${user._id}/photo`, { responseType: 'blob' })
+      .then(({ data }) => {
+        if (!active || !data?.size) return;
+        const nextUrl = URL.createObjectURL(data);
+        if (photoUrlRef.current) URL.revokeObjectURL(photoUrlRef.current);
+        photoUrlRef.current = nextUrl;
+        setPhotoUrl(nextUrl);
+      })
+      .catch(() => { if (active) setPhotoUrl(''); });
+    return () => {
+      active = false;
+      if (photoUrlRef.current) URL.revokeObjectURL(photoUrlRef.current);
+      photoUrlRef.current = '';
+    };
+  }, [user?._id]);
 
   const openRoute = ({ key }) => {
     navigate(key);
@@ -66,8 +88,7 @@ const MemberPortalLayout = () => {
           {desktop && <Button type="text" icon={collapsed ? <MenuUnfoldOutlined /> : <MenuFoldOutlined />} aria-label={collapsed ? 'Show sidebar' : 'Hide sidebar'} onClick={() => setCollapsed((value) => !value)} />}
           <Space className="member-header-actions">
             <div className="member-account-summary">
-              <Avatar size="small" icon={<UserOutlined />} />
-              <strong>{user?.name || 'Member'}</strong>
+              <Avatar size="small" src={photoUrl || undefined} icon={<UserOutlined />} aria-label="Member profile photograph" />
             </div>
           </Space>
         </Header>
