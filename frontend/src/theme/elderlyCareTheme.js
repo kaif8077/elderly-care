@@ -11,6 +11,11 @@ const elderlyCareTheme = {
   components: {
     Button: {
       fontWeight: 700,
+      controlHeight: 34,
+      controlHeightSM: 28,
+      controlHeightLG: 42,
+      paddingInline: 14,
+      defaultFontSize: 14,
       primaryShadow: 'none',
       defaultColor: '#0066ff',
       defaultBorderColor: '#0066ff',
@@ -23,6 +28,7 @@ const elderlyCareTheme = {
     Layout: { bodyBg: '#f3f7f5', headerBg: '#ffffff', siderBg: '#0066ff' },
     Menu: {
       itemColor: '#1f2937', itemHoverColor: '#ff6b00', itemSelectedColor: '#ff6b00',
+      itemSelectedBg: '#edf3ff', itemHoverBg: '#fff4ec',
       horizontalItemHoverColor: '#ff6b00', horizontalItemSelectedColor: '#ff6b00',
       darkItemBg: '#0066ff', darkItemSelectedBg: '#ff6b00',
       darkItemSelectedColor: '#ffffff', darkItemHoverBg: '#ff6b00'
