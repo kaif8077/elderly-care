@@ -1,9 +1,12 @@
-import React from 'react';
-import { Menu, Typography } from 'antd';
+import { useContext, useState } from 'react';
+import { Button, Menu, message } from 'antd';
 import { useLocation, useNavigate } from 'react-router-dom';
 import {
-  AlertOutlined, AuditOutlined, DashboardOutlined, MessageOutlined, UserOutlined
+  AlertOutlined, AuditOutlined, DashboardOutlined, LogoutOutlined,
+  MessageOutlined, UserOutlined
 } from '@ant-design/icons';
+import { AdminAuthContext } from '../context/AdminAuthContext';
+import logo from '../../assests/logo.png';
 
 const entries = [
   { key: '/admin/dashboard', label: 'Dashboard', icon: <DashboardOutlined /> },
@@ -13,33 +16,43 @@ const entries = [
   { key: '/admin/contacts', label: 'Contact Us', icon: <MessageOutlined /> }
 ];
 
-const AdminSidebar = ({ collapsed, onClose }) => {
+const AdminSidebar = ({ collapsed = false, onClose }) => {
+  const { logout } = useContext(AdminAuthContext);
   const location = useLocation();
   const navigate = useNavigate();
-  const selected = location.pathname.startsWith('/admin/users') ? '/admin/users' : location.pathname;
+  const [loggingOut, setLoggingOut] = useState(false);
+  const selected = location.pathname.startsWith('/admin/users') || location.pathname.startsWith('/admin/id-cards')
+    ? '/admin/users' : location.pathname;
+
+  const exit = async () => {
+    setLoggingOut(true);
+    try {
+      await logout();
+      message.success('Administrator logged out.');
+      navigate('/admin/login', { replace: true });
+    } finally {
+      setLoggingOut(false);
+      onClose?.();
+    }
+  };
 
   return (
-    <>
-      <div className={`admin-ant-brand${collapsed ? ' is-collapsed' : ''}`}>
-        <span className="admin-ant-brand-mark">EC</span>
-        {!collapsed && (
-          <span className="admin-ant-brand-copy">
-            <strong>ElderlyCare</strong>
-            <Typography.Text>ADMINISTRATION</Typography.Text>
-          </span>
-        )}
-      </div>
-      <Menu
-        theme="dark"
-        mode="inline"
-        selectedKeys={[selected]}
-        items={entries}
-        onClick={({ key }) => {
-          navigate(key);
-          onClose?.();
-        }}
-      />
-    </>
+    <div className="admin-portal-sidebar-inner">
+      <Button type="text" className="admin-portal-brand" onClick={() => navigate('/admin/dashboard')} aria-label="ElderlyCare administration dashboard">
+        <img src={collapsed ? '/favicon.png' : logo} alt="ElderlyCare" />
+      </Button>
+      <nav aria-label="Administration navigation">
+        <Menu
+          mode="inline"
+          selectedKeys={[selected]}
+          items={entries}
+          onClick={({ key }) => { navigate(key); onClose?.(); }}
+        />
+      </nav>
+      <Button type="text" danger icon={<LogoutOutlined />} className="admin-portal-logout" loading={loggingOut} onClick={exit}>
+        {!collapsed && 'Logout'}
+      </Button>
+    </div>
   );
 };
 

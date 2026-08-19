@@ -1,7 +1,7 @@
 import React, { useContext, useEffect, useMemo, useState } from 'react';
 import { Button, Card, Col, Flex, Progress, Row, Skeleton, Typography } from 'antd';
 import {
-  ContactsOutlined, EditOutlined, MedicineBoxOutlined, ProfileOutlined, QrcodeOutlined
+  ContactsOutlined, MedicineBoxOutlined, ProfileOutlined, QrcodeOutlined
 } from '@ant-design/icons';
 import { useNavigate } from 'react-router-dom';
 import { AuthContext } from '../context/AuthContext';
@@ -51,22 +51,22 @@ const Dashboard = () => {
 
   return (
     <main className="care-page member-dashboard-page">
-      <Card className="member-welcome-card">
-        <Row align="middle" justify="space-between" gutter={[20, 20]}>
-          <Col xs={24} md={15}>
+      <Row align="middle" justify="space-between" gutter={[20, 16]} className="member-dashboard-intro">
+          <Col xs={24} lg={16}>
             <Text type="secondary">Good {new Date().getHours() < 12 ? 'morning' : new Date().getHours() < 18 ? 'afternoon' : 'evening'},</Text>
-            <Title level={2}>Welcome, {user?.name || 'Member'}</Title>
-            <Paragraph type="secondary">Manage health information and keep emergency access ready from one secure place.</Paragraph>
+            <Title level={2}>{user?.name || 'ElderlyCare Member'}</Title>
+            <Paragraph type="secondary">Here is an overview of your health profile and emergency readiness.</Paragraph>
           </Col>
-          <Col xs={24} md={9}>
-            <Flex justify="space-between"><Text strong>Profile completion</Text><Text strong>{completion}%</Text></Flex>
-            <Progress percent={completion} showInfo={false} strokeColor="#0066ff" />
-            <Button type="primary" icon={<EditOutlined />} onClick={() => navigate('/medical-profile')}>
-              {summary.profile ? 'Update profile' : 'Complete profile'}
-            </Button>
+          <Col xs={24} lg={8}>
+            <Card className="member-completion-card" size="small">
+              <Flex justify="space-between"><Text strong>Profile completion</Text><Text strong>{completion}%</Text></Flex>
+              <Progress percent={completion} showInfo={false} strokeColor="#0066ff" trailColor="#eaf0f8" />
+              <Button type="primary" onClick={() => navigate('/medical-profile')}>
+                {summary.profile ? 'Update profile' : 'Complete profile'}
+              </Button>
+            </Card>
           </Col>
-        </Row>
-      </Card>
+      </Row>
 
       {summary.loading ? <Skeleton active paragraph={{ rows: 3 }} /> : (
         <Row gutter={[14, 14]} className="member-overview-grid">
@@ -74,7 +74,7 @@ const Dashboard = () => {
             <Col xs={12} md={6} key={item.key}>
               <Card hoverable onClick={item.action} className="member-stat-card">
                 <span className="member-stat-icon">{item.icon}</span>
-                <Text>{item.label}</Text>
+                <Text strong>{item.label}</Text>
                 <Title level={4}>{item.value}</Title>
                 <Text type="secondary">{item.detail}</Text>
               </Card>

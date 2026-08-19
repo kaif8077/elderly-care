@@ -1,16 +1,19 @@
-.member-portal-shell{min-height:100vh;background:#f6f8fc}
-.member-portal-sider{position:fixed!important;inset:0 auto 0 0;z-index:30;border-right:1px solid #e6eaf0}
+.member-portal-shell{min-height:100vh;background:#f7f9fc}
+.member-portal-sider{position:fixed!important;inset:0 auto 0 0;z-index:30;border-right:1px solid #e8edf4;box-shadow:3px 0 18px rgba(31,45,61,.025)}
 .member-brand.ant-btn{display:flex;width:100%;height:80px;align-items:center;justify-content:flex-start;padding:0 24px;border:0;border-bottom:1px solid #eef1f5;border-radius:0;background:#fff}
 .member-brand img{width:142px;height:52px;object-fit:contain}
 .ant-layout-sider-collapsed .member-brand.ant-btn{justify-content:center;padding:0}.ant-layout-sider-collapsed .member-brand img{width:42px;height:42px}
-.member-portal-sider nav{padding:18px 10px}
+.member-portal-sider nav{padding:18px 12px}
 .member-portal-sider .ant-menu{border-inline-end:0!important}
-.member-portal-sider .ant-menu-item{height:44px;margin-block:5px;border-radius:9px}
+.member-portal-sider .ant-menu-item{height:42px;margin-block:5px;border-radius:9px;color:#344054}
+.member-portal-sider .ant-menu-item .anticon{font-size:16px}
+.member-portal-sider .ant-menu-item-selected{background:#edf3ff!important;color:#0066ff!important;font-weight:600}
+.member-portal-sider .ant-menu-item:hover{background:#fff3ea!important;color:#ff6b00!important}
 .member-logout{position:absolute;right:12px;bottom:18px;left:12px;width:calc(100% - 24px);text-align:left}
 .member-portal-main{min-width:0;margin-left:250px;transition:margin-left .2s ease}.member-portal-main-collapsed{margin-left:76px}
-.member-portal-header{position:sticky;top:0;z-index:20;display:flex;align-items:center;height:80px;padding:0 24px!important;border-bottom:1px solid #e6eaf0;background:rgba(255,255,255,.96)!important;backdrop-filter:blur(12px)}
+.member-portal-header{position:sticky;top:0;z-index:20;display:flex;align-items:center;height:72px;padding:0 28px!important;border-bottom:1px solid #e8edf4;background:rgba(255,255,255,.97)!important;backdrop-filter:blur(12px)}
 .member-header-actions{margin-left:auto}.member-account-summary{display:flex;align-items:center}.member-account-summary .ant-avatar{width:36px;height:36px;border:2px solid #edf3ff}.member-mobile-logo{width:118px;height:40px;object-fit:contain}
-.member-portal-content{min-width:0}.member-portal-content .care-page{width:min(1180px,calc(100% - 40px));padding:26px 0 64px}
+.member-portal-content{min-width:0}.member-portal-content .care-page{width:min(1240px,calc(100% - 48px));padding:28px 0 64px}
 .member-bottom-nav{position:fixed;right:0;bottom:0;left:0;z-index:50;display:grid;grid-template-columns:repeat(5,1fr);padding:5px max(6px,env(safe-area-inset-right)) calc(5px + env(safe-area-inset-bottom)) max(6px,env(safe-area-inset-left));border-top:1px solid #e2e7ee;background:rgba(255,255,255,.98);box-shadow:0 -8px 24px rgba(31,41,55,.08)}
 .member-bottom-nav button{display:flex;min-width:0;min-height:48px;flex-direction:column;align-items:center;justify-content:center;gap:2px;padding:3px;border:0;background:transparent;color:#667085;font-size:10px;cursor:pointer}
 .member-bottom-nav button .anticon{font-size:17px}.member-bottom-nav button.active{color:#ff6b00;font-weight:700}
