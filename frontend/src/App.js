@@ -1,6 +1,5 @@
 import React from 'react';
 import { BrowserRouter as Router, Route, Routes, useLocation } from 'react-router-dom';
-import '@fortawesome/fontawesome-free/css/all.min.css';
 import Navbar from './components/Navbar';
 import Home from './pages/Home';
 import Login from './pages/Login';
@@ -24,7 +23,6 @@ import MemberEmergencyPage from './pages/MemberEmergencyPage';
 import { AdminAuthProvider } from './admin/context/AdminAuthContext';
 import AdminProtectedRoute from './admin/components/AdminProtectedRoute';
 import AdminLogin from './admin/pages/AdminLogin';
-import AdminDashboardPlaceholder from './admin/pages/AdminDashboardPlaceholder';
 import AdminLayout from './admin/layout/AdminLayout';
 import AdminDashboard from './admin/pages/AdminDashboard';
 import AdminUsers from './admin/pages/AdminUsers';
@@ -35,7 +33,6 @@ import AdminContacts from './admin/pages/AdminContacts';
 import AdminEmergencyAlerts from './admin/pages/AdminEmergencyAlerts';
 import ProtectedRoute from './components/ProtectedRoute';
 import MemberPortalLayout from './components/MemberPortalLayout';
-import './App.css';
 
 const AppRoutes = () => {
     const location = useLocation();
@@ -81,7 +78,6 @@ const AppRoutes = () => {
                     <Route path="id-cards/:userId" element={<AdminIdCard />} />
                     <Route path="audit-logs" element={<AdminAuditLogs />} />
                     <Route path="contacts" element={<AdminContacts />} />
-                    <Route path="phase-1" element={<AdminDashboardPlaceholder />} />
                 </Route>
             </Routes>
         </>
