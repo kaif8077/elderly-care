@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import {
-  Button, Card, Col, Empty, Form, Image, Input, List, Modal, Row, Select,
-  Space, Typography, Upload, message
+  Button, Card, Col, Empty, Form, Image, Input, Modal, Row, Select,
+  Space, Table, Typography, Upload, message
 } from 'antd';
 import {
   DeleteOutlined, DownloadOutlined, EyeOutlined, UploadOutlined
@@ -20,6 +20,7 @@ const MedicalDocuments = () => {
   const [items, setItems] = useState([]);
   const [working, setWorking] = useState(false);
   const [preview, setPreview] = useState(null);
+  const [uploadOpen, setUploadOpen] = useState(false);
   const [previewLoadingId, setPreviewLoadingId] = useState(null);
   const previewUrlRef = useRef(null);
 
@@ -51,6 +52,7 @@ const MedicalDocuments = () => {
       });
       form.resetFields();
       setFile(undefined);
+      setUploadOpen(false);
       message.success('Document uploaded securely.');
       load();
     } catch (error) {
@@ -121,21 +123,36 @@ const MedicalDocuments = () => {
     }
   });
 
+  const columns = [
+    { title: 'Document name', dataIndex: 'displayName', key: 'displayName' },
+    { title: 'Category', dataIndex: 'category', key: 'category', render: (value) => value.replaceAll('_', ' ') },
+    { title: 'File size', dataIndex: 'bytes', key: 'bytes', render: (value) => `${Math.ceil(value / 1024)} KB` },
+    { title: 'Uploaded date', dataIndex: 'createdAt', key: 'createdAt', render: (value) => value ? new Date(value).toLocaleDateString() : '—' },
+    { title: 'Actions', key: 'actions', render: (_, item) => <Space size={2}>
+      <Button type="text" aria-label={`View ${item.displayName}`} icon={<EyeOutlined />} loading={previewLoadingId === item._id} onClick={() => view(item)} />
+      <Button type="text" aria-label={`Download ${item.displayName}`} icon={<DownloadOutlined />} onClick={() => download(item)} />
+      <Button type="text" danger aria-label={`Delete ${item.displayName}`} icon={<DeleteOutlined />} onClick={() => remove(item)} />
+    </Space> }
+  ];
+
   return (
-    <Card className="care-section-card" title="Secure medical documents">
+    <Card className="care-section-card member-documents-card" title="Your documents" extra={<Button type="primary" onClick={() => setUploadOpen(true)}>Upload document</Button>}>
+      <Table rowKey="_id" columns={columns} dataSource={items} scroll={{ x: 760 }} pagination={{ pageSize: 6, showSizeChanger: false }} locale={{ emptyText: <Empty description="No documents uploaded" /> }} />
+
+      <Modal title="Upload secure document" open={uploadOpen} onCancel={() => setUploadOpen(false)} footer={null} destroyOnHidden>
       <Form form={form} layout="vertical" size="middle" onFinish={upload}>
         <Row gutter={[16, 8]} align="bottom">
-          <Col xs={24} sm={12} lg={6}>
+          <Col span={24}>
             <Form.Item name="displayName" label="Document name" rules={[{ required: true }]}>
               <Input placeholder="e.g. Latest prescription" />
             </Form.Item>
           </Col>
-          <Col xs={24} sm={12} lg={6}>
+          <Col span={24}>
             <Form.Item name="category" label="Category" rules={[{ required: true }]}>
               <Select placeholder="Select category" options={categories} />
             </Form.Item>
           </Col>
-          <Col xs={24} sm={12} lg={6}>
+          <Col span={24}>
             <Form.Item label="Document file" required>
               <Upload
                 style={{ width: '100%' }}
@@ -152,7 +169,7 @@ const MedicalDocuments = () => {
               </Upload>
             </Form.Item>
           </Col>
-          <Col xs={24} sm={12} lg={6}>
+          <Col span={24}>
             <Form.Item label="Upload document">
               <Button block type="primary" size="middle" htmlType="submit" loading={working}>
                 Upload securely
@@ -161,25 +178,7 @@ const MedicalDocuments = () => {
           </Col>
         </Row>
       </Form>
-
-      <List
-        dataSource={items}
-        locale={{ emptyText: <Empty description="No documents uploaded" /> }}
-        renderItem={(item) => (
-          <List.Item
-            actions={[
-              <Button key="view" type="link" icon={<EyeOutlined />} loading={previewLoadingId === item._id} disabled={Boolean(previewLoadingId) && previewLoadingId !== item._id} onClick={() => view(item)}>View</Button>,
-              <Button key="download" type="link" icon={<DownloadOutlined />} onClick={() => download(item)}>Download</Button>,
-              <Button key="delete" danger type="link" icon={<DeleteOutlined />} onClick={() => remove(item)}>Delete</Button>
-            ]}
-          >
-            <List.Item.Meta
-              title={item.displayName}
-              description={`${item.category.replaceAll('_', ' ')} · ${Math.ceil(item.bytes / 1024)} KB · Account owner only`}
-            />
-          </List.Item>
-        )}
-      />
+      </Modal>
 
       <Modal
         open={Boolean(preview)}

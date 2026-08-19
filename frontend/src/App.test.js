@@ -242,14 +242,14 @@ test('public emergency profile uses a mobile safe view with location alerts and 
   expect(source).toContain('URL.createObjectURL');
 });
 
-test('member profile uses a responsive Ant Design summary containing saved details only', () => {
+test('member profile uses the responsive portal reference layout with saved details only', () => {
   const source = fs.readFileSync(path.join(__dirname, 'pages', 'Profile.js'), 'utf8');
   expect(source).toContain('member-profile-header');
   expect(source).toContain('member-profile-grid');
   expect(source).toContain('Health information');
   expect(source).toContain('Emergency contact');
   expect(source).not.toContain('Active profile');
-  expect(source).not.toContain('>Edit profile</Button>');
+  expect(source).toContain('>Edit profile</Button>');
   expect(source).toContain('aria-label="Edit profile photograph"');
   expect(source).not.toContain('<HeartOutlined />Health information');
   expect(source).not.toContain('<PhoneOutlined />Emergency contact');
@@ -274,9 +274,10 @@ test('member pages use a shared responsive portal and compact Ant Design buttons
   expect(layout).not.toContain("split('#')");
   expect(layout).toContain('MenuFoldOutlined');
   expect(layout).toContain('member-portal-main-collapsed');
-  expect(layout).not.toContain('BellOutlined');
-  expect(layout).not.toContain('<Dropdown');
-  expect(layout).not.toContain("<strong>{user?.name");
+  expect(layout).toContain('BellOutlined');
+  expect(layout).toContain('<Dropdown');
+  expect(layout).toContain('member-global-search');
+  expect(layout).toContain("{user?.name || 'Member'}");
   expect(layout).toContain("responseType: 'blob'");
   expect(entry).toContain('componentSize="small"');
   expect(theme).toContain('controlHeight: 30');

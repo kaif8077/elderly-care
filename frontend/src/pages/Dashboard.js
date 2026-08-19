@@ -1,5 +1,5 @@
 import React, { useContext, useEffect, useMemo, useState } from 'react';
-import { Button, Card, Col, Flex, Progress, Row, Skeleton, Typography } from 'antd';
+import { Button, Card, Col, Empty, Flex, List, Progress, Row, Skeleton, Space, Tag, Typography } from 'antd';
 import {
   ContactsOutlined, MedicineBoxOutlined, ProfileOutlined, QrcodeOutlined
 } from '@ant-design/icons';
@@ -14,19 +14,22 @@ const profileFields = ['name', 'dob', 'gender', 'bloodGroup', 'phone', 'address'
 const Dashboard = () => {
   const { user } = useContext(AuthContext);
   const navigate = useNavigate();
-  const [summary, setSummary] = useState({ loading: true, profile: null, qrReady: false });
+  const [summary, setSummary] = useState({ loading: true, profile: null, qrReady: false, recommendations: [], documents: [] });
 
   useEffect(() => {
     let active = true;
     const load = async () => {
-      const [medical, qr] = await Promise.allSettled([
-        api.get(`/api/medical/${user._id}`), api.get(`/api/qr/${user._id}`)
+      const [medical, qr, recommendations, documents] = await Promise.allSettled([
+        api.get(`/api/medical/${user._id}`), api.get(`/api/qr/${user._id}`),
+        api.get('/api/recommendations/health'), api.get('/api/medical-documents')
       ]);
       if (!active) return;
       setSummary({
         loading: false,
         profile: medical.status === 'fulfilled' ? medical.value.data : null,
-        qrReady: qr.status === 'fulfilled' && Boolean(qr.value.data?.qrCode?.data)
+        qrReady: qr.status === 'fulfilled' && Boolean(qr.value.data?.qrCode?.data),
+        recommendations: recommendations.status === 'fulfilled' ? recommendations.value.data?.recommendations || [] : [],
+        documents: documents.status === 'fulfilled' ? documents.value.data?.documents || [] : []
       });
     };
     if (user?._id) load();
@@ -82,6 +85,24 @@ const Dashboard = () => {
           ))}
         </Row>
       )}
+
+      <Row gutter={[16, 16]} className="member-dashboard-detail-grid">
+        <Col xs={24} xl={14}>
+          <Card title="Latest Health Recommendation" className="member-dashboard-feature-card" extra={<Button type="link" onClick={() => navigate('/recommendations')}>View all</Button>}>
+            {summary.recommendations[0] ? <>
+              <Space wrap><Tag color="orange">Latest</Tag><Text type="secondary">{new Date(summary.recommendations[0].generatedAt).toLocaleString()}</Text></Space>
+              <Title level={4}>Personalized Wellness</Title>
+              <Paragraph className="member-recommendation-preview" ellipsis={{ rows: 5 }}>{summary.recommendations[0].content}</Paragraph>
+              <Space wrap><Button type="primary" onClick={() => navigate('/recommendations')}>Read recommendation</Button><Button onClick={() => navigate('/recommendations')}>Generate new</Button></Space>
+            </> : <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} description="No recommendation generated"><Button type="primary" onClick={() => navigate('/recommendations')}>Generate recommendation</Button></Empty>}
+          </Card>
+        </Col>
+        <Col xs={24} xl={10}>
+          <Card title="Recent Documents" className="member-dashboard-feature-card" extra={<Button type="link" onClick={() => navigate('/documents')}>View all</Button>}>
+            <List dataSource={summary.documents.slice(0, 4)} locale={{ emptyText: <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} description="No documents uploaded" /> }} renderItem={(item) => <List.Item><List.Item.Meta title={item.displayName} description={`${item.category?.replaceAll('_', ' ')} · ${Math.ceil(item.bytes / 1024)} KB`} /></List.Item>} />
+          </Card>
+        </Col>
+      </Row>
 
       <EmergencyAlertSummary />
     </main>
