@@ -5,7 +5,7 @@ import {
   Space, Tag, Typography
 } from 'antd';
 import {
-  HeartOutlined, MedicineBoxOutlined, PhoneOutlined, SafetyCertificateOutlined, UserOutlined
+  EditOutlined, MedicineBoxOutlined, SafetyCertificateOutlined, UserOutlined
 } from '@ant-design/icons';
 import { useNavigate } from 'react-router-dom';
 import { AuthContext } from '../context/AuthContext';
@@ -108,17 +108,18 @@ const Profile = () => {
     <main className="care-page member-profile-page">
       <Flex align="center" justify="space-between" gap={16} wrap="wrap" className="member-page-title">
         <div><Title level={2}>My Profile</Title><Text type="secondary">Review your health and emergency information.</Text></div>
-        <Button type="primary" onClick={() => navigate('/medical-profile')}>Edit profile</Button>
       </Flex>
 
       <Card className="member-profile-header">
         <Row gutter={[24, 20]} align="middle">
           <Col xs={24} md={7}>
             <Flex vertical align="center" gap={8} className="member-profile-identity">
-              <Avatar size={128} src={photoUrl} icon={<UserOutlined />} />
+              <div className="member-profile-photo-edit">
+                <Avatar size={128} src={photoUrl} icon={<UserOutlined />} />
+                <Button type="primary" shape="circle" icon={<EditOutlined />} aria-label="Edit profile photograph" onClick={() => navigate('/medical-profile')} />
+              </div>
               <Title level={3}>{profile.name}</Title>
               <Text type="secondary">{age !== null ? `Age: ${age}` : `DOB: ${formatDate(profile.dob)}`} · {show(profile.gender)}</Text>
-              <Tag color="blue">Active profile</Tag>
             </Flex>
           </Col>
           <Col xs={24} md={17}>
@@ -141,14 +142,14 @@ const Profile = () => {
         </Col>
         <Col xs={24} lg={8}>
           <Space direction="vertical" size={18} style={{ width: '100%' }}>
-            <Card title={<Space><HeartOutlined />Health information</Space>} className="member-panel-card">
+            <Card title="Health information" className="member-panel-card">
               <Descriptions size="small" column={1} items={[
                 { key: 'conditions', label: 'Medical conditions', children: show(profile.medicalHistory) },
                 { key: 'allergies', label: 'Allergies', children: show(profile.allergies) },
                 { key: 'medicines', label: 'Current medications', children: show(profile.medications) }
               ]} />
             </Card>
-            <Card title={<Space><PhoneOutlined />Emergency contact</Space>} className="member-panel-card">
+            <Card title="Emergency contact" className="member-panel-card">
               <Descriptions size="small" column={1} items={[
                 { key: 'name', label: 'Name', children: show(primary?.name) },
                 { key: 'relation', label: 'Relationship', children: show(primary?.relationship) },
