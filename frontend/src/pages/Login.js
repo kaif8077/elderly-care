@@ -1,10 +1,12 @@
 import React, { useContext, useState } from 'react';
 import axios from 'axios';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
-import { Alert, Button, Card, Form, Input, Space, Typography } from 'antd';
+import { Alert, Button, Card, Checkbox, Flex, Form, Input, Space, Typography } from 'antd';
 import { LockOutlined, MailOutlined } from '@ant-design/icons';
 import { AuthContext } from '../context/AuthContext';
 import { toast } from 'react-toastify';
+import AuthShowcase from '../components/AuthShowcase';
+import logo from '../assests/logo.png';
 
 const { Title, Text } = Typography;
 const apiBase = import.meta.env.VITE_BACKEND_URI || 'http://localhost:5000';
@@ -36,9 +38,10 @@ const Login = () => {
 
   return (
     <main className="care-auth-page">
+      <AuthShowcase />
       <Card className="care-auth-card" styles={{ body: { padding: 28 } }}>
         <div className="care-auth-brand">
-          <span className="care-auth-logo"><img src="/favicon.png" alt="ElderlyCare logo" /></span>
+          <span className="care-auth-logo"><img src={logo} alt="ElderlyCare logo" /></span>
           <div><Text className="care-eyebrow">ELDERLYCARE</Text><br /><Text type="secondary">Secure member access</Text></div>
         </div>
         <Title level={2}>Welcome back</Title>
@@ -55,9 +58,7 @@ const Login = () => {
           <Form.Item label="Password" name="password" rules={[{ required: true, message: 'Enter your password' }]}>
             <Input.Password size="middle" prefix={<LockOutlined />} autoComplete="current-password" placeholder="Enter your password" />
           </Form.Item>
-          <div style={{ textAlign: 'right', margin: '-8px 0 16px' }}>
-            <Link to="/forgot-password">Forgot password?</Link>
-          </div>
+          <Flex justify="space-between" align="center" style={{ margin: '-8px 0 16px' }}><Checkbox>Remember me</Checkbox><Link to="/forgot-password">Forgot password?</Link></Flex>
           <Button type="primary" htmlType="submit" loading={loading} block>Sign in securely</Button>
         </Form>
         <Space direction="vertical" size={6} className="care-auth-footer" style={{ width: '100%' }}>
