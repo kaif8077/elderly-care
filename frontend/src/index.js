@@ -10,7 +10,7 @@ import './theme/elderlyCare.css';
 
 const root = createRoot(document.getElementById('root'));
 root.render(
-  <ConfigProvider theme={elderlyCareTheme} componentSize="middle">
+  <ConfigProvider theme={elderlyCareTheme} componentSize="small">
     <AntApp><AuthProvider><App /></AuthProvider></AntApp>
   </ConfigProvider>
 );

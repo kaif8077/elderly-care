@@ -241,14 +241,21 @@ test('member profile uses a responsive Ant Design summary containing saved detai
 test('member pages use a shared responsive portal and compact Ant Design buttons', () => {
   const app = fs.readFileSync(path.join(__dirname, 'App.js'), 'utf8');
   const layout = fs.readFileSync(path.join(__dirname, 'components', 'MemberPortalLayout.js'), 'utf8');
+  const entry = fs.readFileSync(path.join(__dirname, 'index.js'), 'utf8');
   const theme = fs.readFileSync(path.join(__dirname, 'theme', 'elderlyCareTheme.js'), 'utf8');
   expect(app).toContain('<MemberPortalLayout />');
   expect(app).toContain('!isMemberRoute');
   expect(layout).toContain('member-bottom-nav');
   expect(layout).toContain('Emergency Alerts');
+  expect(layout).toContain("label: 'ID Card'");
   expect(layout).toContain('<Outlet />');
   expect(layout).not.toContain("split('#')");
-  expect(theme).toContain('controlHeight: 34');
+  expect(layout).toContain('MenuFoldOutlined');
+  expect(layout).toContain('member-portal-main-collapsed');
+  expect(layout).not.toContain('BellOutlined');
+  expect(layout).not.toContain('<Dropdown');
+  expect(entry).toContain('componentSize="small"');
+  expect(theme).toContain('controlHeight: 30');
   expect(theme).toContain("itemSelectedBg: '#edf3ff'");
 });
 
