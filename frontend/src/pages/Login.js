@@ -1,7 +1,7 @@
 import React, { useContext, useState } from 'react';
 import axios from 'axios';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
-import { Alert, Button, Card, Checkbox, Flex, Form, Input, Space, Typography } from 'antd';
+import { Alert, Button, Card, Checkbox, Divider, Flex, Form, Input, Space, Typography } from 'antd';
 import { LockOutlined, MailOutlined } from '@ant-design/icons';
 import { AuthContext } from '../context/AuthContext';
 import { toast } from 'react-toastify';
@@ -61,6 +61,7 @@ const Login = () => {
           <Flex justify="space-between" align="center" style={{ margin: '-8px 0 16px' }}><Checkbox>Remember me</Checkbox><Link to="/forgot-password">Forgot password?</Link></Flex>
           <Button type="primary" htmlType="submit" loading={loading} block>Sign in securely</Button>
         </Form>
+        <Divider plain>or</Divider>
         <Space direction="vertical" size={6} className="care-auth-footer" style={{ width: '100%' }}>
           <Text>New to ElderlyCare? <Link to="/register">Create an account</Link></Text>
           <Button type="link" onClick={() => navigate('/')}>Return home</Button>
