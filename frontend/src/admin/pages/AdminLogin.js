@@ -31,7 +31,7 @@ const AdminLogin = () => {
         <Form layout="vertical" onFinish={submit} style={{ marginTop: 24 }}>
           <Form.Item name="email" label="Email address" rules={[{ required: true }, { type: 'email' }]}><Input size="middle" prefix={<MailOutlined />} placeholder="Enter your admin email" autoComplete="username" /></Form.Item>
           <Form.Item name="password" label="Password" rules={[{ required: true }]}><Input.Password size="middle" prefix={<LockOutlined />} placeholder="Enter your password" autoComplete="current-password" /></Form.Item>
-          <Button type="primary" block htmlType="submit" loading={loading}>Sign in securely</Button>
+          <Button size="middle" type="primary" block htmlType="submit" loading={loading}>Sign in securely</Button>
         </Form>
         <Button type="link" block onClick={() => navigate('/')}>Return to ElderlyCare</Button>
       </Card>
