@@ -7,6 +7,7 @@ import App from './App';
 import { AuthProvider } from './context/AuthContext';
 import elderlyCareTheme from './theme/elderlyCareTheme';
 import './theme/elderlyCare.css';
+import './theme/formControls.css';
 
 const root = createRoot(document.getElementById('root'));
 root.render(

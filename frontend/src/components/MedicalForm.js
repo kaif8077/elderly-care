@@ -5,10 +5,6 @@ import {
   Alert, Button, Card, Checkbox, Col, DatePicker, Divider, Form, Image, Input, InputNumber,
   Row, Select, Space, Steps, Switch, Typography, Upload
 } from 'antd';
-import {
-  DeleteOutlined, LeftOutlined, PlusOutlined, RightOutlined, SaveOutlined,
-  UploadOutlined
-} from '@ant-design/icons';
 import { AuthContext } from '../context/AuthContext';
 import api from '../services/api';
 
@@ -183,15 +179,8 @@ const MedicalForm = ({ onSubmissionSuccess }) => {
 
   return (
     <section className="medical-form">
-      <Row justify="space-between" align="top" gutter={[16, 16]}>
-        <Col>
-          <Title level={2} className="care-eyebrow">HEALTH PROFILE</Title>
-          <h6 className="care-secondary-heading" style={{ margin: '6px 0' }}>Medical information</h6>
-          <Paragraph type="secondary">Each step is saved securely before you continue.</Paragraph>
-        </Col>
-        <Col><Text strong>{step + 1} of 4</Text></Col>
-      </Row>
-      <Steps current={step} items={stepItems} responsive style={{ margin: '18px 0 30px' }} />
+      <div className="medical-form-progress"><Text type="secondary">Step {step + 1} of 4 · Each step is saved before you continue.</Text></div>
+      <Steps size="small" current={step} items={stepItems} responsive />
 
       <Form
         form={form}
@@ -201,13 +190,13 @@ const MedicalForm = ({ onSubmissionSuccess }) => {
         onValuesChange={() => setValues(form.getFieldsValue(true))}
       >
         {step === 0 && (
-          <>
+          <Card size="small" className="medical-step-card">
             <Title level={4}>Personal details</Title>
             <Form.Item name="profilePhoto" label="Profile photograph" required>
               <Space align="center" wrap>
                 {photoPreview && <Image width={78} height={88} src={photoPreview} preview={false} style={{ objectFit: 'cover', borderRadius: 8 }} />}
                 <Upload beforeUpload={photoFile} maxCount={1} showUploadList={false} accept="image/jpeg,image/png,image/webp">
-                  <Button icon={<UploadOutlined />}>{photoPreview ? 'Replace photograph' : 'Choose photograph'}</Button>
+                  <Button>{photoPreview ? 'Replace photograph' : 'Choose photograph'}</Button>
                 </Upload>
                 <Text type="secondary">JPEG, PNG or WebP · maximum 3 MB</Text>
               </Space>
@@ -226,11 +215,11 @@ const MedicalForm = ({ onSubmissionSuccess }) => {
               <Col xs={24} md={8}><Form.Item name="dietPreference" label="Diet preference" rules={required('Select diet preference')}><Select placeholder="Select diet preference" options={['Vegetarian', 'Non-Vegetarian', 'Vegan', 'Eggetarian'].map((value) => ({ value, label: value }))} /></Form.Item></Col>
               <Col xs={24} md={8}><Form.Item name="maritalStatus" label="Marital status" rules={required('Select marital status')}><Select placeholder="Select marital status" options={['single', 'married', 'widowed', 'divorced', 'separated'].map((value) => ({ value, label: value[0].toUpperCase() + value.slice(1) }))} /></Form.Item></Col>
             </Row>
-          </>
+          </Card>
         )}
 
         {step === 1 && (
-          <>
+          <Card size="small" className="medical-step-card">
             <Title level={4}>Address and emergency contacts</Title>
             <Alert showIcon type="info" message="Add at least one complete emergency contact. You can add more contacts when needed." style={{ marginBottom: 20 }} />
             <Row gutter={16}>
@@ -241,28 +230,27 @@ const MedicalForm = ({ onSubmissionSuccess }) => {
               {(fields, { add, remove }) => (
                 <Space direction="vertical" size={14} style={{ width: '100%' }}>
                   {fields.map((field, index) => (
-                    <Card size="small" title={`Emergency contact ${index + 1}`} key={field.key} extra={fields.length > 1 && <Button type="text" danger icon={<DeleteOutlined />} onClick={() => remove(field.name)}>Remove</Button>}>
+                    <Card size="small" title={`Emergency contact ${index + 1}`} key={field.key} extra={fields.length > 1 && <Button type="text" danger onClick={() => remove(field.name)}>Remove</Button>}>
                       <Row gutter={16}>
-                        <Col xs={24} md={8}><Form.Item {...field} name={[field.name, 'name']} label="Contact name" rules={required('Enter contact name')}><Input placeholder="Enter emergency contact name" /></Form.Item></Col>
-                        <Col xs={24} md={8}><Form.Item {...field} name={[field.name, 'phone']} label="Contact number" rules={required('Enter contact number')}><Input type="tel" placeholder="Enter emergency contact number" /></Form.Item></Col>
-                        <Col xs={24} md={8}><Form.Item {...field} name={[field.name, 'relationship']} label="Relationship" rules={required('Enter relationship')}><Input placeholder="e.g. Son, daughter or spouse" /></Form.Item></Col>
-                        <Col xs={24} md={8}><Form.Item {...field} name={[field.name, 'email']} label="Email"><Input type="email" placeholder="Enter contact email for verification" /></Form.Item></Col>
-                        <Col xs={12} md={4}><Form.Item {...field} name={[field.name, 'priority']} label="Priority"><InputNumber min={1} max={10} style={{ width: '100%' }} /></Form.Item></Col>
-                        <Col xs={12} md={6}><Form.Item {...field} name={[field.name, 'preferredChannel']} label="Preferred channel"><Select options={['phone', 'email', 'sms', 'telegram'].map((value) => ({ value, label: value }))} /></Form.Item></Col>
-                        <Col xs={24} md={6}><Space wrap><Form.Item {...field} name={[field.name, 'isPrimary']} valuePropName="checked"><Checkbox>Primary</Checkbox></Form.Item><Form.Item {...field} name={[field.name, 'canReceiveAlerts']} valuePropName="checked"><Checkbox>Receive alerts</Checkbox></Form.Item></Space></Col>
-                        <Col xs={24}><Space wrap><Form.Item {...field} name={[field.name, 'canAccessReports']} valuePropName="checked"><Checkbox>Can access reports</Checkbox></Form.Item><Form.Item {...field} name={[field.name, 'canManageAccount']} valuePropName="checked"><Checkbox>Can manage account</Checkbox></Form.Item></Space></Col>
+                        <Col xs={24} md={12} lg={6}><Form.Item {...field} name={[field.name, 'name']} label="Contact name" rules={required('Enter contact name')}><Input placeholder="Enter emergency contact name" /></Form.Item></Col>
+                        <Col xs={24} md={12} lg={6}><Form.Item {...field} name={[field.name, 'phone']} label="Contact number" rules={required('Enter contact number')}><Input type="tel" placeholder="Enter emergency contact number" /></Form.Item></Col>
+                        <Col xs={24} md={12} lg={6}><Form.Item {...field} name={[field.name, 'relationship']} label="Relationship" rules={required('Enter relationship')}><Input placeholder="e.g. Son or daughter" /></Form.Item></Col>
+                        <Col xs={24} md={12} lg={6}><Form.Item {...field} name={[field.name, 'email']} label="Email"><Input type="email" placeholder="Enter contact email" /></Form.Item></Col>
+                        <Col xs={12} md={6} lg={4}><Form.Item {...field} name={[field.name, 'priority']} label="Priority"><InputNumber min={1} max={10} style={{ width: '100%' }} /></Form.Item></Col>
+                        <Col xs={12} md={6} lg={6}><Form.Item {...field} name={[field.name, 'preferredChannel']} label="Preferred channel"><Select options={['phone', 'email', 'sms', 'telegram'].map((value) => ({ value, label: value }))} /></Form.Item></Col>
+                        <Col xs={24} md={12} lg={14}><Space wrap className="medical-contact-permissions"><Form.Item {...field} name={[field.name, 'isPrimary']} valuePropName="checked"><Checkbox>Primary</Checkbox></Form.Item><Form.Item {...field} name={[field.name, 'canReceiveAlerts']} valuePropName="checked"><Checkbox>Receive alerts</Checkbox></Form.Item><Form.Item {...field} name={[field.name, 'canAccessReports']} valuePropName="checked"><Checkbox>Access reports</Checkbox></Form.Item><Form.Item {...field} name={[field.name, 'canManageAccount']} valuePropName="checked"><Checkbox>Manage account</Checkbox></Form.Item></Space></Col>
                       </Row>
                     </Card>
                   ))}
-                  <Button type="dashed" block icon={<PlusOutlined />} onClick={() => add({ name: '', phone: '', relationship: '', priority: fields.length + 1, canReceiveAlerts: true, preferredChannel: 'phone' })}>Add another emergency contact</Button>
+                  <Button type="dashed" block onClick={() => add({ name: '', phone: '', relationship: '', priority: fields.length + 1, canReceiveAlerts: true, preferredChannel: 'phone' })}>Add another emergency contact</Button>
                 </Space>
               )}
             </Form.List>
-          </>
+          </Card>
         )}
 
         {step === 2 && (
-          <>
+          <Card size="small" className="medical-step-card">
             <Title level={4}>Medical information</Title>
             <Paragraph type="secondary">Select an option or type a new value and press Enter.</Paragraph>
             <Row gutter={16}>
@@ -278,11 +266,11 @@ const MedicalForm = ({ onSubmissionSuccess }) => {
               <Col xs={24} md={8}><Form.Item name="preferredHospital" label="Preferred hospital"><Input placeholder="Enter preferred hospital" /></Form.Item></Col>
               <Col xs={24} md={8}><Form.Item name="fallRisk" label="Fall risk" valuePropName="checked"><Switch checkedChildren="Yes" unCheckedChildren="No" /></Form.Item></Col>
             </Row>
-          </>
+          </Card>
         )}
 
         {step === 3 && (
-          <>
+          <Card size="small" className="medical-step-card">
             <Title level={4}>Review summary</Title>
             <Card size="small">
               <Row gutter={[18, 18]}>
@@ -295,15 +283,15 @@ const MedicalForm = ({ onSubmissionSuccess }) => {
             <Form.Item name="reviewConfirmed" valuePropName="checked" rules={[{ validator: (_, checked) => checked ? Promise.resolve() : Promise.reject(new Error('Confirm the summary before saving')) }]} style={{ marginTop: 18 }}>
               <Checkbox>I reviewed these details and confirm they are correct.</Checkbox>
             </Form.Item>
-          </>
+          </Card>
         )}
 
         <Divider />
         <Space style={{ display: 'flex', justifyContent: 'flex-end' }} wrap>
-          {step > 0 && <Button icon={<LeftOutlined />} onClick={() => setStep((value) => value - 1)}>Previous</Button>}
+          {step > 0 && <Button onClick={() => setStep((value) => value - 1)}>Previous</Button>}
           {step < 3
-            ? <Button type="primary" icon={<RightOutlined />} loading={saving} onClick={() => saveStep(step + 1)}>Save & continue</Button>
-            : <Button type="primary" icon={<SaveOutlined />} loading={saving} onClick={submit}>Save medical profile</Button>}
+            ? <Button type="primary" loading={saving} onClick={() => saveStep(step + 1)}>Save & continue</Button>
+            : <Button type="primary" loading={saving} onClick={submit}>Save medical profile</Button>}
         </Space>
       </Form>
     </section>
