@@ -1,27 +1,28 @@
 import { useContext, useState } from 'react';
 import { Outlet, useLocation, useNavigate } from 'react-router-dom';
 import {
-  Avatar, Badge, Button, Drawer, Dropdown, Flex, Grid, Layout, Menu, Space, Typography, message
+  Avatar, Badge, Button, Drawer, Dropdown, Grid, Layout, Menu, Space, message
 } from 'antd';
 import {
   AlertOutlined, BellOutlined, FileProtectOutlined, HeartOutlined, HomeOutlined,
-  LogoutOutlined, MenuOutlined, ProfileOutlined, QrcodeOutlined, UserOutlined
+  LogoutOutlined, MenuOutlined, ProfileOutlined, QrcodeOutlined,
+  SafetyCertificateOutlined, UserOutlined
 } from '@ant-design/icons';
 import { AuthContext } from '../context/AuthContext';
 import logo from '../assests/logo.png';
 import './MemberPortalLayout.css';
 
 const { Header, Sider, Content } = Layout;
-const { Text } = Typography;
 const { useBreakpoint } = Grid;
 
 const portalItems = [
   { key: '/dashboard', icon: <HomeOutlined />, label: 'Overview' },
   { key: '/profile', icon: <ProfileOutlined />, label: 'My Profile' },
-  { key: '/dashboard#health-recommendations', icon: <HeartOutlined />, label: 'Recommendations' },
-  { key: '/dashboard#qr', icon: <QrcodeOutlined />, label: 'Emergency QR' },
+  { key: '/medical-profile', icon: <SafetyCertificateOutlined />, label: 'Medical Profile' },
+  { key: '/recommendations', icon: <HeartOutlined />, label: 'Recommendations' },
+  { key: '/emergency', icon: <QrcodeOutlined />, label: 'Emergency' },
+  { key: '/documents', icon: <FileProtectOutlined />, label: 'Documents' },
   { key: '/emergency-alerts', icon: <AlertOutlined />, label: 'Emergency Alerts' },
-  { key: '/profile#medical-documents', icon: <FileProtectOutlined />, label: 'Documents' }
 ];
 
 const MemberPortalLayout = () => {
@@ -31,14 +32,11 @@ const MemberPortalLayout = () => {
   const screens = useBreakpoint();
   const [drawerOpen, setDrawerOpen] = useState(false);
   const desktop = screens.lg;
-  const selectedKey = location.pathname === '/profile' ? '/profile'
-    : location.pathname === '/emergency-alerts' ? '/emergency-alerts' : '/dashboard';
+  const selectedKey = portalItems.find(({ key }) => key === location.pathname)?.key || '/dashboard';
 
   const openRoute = ({ key }) => {
-    const [pathname, hash] = key.split('#');
-    navigate({ pathname, hash: hash ? `#${hash}` : '' });
+    navigate(key);
     setDrawerOpen(false);
-    if (hash) window.setTimeout(() => document.getElementById(hash)?.scrollIntoView({ behavior: 'smooth' }), 80);
   };
 
   const handleLogout = () => {
@@ -59,7 +57,7 @@ const MemberPortalLayout = () => {
       {desktop && (
         <Sider width={236} theme="light" className="member-portal-sider">
           <button type="button" className="member-brand" onClick={() => navigate('/dashboard')} aria-label="ElderlyCare dashboard">
-            <img src={logo} alt="" /><Text strong>ElderlyCare</Text>
+            <img src={logo} alt="ElderlyCare" />
           </button>
           <nav aria-label="Member navigation">{menu}</nav>
           <Button type="text" danger icon={<LogoutOutlined />} className="member-logout" onClick={handleLogout}>Logout</Button>
@@ -93,7 +91,7 @@ const MemberPortalLayout = () => {
 
       {!desktop && (
         <nav className="member-bottom-nav" aria-label="Mobile member navigation">
-          {portalItems.slice(0, 5).map((item) => (
+          {portalItems.filter(({ key }) => key !== '/medical-profile' && key !== '/emergency-alerts').map((item) => (
             <button key={item.key} type="button" className={selectedKey === item.key ? 'active' : ''} onClick={() => openRoute(item)}>
               {item.icon}<span>{item.label.replace('Emergency ', '')}</span>
             </button>

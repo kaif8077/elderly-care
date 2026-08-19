@@ -1,19 +1,15 @@
 import React, { useCallback, useContext, useEffect, useMemo, useState } from 'react';
 import axios from 'axios';
 import {
-  Avatar, Button, Card, Col, Collapse, Descriptions, Empty, Flex, Row,
-  Skeleton, Space, Tag, Typography
+  Avatar, Button, Card, Col, Collapse, Descriptions, Flex, Row, Skeleton,
+  Space, Tag, Typography
 } from 'antd';
 import {
-  FileProtectOutlined, HeartOutlined, IdcardOutlined, MedicineBoxOutlined,
-  PhoneOutlined, SafetyCertificateOutlined, UserOutlined
+  HeartOutlined, MedicineBoxOutlined, PhoneOutlined, SafetyCertificateOutlined, UserOutlined
 } from '@ant-design/icons';
 import { useNavigate } from 'react-router-dom';
 import { AuthContext } from '../context/AuthContext';
 import { toast } from 'react-toastify';
-import UserIdCard from '../components/UserIdCard';
-import Recommendations from '../components/Recommendations';
-import MedicalDocuments from '../components/MedicalDocuments';
 
 const { Title, Text } = Typography;
 const apiBase = (import.meta.env.VITE_BACKEND_URI || 'http://localhost:5000').replace(/\/+$/, '');
@@ -33,10 +29,8 @@ const Profile = () => {
   const { user } = useContext(AuthContext);
   const navigate = useNavigate();
   const [profile, setProfile] = useState(null);
-  const [qrCode, setQrCode] = useState('');
   const [loading, setLoading] = useState(true);
   const [photoUrl, setPhotoUrl] = useState('');
-  const [showRecommendations, setShowRecommendations] = useState(true);
 
   const loadPhoto = useCallback(async (token) => {
     const response = await axios.get(`${apiBase}/api/medical/${user._id}/photo`, {
@@ -59,12 +53,6 @@ const Profile = () => {
         setProfile(medical.data);
         if (medical.data.profilePhoto) {
           try { await loadPhoto(token); } catch { /* The fallback avatar remains available. */ }
-        }
-        try {
-          const qr = await axios.get(`${apiBase}/api/qr/${user._id}`, { headers: { Authorization: `Bearer ${token}` } });
-          if (active) setQrCode(qr.data?.qrCode?.data || '');
-        } catch (qrError) {
-          if (qrError.response?.status !== 404) toast.error('Unable to load the emergency QR code.');
         }
       } catch (error) {
         toast.error(error.response?.data?.message || 'Failed to load profile data.');
@@ -120,7 +108,7 @@ const Profile = () => {
     <main className="care-page member-profile-page">
       <Flex align="center" justify="space-between" gap={16} wrap="wrap" className="member-page-title">
         <div><Title level={2}>My Profile</Title><Text type="secondary">Review your health and emergency information.</Text></div>
-        <Button type="primary" onClick={() => navigate('/dashboard#medical-form')}>Edit profile</Button>
+        <Button type="primary" onClick={() => navigate('/medical-profile')}>Edit profile</Button>
       </Flex>
 
       <Card className="member-profile-header">
@@ -167,26 +155,9 @@ const Profile = () => {
                 { key: 'phone', label: 'Phone', children: primary?.phone ? <a href={`tel:${primary.phone}`}>{primary.phone}</a> : 'Not provided' }
               ]} />
             </Card>
-            <Card title={<Space><FileProtectOutlined />Profile resources</Space>} className="member-panel-card">
-              <Space direction="vertical" style={{ width: '100%' }}>
-                <Button block icon={<FileProtectOutlined />} href="#medical-documents">Medical documents</Button>
-                <Button block icon={<IdcardOutlined />} href="#emergency-id-card">Emergency ID card</Button>
-                <Button block icon={<HeartOutlined />} href="#health-recommendations">Health recommendations</Button>
-              </Space>
-            </Card>
           </Space>
         </Col>
       </Row>
-
-      <Card id="health-recommendations" className="care-section-card" title={<Space><MedicineBoxOutlined />Health recommendations</Space>} extra={<Button onClick={() => setShowRecommendations((current) => !current)}>{showRecommendations ? 'Hide recommendations' : 'Show recommendations'}</Button>}>
-        {showRecommendations ? <Recommendations /> : <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} description="Recommendations are hidden." />}
-      </Card>
-
-      <Card id="emergency-id-card" className="care-section-card" title={<Space><IdcardOutlined />Emergency ID card</Space>}>
-        <UserIdCard profile={profile} qrCode={qrCode} photoUrl={photoUrl} />
-      </Card>
-
-      <section id="medical-documents"><MedicalDocuments /></section>
     </main>
   );
 };
