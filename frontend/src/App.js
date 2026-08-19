@@ -41,11 +41,12 @@ const AppRoutes = () => {
     const location = useLocation();
     const isAdminRoute = location.pathname.startsWith('/admin');
     const isEmergencyRoute = location.pathname.startsWith('/emergency/');
+    const isAuthRoute = ['/login', '/register', '/forgot-password'].includes(location.pathname);
     const isMemberRoute = ['/dashboard', '/profile', '/medical-profile', '/recommendations', '/emergency', '/documents', '/emergency-alerts', '/reports'].includes(location.pathname);
 
     return (
         <>
-            {!isAdminRoute && !isEmergencyRoute && !isMemberRoute && <Navbar />}
+            {!isAdminRoute && !isEmergencyRoute && !isMemberRoute && !isAuthRoute && <Navbar />}
             <Routes>
                 <Route path="/" element={<Home />} />
                 <Route path="/about" element={<About />} />  
