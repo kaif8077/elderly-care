@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
-import { Alert, Button, Card, Descriptions, Drawer, Empty, Input, Select, Space, Table, Tag, Typography } from 'antd';
+import { Alert, Button, Card, Col, Descriptions, Drawer, Empty, Input, Row, Select, Space, Table, Tag, Typography } from 'antd';
 import { ReloadOutlined, SearchOutlined } from '@ant-design/icons';
 import adminApi from '../../services/adminApi';
 
@@ -50,15 +50,12 @@ const AdminAuditLogs = () => {
     <Space direction="vertical" size={18} style={{ width: '100%' }}>
       <Alert type="info" showIcon message="Administrative activity" description="Passwords, tokens, and complete medical records are not stored in audit logs." />
       {error && <Alert type="error" showIcon message={error} action={<Button onClick={load}>Retry</Button>} />}
-      <Card>
-        <Space className="admin-filter-toolbar admin-audit-toolbar" wrap>
-          <Space.Compact className="care-inline-action">
-            <Input value={search} onChange={(event) => setSearch(event.target.value)} onPressEnter={() => updateQuery({ search: search.trim() })} prefix={<SearchOutlined />} placeholder="Action, resource, or reason" allowClear />
-            <Button type="primary" onClick={() => updateQuery({ search: search.trim() })}>Search</Button>
-          </Space.Compact>
-          <Select allowClear value={query.success} onChange={(value) => updateQuery({ success: value })} placeholder="Result" style={{ width: 140 }} options={[{ value: 'true', label: 'Succeeded' }, { value: 'false', label: 'Failed' }]} />
-          <Button icon={<ReloadOutlined />} onClick={load}>Refresh</Button>
-        </Space>
+      <Card size="small">
+        <Row gutter={[12, 12]} align="middle">
+          <Col xs={24} lg={10}><Space.Compact block><Input size="middle" value={search} onChange={(event) => setSearch(event.target.value)} onPressEnter={() => updateQuery({ search: search.trim() })} prefix={<SearchOutlined />} placeholder="Action, resource, or reason" allowClear /><Button size="middle" type="primary" onClick={() => updateQuery({ search: search.trim() })}>Search</Button></Space.Compact></Col>
+          <Col xs={24} sm={12} lg={4}><Select size="middle" allowClear value={query.success} onChange={(value) => updateQuery({ success: value })} placeholder="Result" style={{ width: '100%' }} options={[{ value: 'true', label: 'Succeeded' }, { value: 'false', label: 'Failed' }]} /></Col>
+          <Col xs={24} sm={12} lg={3}><Button size="middle" block icon={<ReloadOutlined />} onClick={load}>Refresh</Button></Col>
+        </Row>
       </Card>
       <Drawer width={720} title="Audit event details" open={Boolean(selected)} onClose={() => setSelected(null)}>
         {selected && <Space direction="vertical" size={18} style={{ width: '100%' }}>

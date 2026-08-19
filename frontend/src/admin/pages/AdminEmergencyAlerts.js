@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import {
-  Alert, Button, Card, Descriptions, Drawer, Empty, Select, Space, Table, Tag, Timeline, Typography
+  Alert, Button, Card, Col, Descriptions, Drawer, Empty, Row, Select, Space, Table, Tag, Timeline, Typography
 } from 'antd';
 import { EnvironmentOutlined, ReloadOutlined } from '@ant-design/icons';
 import { useSearchParams } from 'react-router-dom';
@@ -62,7 +62,7 @@ const AdminEmergencyAlerts = () => {
     <Space direction="vertical" size={18} style={{ width: '100%' }}>
       <Alert type="info" showIcon message="Emergency alert monitoring" description="Review delivery and acknowledgement progress. Administrators monitor alerts but do not acknowledge on behalf of family members." />
       {error && <Alert type="error" showIcon message={error} action={<Button onClick={load}>Retry</Button>} />}
-      <Card><Space className="admin-filter-toolbar admin-emergency-toolbar" wrap><Select allowClear value={query.status} placeholder="Alert status" onChange={(value) => updateQuery({ status: value })} options={['sent', 'failed', 'acknowledged', 'resolved', 'false_alarm'].map((value) => ({ value, label: readable(value) }))} /><Select allowClear value={query.emergencyType} placeholder="Situation type" onChange={(value) => updateQuery({ emergencyType: value })} options={['person_found', 'medical_emergency', 'fall', 'lost_confused', 'accident', 'other'].map((value) => ({ value, label: readable(value) }))} /><Button icon={<ReloadOutlined />} onClick={load}>Refresh</Button></Space></Card>
+      <Card size="small"><Row gutter={[12, 12]} align="middle"><Col xs={24} sm={12} lg={6}><Select size="middle" style={{ width: '100%' }} allowClear value={query.status} placeholder="Alert status" onChange={(value) => updateQuery({ status: value })} options={['sent', 'failed', 'acknowledged', 'resolved', 'false_alarm'].map((value) => ({ value, label: readable(value) }))} /></Col><Col xs={24} sm={12} lg={6}><Select size="middle" style={{ width: '100%' }} allowClear value={query.emergencyType} placeholder="Situation type" onChange={(value) => updateQuery({ emergencyType: value })} options={['person_found', 'medical_emergency', 'fall', 'lost_confused', 'accident', 'other'].map((value) => ({ value, label: readable(value) }))} /></Col><Col xs={24} sm={12} lg={3}><Button size="middle" block icon={<ReloadOutlined />} onClick={load}>Refresh</Button></Col></Row></Card>
       <Card><Table rowKey="id" loading={loading} dataSource={data.alerts} columns={columns} scroll={{ x: 1250 }} locale={{ emptyText: <Empty description="No emergency alerts found" /> }} pagination={{ current: data.pagination.page, pageSize: data.pagination.limit, total: data.pagination.total, showSizeChanger: true, pageSizeOptions: [10, 20, 50], showTotal: (total) => `${total} alerts`, onChange: (page, limit) => updateQuery({ page: String(page), limit: String(limit) }) }} /></Card>
       <Drawer width={720} open={Boolean(detail)} loading={detailLoading} title="Emergency alert details" onClose={() => setDetail(null)}>
         {detail?.createdAt && <Space direction="vertical" size={18} style={{ width: '100%' }}>

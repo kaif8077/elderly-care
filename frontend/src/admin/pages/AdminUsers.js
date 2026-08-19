@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
 import {
-  Alert, Avatar, Button, Card, Empty, Grid, Input, List, Pagination, Progress, Select, Space, Table, Tag, Typography
+  Alert, Avatar, Button, Card, Col, Empty, Grid, Input, List, Pagination, Progress, Row, Select, Space, Table, Tag, Typography
 } from 'antd';
 import { EyeOutlined, ReloadOutlined, SearchOutlined, UserOutlined } from '@ant-design/icons';
 import adminApi from '../../services/adminApi';
@@ -56,17 +56,19 @@ const AdminUsers = () => {
   return (
     <Space direction="vertical" size={18} style={{ width: '100%' }}>
       {error && <Alert type="error" showIcon message={error} action={<Button onClick={load}>Retry</Button>} />}
-      <Card>
-        <Space className="admin-users-toolbar admin-filter-toolbar" wrap>
-          <Space.Compact className="care-inline-action">
-            <Input value={search} onChange={(event) => setSearch(event.target.value)} onPressEnter={() => updateQuery({ search: search.trim() })} prefix={<SearchOutlined />} placeholder="Name, email, or phone" allowClear />
-            <Button type="primary" onClick={() => updateQuery({ search: search.trim() })}>Search</Button>
-          </Space.Compact>
-          <Select allowClear value={query.profileStatus} onChange={(value) => updateQuery({ profileStatus: value })} placeholder="Profile status" style={{ width: 150 }} options={['complete', 'incomplete'].map((value) => ({ value, label: value }))} />
-          <Select allowClear value={query.bloodGroup} onChange={(value) => updateQuery({ bloodGroup: value })} placeholder="Blood group" style={{ width: 140 }} options={bloodGroups.map((value) => ({ value, label: value }))} />
-          <Select allowClear value={query.qrStatus} onChange={(value) => updateQuery({ qrStatus: value })} placeholder="QR status" style={{ width: 140 }} options={['active', 'revoked', 'generated', 'missing'].map((value) => ({ value, label: value }))} />
-          <Button icon={<ReloadOutlined />} onClick={load}>Refresh</Button>
-        </Space>
+      <Card size="small">
+        <Row gutter={[12, 12]} align="middle">
+          <Col xs={24} lg={9}>
+            <Space.Compact block>
+              <Input size="middle" value={search} onChange={(event) => setSearch(event.target.value)} onPressEnter={() => updateQuery({ search: search.trim() })} prefix={<SearchOutlined />} placeholder="Name, email, or phone" allowClear />
+              <Button size="middle" type="primary" onClick={() => updateQuery({ search: search.trim() })}>Search</Button>
+            </Space.Compact>
+          </Col>
+          <Col xs={24} sm={12} lg={4}><Select size="middle" allowClear value={query.profileStatus} onChange={(value) => updateQuery({ profileStatus: value })} placeholder="Profile status" style={{ width: '100%' }} options={['complete', 'incomplete'].map((value) => ({ value, label: value }))} /></Col>
+          <Col xs={24} sm={12} lg={4}><Select size="middle" allowClear value={query.bloodGroup} onChange={(value) => updateQuery({ bloodGroup: value })} placeholder="Blood group" style={{ width: '100%' }} options={bloodGroups.map((value) => ({ value, label: value }))} /></Col>
+          <Col xs={24} sm={12} lg={4}><Select size="middle" allowClear value={query.qrStatus} onChange={(value) => updateQuery({ qrStatus: value })} placeholder="QR status" style={{ width: '100%' }} options={['active', 'revoked', 'generated', 'missing'].map((value) => ({ value, label: value }))} /></Col>
+          <Col xs={24} sm={12} lg={3}><Button size="middle" block icon={<ReloadOutlined />} onClick={load}>Refresh</Button></Col>
+        </Row>
       </Card>
       <Card className="admin-users-results">
         {screens.md ? <Table

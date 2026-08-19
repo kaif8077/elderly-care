@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useState } from 'react';
 import {
-  Alert, Button, Card, Descriptions, Drawer, Empty, Input, Space, Table, Typography
+  Alert, Button, Card, Col, Descriptions, Drawer, Empty, Input, Row, Space, Table, Typography
 } from 'antd';
 import { EyeOutlined, ReloadOutlined, SearchOutlined } from '@ant-design/icons';
 import adminApi from '../../services/adminApi';
@@ -42,12 +42,11 @@ const AdminSubmissionsTable = ({ endpoint, type }) => {
   return (
     <Space direction="vertical" size={18} style={{ width: '100%' }}>
       {error && <Alert type="error" showIcon message={error} action={<Button onClick={load}>Retry</Button>} />}
-      <Card>
-        <Space.Compact className="care-inline-action" style={{ width: '100%', maxWidth: 680 }}>
-          <Input value={search} onChange={(event) => setSearch(event.target.value)} onPressEnter={() => setQuery((current) => ({ ...current, page: 1, search: search.trim() }))} prefix={<SearchOutlined />} placeholder="Search name, email, or message" allowClear />
-          <Button type="primary" onClick={() => setQuery((current) => ({ ...current, page: 1, search: search.trim() }))}>Search</Button>
-          <Button icon={<ReloadOutlined />} onClick={load}>Refresh</Button>
-        </Space.Compact>
+      <Card size="small">
+        <Row gutter={[12, 12]} align="middle">
+          <Col xs={24} lg={10}><Space.Compact block><Input size="middle" value={search} onChange={(event) => setSearch(event.target.value)} onPressEnter={() => setQuery((current) => ({ ...current, page: 1, search: search.trim() }))} prefix={<SearchOutlined />} placeholder="Search name, email, or message" allowClear /><Button size="middle" type="primary" onClick={() => setQuery((current) => ({ ...current, page: 1, search: search.trim() }))}>Search</Button></Space.Compact></Col>
+          <Col xs={24} sm={12} lg={3}><Button size="middle" block icon={<ReloadOutlined />} onClick={load}>Refresh</Button></Col>
+        </Row>
       </Card>
       <Card>
         <Table
