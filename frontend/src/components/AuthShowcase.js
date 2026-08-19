@@ -1,13 +1,13 @@
 import { SafetyCertificateOutlined, HeartOutlined, TeamOutlined } from '@ant-design/icons';
 import { Space, Typography } from 'antd';
-import logo from '../assests/logo.png';
+import AuthBrand from './AuthBrand';
 import './AuthShowcase.css';
 
 const { Paragraph, Text, Title } = Typography;
 
 const AuthShowcase = ({ admin = false }) => (
   <aside className="auth-showcase" aria-label="About ElderlyCare">
-    <img className="auth-showcase-logo" src={logo} alt="ElderlyCare" />
+    <AuthBrand className="auth-showcase-logo" />
     <div className="auth-showcase-copy">
       <span className="auth-showcase-line" />
       <Title level={1}>{admin ? 'Manage.' : 'Care.'}<br /><strong>{admin ? 'Review.' : 'Connect.'}</strong><br />Protect.</Title>

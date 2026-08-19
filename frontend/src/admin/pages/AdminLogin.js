@@ -4,7 +4,7 @@ import { LockOutlined, MailOutlined } from '@ant-design/icons';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { AdminAuthContext } from '../context/AdminAuthContext';
 import AuthShowcase from '../../components/AuthShowcase';
-import logo from '../../assests/logo.png';
+import AuthBrand from '../../components/AuthBrand';
 
 const { Title, Text } = Typography;
 
@@ -25,7 +25,7 @@ const AdminLogin = () => {
     <main className="care-auth-page">
       <AuthShowcase admin />
       <Card className="care-auth-card" styles={{ body: { padding: 34 } }}>
-        <div className="care-auth-brand"><span className="care-auth-logo"><img src={logo} alt="ElderlyCare logo" /></span><div><Text className="care-eyebrow">ELDERLYCARE ADMINISTRATION</Text><br /><Text type="secondary">Restricted management workspace</Text></div></div>
+        <div className="care-auth-brand"><span className="care-auth-logo"><AuthBrand /></span><div><Text className="care-eyebrow">ELDERLYCARE ADMINISTRATION</Text><br /><Text type="secondary">Restricted management workspace</Text></div></div>
         <Title level={2}>Admin sign in</Title><Text type="secondary">Use an authorized administrator account to continue.</Text>
         {(error || sessionMessage) && <Alert type="error" showIcon message={error || sessionMessage} style={{ marginTop: 20 }} />}
         <Form layout="vertical" onFinish={submit} style={{ marginTop: 24 }}>

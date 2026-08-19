@@ -6,7 +6,7 @@ import { LockOutlined, MailOutlined, UserOutlined } from '@ant-design/icons';
 import { toast } from 'react-toastify';
 import { AuthContext } from '../context/AuthContext';
 import AuthShowcase from '../components/AuthShowcase';
-import logo from '../assests/logo.png';
+import AuthBrand from '../components/AuthBrand';
 
 const { Title, Text } = Typography;
 const apiBase = import.meta.env.VITE_BACKEND_URI || 'http://localhost:5000';
@@ -21,7 +21,7 @@ const Register = () => {
   const resend = async () => { setLoading(true); try { await axios.post(`${apiBase}/api/auth/register`, { name: account.name, email: account.email }); toast.success('A new code was sent.'); } catch (requestError) { setError(requestError.response?.data?.message || 'Unable to resend code.'); } finally { setLoading(false); } };
   return (
     <main className="care-auth-page"><AuthShowcase /><Card className="care-auth-card" styles={{ body: { padding: 32 } }}>
-      <div className="care-auth-brand"><span className="care-auth-logo"><img src={logo} alt="ElderlyCare logo" /></span><div><Text className="care-eyebrow">ELDERLYCARE</Text><br /><Text type="secondary">Create a protected health profile</Text></div></div>
+      <div className="care-auth-brand"><span className="care-auth-logo"><AuthBrand /></span><div><Text className="care-eyebrow">ELDERLYCARE</Text><br /><Text type="secondary">Create a protected health profile</Text></div></div>
       <Title level={2}>{step === 0 ? 'Create your account' : 'Verify your email'}</Title><Steps size="small" current={step} items={[{ title: 'Account' }, { title: 'Verify' }]} />
       {error && <Alert type="error" showIcon message={error} style={{ marginBottom: 20 }} />}
       {step === 0 ? <Form form={form} layout="vertical" requiredMark="optional" onFinish={requestOtp}>

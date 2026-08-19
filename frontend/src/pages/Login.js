@@ -6,7 +6,7 @@ import { LockOutlined, MailOutlined } from '@ant-design/icons';
 import { AuthContext } from '../context/AuthContext';
 import { toast } from 'react-toastify';
 import AuthShowcase from '../components/AuthShowcase';
-import logo from '../assests/logo.png';
+import AuthBrand from '../components/AuthBrand';
 
 const { Title, Text } = Typography;
 const apiBase = import.meta.env.VITE_BACKEND_URI || 'http://localhost:5000';
@@ -41,7 +41,7 @@ const Login = () => {
       <AuthShowcase />
       <Card className="care-auth-card" styles={{ body: { padding: 28 } }}>
         <div className="care-auth-brand">
-          <span className="care-auth-logo"><img src={logo} alt="ElderlyCare logo" /></span>
+          <span className="care-auth-logo"><AuthBrand /></span>
           <div><Text className="care-eyebrow">ELDERLYCARE</Text><br /><Text type="secondary">Secure member access</Text></div>
         </div>
         <Title level={2}>Welcome back</Title>
