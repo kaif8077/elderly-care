@@ -1,5 +1,5 @@
 import React, { useContext, useEffect, useState } from 'react';
-import { Alert, Button, Card, Form, Input, Typography } from 'antd';
+import { Alert, Button, Card, ConfigProvider, Form, Input, Typography } from 'antd';
 import { LockOutlined, MailOutlined } from '@ant-design/icons';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { AdminAuthContext } from '../context/AdminAuthContext';
@@ -22,7 +22,7 @@ const AdminLogin = () => {
     finally { setLoading(false); }
   };
   return (
-    <main className="care-auth-page">
+    <ConfigProvider componentSize="middle"><main className="care-auth-page">
       <AuthShowcase admin />
       <Card className="care-auth-card" styles={{ body: { padding: 34 } }}>
         <div className="care-auth-brand"><span className="care-auth-logo"><AuthBrand /></span><div><Text className="care-eyebrow">ELDERLYCARE ADMINISTRATION</Text><br /><Text type="secondary">Restricted management workspace</Text></div></div>
@@ -35,7 +35,7 @@ const AdminLogin = () => {
         </Form>
         <Button type="link" block onClick={() => navigate('/')}>Return to ElderlyCare</Button>
       </Card>
-    </main>
+    </main></ConfigProvider>
   );
 };
 export default AdminLogin;

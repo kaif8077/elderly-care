@@ -1,7 +1,7 @@
 import React, { useContext, useState } from 'react';
 import axios from 'axios';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
-import { Alert, Button, Card, Checkbox, Divider, Flex, Form, Input, Space, Typography } from 'antd';
+import { Alert, Button, Card, Checkbox, ConfigProvider, Divider, Flex, Form, Input, Space, Typography } from 'antd';
 import { LockOutlined, MailOutlined } from '@ant-design/icons';
 import { AuthContext } from '../context/AuthContext';
 import { toast } from 'react-toastify';
@@ -37,7 +37,7 @@ const Login = () => {
   };
 
   return (
-    <main className="care-auth-page">
+    <ConfigProvider componentSize="middle"><main className="care-auth-page">
       <AuthShowcase />
       <Card className="care-auth-card" styles={{ body: { padding: 28 } }}>
         <div className="care-auth-brand">
@@ -67,7 +67,7 @@ const Login = () => {
           <Button type="link" onClick={() => navigate('/')}>Return home</Button>
         </Space>
       </Card>
-    </main>
+    </main></ConfigProvider>
   );
 };
 

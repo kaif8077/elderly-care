@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import axios from 'axios';
 import { Link, useNavigate } from 'react-router-dom';
-import { Alert, Button, Card, Form, Input, Steps, Typography } from 'antd';
+import { Alert, Button, Card, ConfigProvider, Form, Input, Steps, Typography } from 'antd';
 import { LockOutlined, MailOutlined } from '@ant-design/icons';
 import AuthShowcase from '../components/AuthShowcase';
 import AuthBrand from '../components/AuthBrand';
@@ -59,7 +59,7 @@ const ForgotPassword = () => {
   };
 
   return (
-    <main className="care-auth-page">
+    <ConfigProvider componentSize="middle"><main className="care-auth-page">
       <AuthShowcase />
       <Card className="care-auth-card" styles={{ body: { padding: 28 } }}>
         <div className="care-auth-brand">
@@ -114,7 +114,7 @@ const ForgotPassword = () => {
 
         <div className="care-auth-footer"><Link to="/login">Back to sign in</Link></div>
       </Card>
-    </main>
+    </main></ConfigProvider>
   );
 };
 

@@ -1,7 +1,7 @@
 import React, { useContext, useState } from 'react';
 import axios from 'axios';
 import { useNavigate, Link } from 'react-router-dom';
-import { Alert, Button, Card, Form, Input, Progress, Space, Steps, Typography } from 'antd';
+import { Alert, Button, Card, ConfigProvider, Form, Input, Progress, Space, Steps, Typography } from 'antd';
 import { LockOutlined, MailOutlined, UserOutlined } from '@ant-design/icons';
 import { toast } from 'react-toastify';
 import { AuthContext } from '../context/AuthContext';
@@ -20,7 +20,7 @@ const Register = () => {
   const verify = async ({ otp }) => { setLoading(true); setError(''); try { const verified = await axios.post(`${apiBase}/api/auth/verify-otp`, { email: account.email, otp }); const completed = await axios.post(`${apiBase}/api/auth/complete-registration`, { name: account.name, password: account.password, registrationToken: verified.data.registrationToken }); localStorage.setItem('token', completed.data.token); login(completed.data.user); toast.success('Account created. You are now signed in.'); navigate('/dashboard'); } catch (requestError) { setError(requestError.response?.data?.message || 'Unable to verify the code.'); } finally { setLoading(false); } };
   const resend = async () => { setLoading(true); try { await axios.post(`${apiBase}/api/auth/register`, { name: account.name, email: account.email }); toast.success('A new code was sent.'); } catch (requestError) { setError(requestError.response?.data?.message || 'Unable to resend code.'); } finally { setLoading(false); } };
   return (
-    <main className="care-auth-page"><AuthShowcase /><Card className="care-auth-card" styles={{ body: { padding: 32 } }}>
+    <ConfigProvider componentSize="middle"><main className="care-auth-page"><AuthShowcase /><Card className="care-auth-card" styles={{ body: { padding: 32 } }}>
       <div className="care-auth-brand"><span className="care-auth-logo"><AuthBrand /></span><div><Text className="care-eyebrow">ELDERLYCARE</Text><br /><Text type="secondary">Create a protected health profile</Text></div></div>
       <Title level={2}>{step === 0 ? 'Create your account' : 'Verify your email'}</Title><Steps size="small" current={step} items={[{ title: 'Account' }, { title: 'Verify' }]} />
       {error && <Alert type="error" showIcon message={error} style={{ marginBottom: 20 }} />}
@@ -33,7 +33,7 @@ const Register = () => {
         <Button size="middle" block type="primary" htmlType="submit" loading={loading}>Send verification code</Button>
       </Form> : <Form layout="vertical" onFinish={verify}><Alert type="info" showIcon message={`A 6-digit code was sent to ${account.email}`} style={{ marginBottom: 20 }} /><Form.Item label="Verification code" name="otp" rules={[{ required: true }, { len: 6, message: 'Enter the 6-digit code' }]}><Input.OTP size="middle" length={6} /></Form.Item><Button size="middle" block type="primary" htmlType="submit" loading={loading}>Verify and open dashboard</Button><Button size="middle" block type="link" onClick={resend} disabled={loading}>Resend code</Button></Form>}
       <Space direction="vertical" className="care-auth-footer" style={{ width: '100%' }}><Text>Already registered? <Link to="/login">Sign in</Link></Text><Button type="link" onClick={() => navigate('/')}>Return home</Button></Space>
-    </Card></main>
+    </Card></main></ConfigProvider>
   );
 };
 export default Register;
