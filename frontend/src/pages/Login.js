@@ -59,7 +59,7 @@ const Login = () => {
             <Input.Password size="middle" prefix={<LockOutlined />} autoComplete="current-password" placeholder="Enter your password" />
           </Form.Item>
           <Flex justify="space-between" align="center" style={{ margin: '-8px 0 16px' }}><Checkbox>Remember me</Checkbox><Link to="/forgot-password">Forgot password?</Link></Flex>
-          <Button type="primary" htmlType="submit" loading={loading} block>Sign in securely</Button>
+          <Button size="middle" type="primary" htmlType="submit" loading={loading} block>Sign in securely</Button>
         </Form>
         <Divider plain>or</Divider>
         <Space direction="vertical" size={6} className="care-auth-footer" style={{ width: '100%' }}>

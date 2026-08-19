@@ -75,7 +75,7 @@ const ForgotPassword = () => {
             <Form.Item name="email" label="Email address" rules={[{ required: true }, { type: 'email' }]}>
               <Input size="middle" prefix={<MailOutlined />} placeholder="Enter your registered email" autoComplete="email" />
             </Form.Item>
-            <Button type="primary" htmlType="submit" loading={loading} block>Send reset code</Button>
+            <Button size="middle" type="primary" htmlType="submit" loading={loading} block>Send reset code</Button>
           </Form>
         )}
 
@@ -83,9 +83,9 @@ const ForgotPassword = () => {
           <Form layout="vertical" onFinish={verifyCode} style={{ marginTop: 22 }}>
             <Alert type="info" showIcon message={`Enter the code sent to ${email}`} style={{ marginBottom: 18 }} />
             <Form.Item name="otp" label="Verification code" rules={[{ required: true }, { len: 6 }]}>
-              <Input.OTP length={6} />
+              <Input.OTP size="middle" length={6} />
             </Form.Item>
-            <Button type="primary" htmlType="submit" loading={loading} block>Verify code</Button>
+            <Button size="middle" type="primary" htmlType="submit" loading={loading} block>Verify code</Button>
             <Button type="link" block onClick={() => setStep(0)}>Use another email</Button>
           </Form>
         )}
@@ -108,7 +108,7 @@ const ForgotPassword = () => {
             ]}>
               <Input.Password size="middle" prefix={<LockOutlined />} placeholder="Repeat the new password" autoComplete="new-password" />
             </Form.Item>
-            <Button type="primary" htmlType="submit" loading={loading} block>Save new password</Button>
+            <Button size="middle" type="primary" htmlType="submit" loading={loading} block>Save new password</Button>
           </Form>
         )}
 
