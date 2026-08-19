@@ -65,6 +65,8 @@ test('medical profile form saves steps and supports structured emergency contact
 test('dashboard uses a full-width QR flow without legacy quick-action cards', () => {
   const source = fs.readFileSync(path.join(__dirname, 'pages', 'Dashboard.js'), 'utf8');
   expect(source).toContain('<QRCodeDisplay />');
+  expect(source).toContain('Profile completion');
+  expect(source).toContain('member-overview-grid');
   expect(source).not.toContain('const actions=');
   expect(source).not.toContain('Emergency ID card');
   expect(source).not.toContain('Open my profile');
@@ -223,7 +225,8 @@ test('public emergency profile uses a mobile safe view with location alerts and 
 
 test('member profile uses a responsive Ant Design desktop summary without removing core modules', () => {
   const source = fs.readFileSync(path.join(__dirname, 'pages', 'Profile.js'), 'utf8');
-  expect(source).toContain('<Row gutter={[20, 20]}');
+  expect(source).toContain('member-profile-header');
+  expect(source).toContain('member-profile-grid');
   expect(source).toContain('Health information');
   expect(source).toContain('Emergency contact');
   expect(source).toContain('Profile resources');
@@ -231,4 +234,17 @@ test('member profile uses a responsive Ant Design desktop summary without removi
   expect(source).toContain('<Recommendations />');
   expect(source).toContain('<UserIdCard');
   expect(source).toContain('<MedicalDocuments />');
+});
+
+test('member pages use a shared responsive portal and compact Ant Design buttons', () => {
+  const app = fs.readFileSync(path.join(__dirname, 'App.js'), 'utf8');
+  const layout = fs.readFileSync(path.join(__dirname, 'components', 'MemberPortalLayout.js'), 'utf8');
+  const theme = fs.readFileSync(path.join(__dirname, 'theme', 'elderlyCareTheme.js'), 'utf8');
+  expect(app).toContain('<MemberPortalLayout />');
+  expect(app).toContain('!isMemberRoute');
+  expect(layout).toContain('member-bottom-nav');
+  expect(layout).toContain('Emergency Alerts');
+  expect(layout).toContain('<Outlet />');
+  expect(theme).toContain('controlHeight: 34');
+  expect(theme).toContain("itemSelectedBg: '#edf3ff'");
 });

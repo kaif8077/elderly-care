@@ -5,8 +5,8 @@ import {
   Skeleton, Space, Tag, Typography
 } from 'antd';
 import {
-  ContactsOutlined, EnvironmentOutlined, FileProtectOutlined, HeartOutlined, IdcardOutlined,
-  MailOutlined, MedicineBoxOutlined, PhoneOutlined, SafetyCertificateOutlined, UserOutlined
+  FileProtectOutlined, HeartOutlined, IdcardOutlined, MedicineBoxOutlined,
+  PhoneOutlined, SafetyCertificateOutlined, UserOutlined
 } from '@ant-design/icons';
 import { useNavigate } from 'react-router-dom';
 import { AuthContext } from '../context/AuthContext';
@@ -15,7 +15,7 @@ import UserIdCard from '../components/UserIdCard';
 import Recommendations from '../components/Recommendations';
 import MedicalDocuments from '../components/MedicalDocuments';
 
-const { Title, Text, Paragraph } = Typography;
+const { Title, Text } = Typography;
 const apiBase = (import.meta.env.VITE_BACKEND_URI || 'http://localhost:5000').replace(/\/+$/, '');
 const show = (value) => Array.isArray(value) ? value.filter(Boolean).join(', ') || 'None reported' : value || 'Not provided';
 const formatDate = (value) => value && !Number.isNaN(new Date(value).getTime()) ? new Date(value).toLocaleDateString() : 'Not provided';
@@ -117,64 +117,66 @@ const Profile = () => {
   if (!profile) return <main className="care-page"><Empty description="No medical profile found"><Button type="primary" onClick={() => navigate('/dashboard')}>Create medical profile</Button></Empty></main>;
 
   return (
-    <main className="care-page">
-      <Row gutter={[20, 20]} align="stretch">
-        <Col xs={24} lg={7}>
-          <Card style={{ height: '100%' }}>
-            <Flex vertical align="center" gap={8} style={{ textAlign: 'center' }}>
-              <Avatar size={116} src={photoUrl} icon={<UserOutlined />} style={{ border: '4px solid #edf3ff', background: '#0066ff' }} />
-              <Title level={3} style={{ margin: '6px 0 0' }}>{profile.name}</Title>
+    <main className="care-page member-profile-page">
+      <Flex align="center" justify="space-between" gap={16} wrap="wrap" className="member-page-title">
+        <div><Title level={2}>My Profile</Title><Text type="secondary">Review your health and emergency information.</Text></div>
+        <Button type="primary" onClick={() => navigate('/dashboard#medical-form')}>Edit profile</Button>
+      </Flex>
+
+      <Card className="member-profile-header">
+        <Row gutter={[24, 20]} align="middle">
+          <Col xs={24} md={7}>
+            <Flex vertical align="center" gap={8} className="member-profile-identity">
+              <Avatar size={128} src={photoUrl} icon={<UserOutlined />} />
+              <Title level={3}>{profile.name}</Title>
               <Text type="secondary">{age !== null ? `Age: ${age}` : `DOB: ${formatDate(profile.dob)}`} · {show(profile.gender)}</Text>
-              <Space wrap style={{ justifyContent: 'center' }}><Tag color="blue">Active profile</Tag><Tag>{profile.elderlyCareId || 'ElderlyCare member'}</Tag></Space>
+              <Tag color="blue">Active profile</Tag>
             </Flex>
-            <Card size="small" title={<Space><ContactsOutlined />Contact information</Space>} style={{ marginTop: 20 }}>
-              <Descriptions size="small" column={1} colon={false} items={[
-                { key: 'phone', label: <PhoneOutlined />, children: show(profile.phone) },
-                { key: 'email', label: <MailOutlined />, children: show(user?.email) },
-                { key: 'address', label: <EnvironmentOutlined />, children: show(profile.address) }
-              ]} />
-            </Card>
+          </Col>
+          <Col xs={24} md={17}>
+            <Descriptions className="member-profile-summary" size="small" column={{ xs: 1, sm: 2 }} items={[
+              { key: 'member', label: 'ElderlyCare ID', children: show(profile.elderlyCareId) },
+              { key: 'blood', label: 'Blood group', children: <Tag color="orange">{show(profile.bloodGroup)}</Tag> },
+              { key: 'phone', label: 'Phone', children: show(profile.phone) },
+              { key: 'email', label: 'Email', children: show(user?.email) },
+              { key: 'address', label: 'Residential address', span: 2, children: show(profile.address) }
+            ]} />
+          </Col>
+        </Row>
+      </Card>
+
+      <Row gutter={[18, 18]} align="stretch" className="member-profile-grid">
+        <Col xs={24} lg={16}>
+          <Card title="Complete profile details" className="member-panel-card">
+            <Collapse items={detailItems} ghost />
           </Card>
         </Col>
-
-        <Col xs={24} lg={9}>
-          <Space direction="vertical" size={20} style={{ width: '100%', height: '100%' }}>
-            <Card title={<Space><HeartOutlined />Health information</Space>} style={{ width: '100%' }}>
+        <Col xs={24} lg={8}>
+          <Space direction="vertical" size={18} style={{ width: '100%' }}>
+            <Card title={<Space><HeartOutlined />Health information</Space>} className="member-panel-card">
               <Descriptions size="small" column={1} items={[
-                { key: 'blood', label: 'Blood group', children: <Text strong>{show(profile.bloodGroup)}</Text> },
                 { key: 'conditions', label: 'Medical conditions', children: show(profile.medicalHistory) },
                 { key: 'allergies', label: 'Allergies', children: show(profile.allergies) },
                 { key: 'medicines', label: 'Current medications', children: show(profile.medications) }
               ]} />
             </Card>
-            <Card title={<Space><PhoneOutlined />Emergency contact</Space>} style={{ width: '100%', flex: 1 }}>
+            <Card title={<Space><PhoneOutlined />Emergency contact</Space>} className="member-panel-card">
               <Descriptions size="small" column={1} items={[
                 { key: 'name', label: 'Name', children: show(primary?.name) },
                 { key: 'relation', label: 'Relationship', children: show(primary?.relationship) },
-                { key: 'phone', label: 'Phone number', children: primary?.phone ? <a href={`tel:${primary.phone}`}>{primary.phone}</a> : 'Not provided' }
+                { key: 'phone', label: 'Phone', children: primary?.phone ? <a href={`tel:${primary.phone}`}>{primary.phone}</a> : 'Not provided' }
               ]} />
             </Card>
-          </Space>
-        </Col>
-
-        <Col xs={24} lg={8}>
-          <Space direction="vertical" size={20} style={{ width: '100%' }}>
-            <Card title={<Space><FileProtectOutlined />Profile resources</Space>}>
-              <Paragraph type="secondary">Open your secure documents, emergency card, or personalized health guidance.</Paragraph>
+            <Card title={<Space><FileProtectOutlined />Profile resources</Space>} className="member-panel-card">
               <Space direction="vertical" style={{ width: '100%' }}>
                 <Button block icon={<FileProtectOutlined />} href="#medical-documents">Medical documents</Button>
                 <Button block icon={<IdcardOutlined />} href="#emergency-id-card">Emergency ID card</Button>
                 <Button block icon={<HeartOutlined />} href="#health-recommendations">Health recommendations</Button>
               </Space>
             </Card>
-            <Button type="primary" size="large" block onClick={() => navigate('/dashboard#medical-form')}>Edit profile</Button>
           </Space>
         </Col>
       </Row>
-
-      <Card className="care-section-card" title="Complete profile details">
-        <Collapse items={detailItems} />
-      </Card>
 
       <Card id="health-recommendations" className="care-section-card" title={<Space><MedicineBoxOutlined />Health recommendations</Space>} extra={<Button onClick={() => setShowRecommendations((current) => !current)}>{showRecommendations ? 'Hide recommendations' : 'Show recommendations'}</Button>}>
         {showRecommendations ? <Recommendations /> : <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} description="Recommendations are hidden." />}

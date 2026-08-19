@@ -30,16 +30,18 @@ import AdminAuditLogs from './admin/pages/AdminAuditLogs';
 import AdminContacts from './admin/pages/AdminContacts';
 import AdminEmergencyAlerts from './admin/pages/AdminEmergencyAlerts';
 import ProtectedRoute from './components/ProtectedRoute';
+import MemberPortalLayout from './components/MemberPortalLayout';
 import './App.css';
 
 const AppRoutes = () => {
     const location = useLocation();
     const isAdminRoute = location.pathname.startsWith('/admin');
     const isEmergencyRoute = location.pathname.startsWith('/emergency/');
+    const isMemberRoute = ['/dashboard', '/profile', '/emergency-alerts', '/reports'].includes(location.pathname);
 
     return (
         <>
-            {!isAdminRoute && !isEmergencyRoute && <Navbar />}
+            {!isAdminRoute && !isEmergencyRoute && !isMemberRoute && <Navbar />}
             <Routes>
                 <Route path="/" element={<Home />} />
                 <Route path="/about" element={<About />} />  
@@ -47,10 +49,12 @@ const AppRoutes = () => {
                 <Route path="/register" element={<Register />} />
                 <Route path="/forgot-password" element={<ForgotPassword />} />
                 <Route path="/contact" element={<Contact />} />
-                <Route path="/profile" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
-                <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
-                <Route path="/emergency-alerts" element={<ProtectedRoute><EmergencyAlerts /></ProtectedRoute>} />
-                <Route path="/reports" element={<ProtectedRoute><MedicalReports /></ProtectedRoute>} />
+                <Route element={<ProtectedRoute><MemberPortalLayout /></ProtectedRoute>}>
+                    <Route path="/profile" element={<Profile />} />
+                    <Route path="/dashboard" element={<Dashboard />} />
+                    <Route path="/emergency-alerts" element={<EmergencyAlerts />} />
+                    <Route path="/reports" element={<MedicalReports />} />
+                </Route>
                 <Route path="/emergency/:token" element={<EmergencyProfile />} />
                 <Route path="/services" element={<Services />} />
                 <Route path="/care-invitation/:token" element={<ProtectedRoute><CareInvitation /></ProtectedRoute>} />
