@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
 import {
-  Alert, Avatar, Button, Card, Empty, Input, Progress, Select, Space, Table, Tag, Typography
+  Alert, Avatar, Button, Card, Empty, Grid, Input, List, Pagination, Progress, Select, Space, Table, Tag, Typography
 } from 'antd';
 import { EyeOutlined, ReloadOutlined, SearchOutlined, UserOutlined } from '@ant-design/icons';
 import adminApi from '../../services/adminApi';
@@ -11,6 +11,7 @@ const bloodGroups = ['A+', 'A-', 'B+', 'B-', 'AB+', 'AB-', 'O+', 'O-'];
 const tagColor = (status) => ['active', 'complete'].includes(status) ? 'blue' : ['suspended', 'revoked'].includes(status) ? 'orange' : 'default';
 
 const AdminUsers = () => {
+  const screens = Grid.useBreakpoint();
   const [searchParams, setSearchParams] = useSearchParams();
   const [search, setSearch] = useState(searchParams.get('search') || '');
   const [data, setData] = useState({ users: [], pagination: { page: 1, pages: 1, total: 0, limit: 10 } });
@@ -67,8 +68,8 @@ const AdminUsers = () => {
           <Button icon={<ReloadOutlined />} onClick={load}>Refresh</Button>
         </Space>
       </Card>
-      <Card>
-        <Table
+      <Card className="admin-users-results">
+        {screens.md ? <Table
           rowKey="id"
           loading={loading}
           columns={columns}
@@ -84,7 +85,33 @@ const AdminUsers = () => {
             showTotal: (total) => `${total} users`,
             onChange: (page, limit) => updateQuery({ page: String(page), limit: String(limit) })
           }}
-        />
+        /> : <>
+          <List
+            className="admin-users-mobile-list"
+            loading={loading}
+            dataSource={data.users}
+            locale={{ emptyText: <Empty description="No users found" /> }}
+            renderItem={(user) => (
+              <List.Item>
+                <article className="admin-user-mobile-card">
+                  <header>
+                    <Space align="center"><Avatar size={46} icon={<UserOutlined />} /><div><Text strong>{user.name}</Text><br /><Text type="secondary">{user.elderlyCareId || 'ID pending'}</Text></div></Space>
+                    <Tag color={tagColor(user.qrStatus)}>{user.qrStatus || 'QR missing'}</Tag>
+                  </header>
+                  <dl>
+                    <div><dt>Email</dt><dd><a href={`mailto:${user.email}`}>{user.email}</a></dd></div>
+                    <div><dt>Phone</dt><dd>{user.phone || 'Not provided'}</dd></div>
+                    <div><dt>Blood group</dt><dd>{user.bloodGroup || '—'}</dd></div>
+                    <div><dt>Registered</dt><dd>{user.createdAt ? new Date(user.createdAt).toLocaleDateString() : '—'}</dd></div>
+                  </dl>
+                  <div className="admin-user-mobile-progress"><Text type="secondary">Profile completion</Text><Progress percent={user.profileCompletion || 0} size="small" strokeColor="#0066ff" /></div>
+                  <Link to={`/admin/users/${user.id}`}><Button type="primary" block>View user details</Button></Link>
+                </article>
+              </List.Item>
+            )}
+          />
+          {data.pagination.total > data.pagination.limit && <Pagination className="admin-users-mobile-pagination" simple current={data.pagination.page} pageSize={data.pagination.limit} total={data.pagination.total} onChange={(page) => updateQuery({ page: String(page) })} />}
+        </>}
       </Card>
     </Space>
   );
