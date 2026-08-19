@@ -167,12 +167,22 @@ test('secondary public pages use the single about hero and About omits the team 
 
 test('admin navigation retains requested modules and emergency alert monitoring', () => {
   const sidebar = fs.readFileSync(path.join(__dirname, 'admin', 'components', 'AdminSidebar.js'), 'utf8');
+  const topbar = fs.readFileSync(path.join(__dirname, 'admin', 'components', 'AdminTopbar.js'), 'utf8');
+  const layout = fs.readFileSync(path.join(__dirname, 'admin', 'layout', 'AdminLayout.js'), 'utf8');
   ['Dashboard', 'Users', 'Emergency Alerts', 'Audit Logs', 'Contact Us'].forEach((label) => expect(sidebar).toContain(`label: '${label}'`));
   ['Feedback', 'Medical Profiles', 'Reports', 'ID Cards', 'QR Management', 'Documents'].forEach((label) => expect(sidebar).not.toContain(`label: '${label}'`));
   const app = fs.readFileSync(path.join(__dirname, 'App.js'), 'utf8');
   expect(app).toContain('path="contacts"');
   expect(app).toContain('path="emergency-alerts"');
   expect(app).not.toContain('path="feedback"');
+  expect(sidebar).toContain('admin-portal-brand');
+  expect(sidebar).toContain('admin-portal-logout');
+  expect(topbar).toContain('admin-portal-avatar');
+  expect(topbar).not.toContain('Dropdown');
+  expect(topbar).not.toContain('Input.Search');
+  expect(topbar).not.toContain('admin?.name');
+  expect(layout).toContain('theme="light"');
+  expect(layout).toContain("import '../styles/AdminPortal.css'");
   ['AdminUsers', 'AdminEmergencyAlerts', 'AdminAuditLogs'].forEach((page) => {
     const source = fs.readFileSync(path.join(__dirname, 'admin', 'pages', `${page}.js`), 'utf8');
     expect(source).toContain('<Table');

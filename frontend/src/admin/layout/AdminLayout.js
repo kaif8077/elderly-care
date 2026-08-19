@@ -4,6 +4,8 @@ import { Outlet, useLocation } from 'react-router-dom';
 import AdminSidebar from '../components/AdminSidebar';
 import AdminTopbar from '../components/AdminTopbar';
 import '../styles/AdminLayout.css';
+import '../styles/AdminPortal.css';
+import logo from '../../assests/logo.png';
 
 const { Sider, Header, Content } = Layout;
 const titles = {
@@ -21,16 +23,16 @@ const AdminLayout = () => {
   const title = titles[location.pathname]
     || (location.pathname.startsWith('/admin/users/') ? 'User details' : null)
     || (location.pathname.startsWith('/admin/id-cards/') ? 'ID card' : 'Administration');
-  const sidebarWidth = collapsed ? 80 : 260;
+  const sidebarWidth = collapsed ? 76 : 250;
 
   return (
     <Layout className="admin-ant-layout">
       <Sider
         className="admin-ant-sider admin-ant-desktop"
-        width={260}
-        collapsedWidth={80}
+        width={250}
+        collapsedWidth={76}
         collapsed={collapsed}
-        theme="dark"
+        theme="light"
         trigger={null}
       >
         <AdminSidebar collapsed={collapsed} />
@@ -39,11 +41,11 @@ const AdminLayout = () => {
       <Drawer
         className="admin-mobile-drawer"
         placement="left"
-        width={300}
-        title="ElderlyCare Administration"
+        width={286}
+        title={<img className="admin-drawer-logo" src={logo} alt="ElderlyCare" />}
         open={mobileOpen}
         onClose={() => setMobileOpen(false)}
-        styles={{ body: { padding: 0, background: '#001529' } }}
+        styles={{ body: { padding: 0, background: '#ffffff' } }}
       >
         <AdminSidebar onClose={() => setMobileOpen(false)} />
       </Drawer>
