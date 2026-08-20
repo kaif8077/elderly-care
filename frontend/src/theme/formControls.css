@@ -13,6 +13,7 @@
 
 /* Consistent standard action buttons */
 .ant-btn{font-size:14px!important;font-weight:400!important}
+.ant-btn:not(.ant-btn-circle),.ant-input,.ant-input-affix-wrapper,.ant-input-number,.ant-picker,.ant-select-selector,.ant-cascader-picker,.ant-mentions{border-radius:5px!important}
 .ant-btn-primary:not(:disabled),
 .ant-btn-default:not(.ant-btn-dangerous):not(:disabled),
 .ant-btn-dashed:not(.ant-btn-dangerous):not(:disabled){border-color:#0066ff!important;background:#0066ff!important;color:#fff!important}
