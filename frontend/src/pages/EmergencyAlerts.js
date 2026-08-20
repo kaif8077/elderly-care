@@ -157,6 +157,7 @@ const EmergencyAlerts = () => {
           <Col>
             <Space wrap>
               <Select
+                size="middle"
                 allowClear
                 value={status}
                 placeholder="Filter status"
@@ -166,7 +167,7 @@ const EmergencyAlerts = () => {
                   (value) => ({ value, label: readable(value) })
                 )}
               />
-              <Button icon={<ReloadOutlined />} onClick={load}>
+              <Button size="middle" icon={<ReloadOutlined />} onClick={load}>
                 Refresh
               </Button>
             </Space>
@@ -232,6 +233,7 @@ const EmergencyAlerts = () => {
         </Spin>
       </Card>
       <Drawer
+        rootClassName="member-alert-drawer"
         open={Boolean(selectedId)}
         width={screens.md ? 720 : '100%'}
         title="Emergency alert details"
@@ -243,6 +245,7 @@ const EmergencyAlerts = () => {
               <Descriptions
                 bordered
                 size="small"
+                layout={screens.sm ? 'horizontal' : 'vertical'}
                 column={1}
                 items={[
                   {
@@ -305,6 +308,7 @@ const EmergencyAlerts = () => {
                   <Row gutter={[10, 10]}>
                     <Col xs={24} sm={15}>
                       <Select
+                        size="middle"
                         value={action}
                         onChange={setAction}
                         placeholder="Choose an action"
@@ -314,6 +318,7 @@ const EmergencyAlerts = () => {
                     </Col>
                     <Col xs={24} sm={9}>
                       <Button
+                        size="middle"
                         type="primary"
                         block
                         loading={saving}

@@ -1,7 +1,7 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import axios from 'axios';
 import {
-  Alert, Button, Card, Empty, List, Skeleton, Space, Tag, Typography
+  Alert, Button, Card, Empty, Flex, List, Skeleton, Space, Tag, Typography
 } from 'antd';
 import {
   DownloadOutlined, HeartOutlined, HistoryOutlined, LikeOutlined, DislikeOutlined, ReloadOutlined
@@ -11,7 +11,7 @@ import './Recommendations.css';
 const { Paragraph, Text, Title } = Typography;
 const base = import.meta.env.VITE_BACKEND_URI || 'http://localhost:5000';
 
-const Recommendations = () => {
+const Recommendations = ({ showPageHeader = false }) => {
   const [items, setItems] = useState([]);
   const [loading, setLoading] = useState(true);
   const [working, setWorking] = useState(false);
@@ -76,13 +76,22 @@ const Recommendations = () => {
   const latest = items[0];
   return (
     <section>
-      <Space align="start" style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 18 }}>
+      {showPageHeader && (
+        <Flex className="member-page-title" justify="space-between" align="center" gap={16} wrap>
+          <div>
+            <Title level={2}>Health Recommendations</Title>
+            <Text type="secondary">Generate, read, download, and review your personalized guidance.</Text>
+          </div>
+          <Button type="primary" size="middle" icon={<ReloadOutlined />} onClick={generate} loading={working}>Generate new</Button>
+        </Flex>
+      )}
+      <Card className="member-content-card">
+      <Space align="start" style={{ display: 'flex', marginBottom: 18 }}>
         <div>
           <Title level={2} className="care-eyebrow">PERSONALIZED WELLNESS</Title>
           <h6 className="care-secondary-heading" style={{ margin: '5px 0' }}><HeartOutlined /> Necessary health guidance</h6>
           <Paragraph type="secondary" style={{ margin: 0 }}>A short list based on your latest medical profile.</Paragraph>
         </div>
-        <Button type="primary" icon={<ReloadOutlined />} onClick={generate} loading={working}>Generate new</Button>
       </Space>
 
       {error && <Alert type="error" showIcon message={error} closable onClose={() => setError('')} />}
@@ -119,6 +128,7 @@ const Recommendations = () => {
           <Button type="primary" onClick={generate} loading={working}>Generate recommendation</Button>
         </Empty>
       )}
+      </Card>
     </section>
   );
 };
