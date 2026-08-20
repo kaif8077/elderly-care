@@ -340,6 +340,7 @@ test('member pages use a shared responsive portal and compact Ant Design buttons
   expect(layout).toContain("responseType: 'blob'");
   expect(entry).toContain('componentSize="small"');
   expect(theme).toContain('controlHeight: 32');
+  expect(theme).toContain('borderRadiusLG: 10');
   expect(theme).toContain('fontWeight: 400');
   expect(theme).toContain("itemSelectedBg: '#edf3ff'");
   expect(controls).toContain('.medical-form{width:min(100%,980px)');
