@@ -14,6 +14,9 @@
 /* Consistent standard action buttons */
 .ant-btn{font-size:14px!important;font-weight:400!important}
 .ant-btn:not(.ant-btn-circle),.ant-input,.ant-input-affix-wrapper,.ant-input-number,.ant-picker,.ant-select-selector,.ant-cascader-picker,.ant-mentions{border-radius:5px!important}
+.ant-space-compact>.ant-input:first-child,.ant-space-compact>.ant-input-affix-wrapper:first-child,.ant-space-compact>.ant-select:first-child .ant-select-selector{border-radius:5px 0 0 5px!important}
+.ant-space-compact>.ant-btn:last-child{margin-inline-start:-1px;border-inline-start:0!important;border-radius:0 5px 5px 0!important}
+.ant-space-compact>*:not(:first-child):not(:last-child),.ant-space-compact>*:not(:first-child):not(:last-child) .ant-select-selector{border-radius:0!important}
 .ant-btn-primary:not(:disabled),
 .ant-btn-default:not(.ant-btn-dangerous):not(:disabled),
 .ant-btn-dashed:not(.ant-btn-dangerous):not(:disabled){border-color:#0066ff!important;background:#0066ff!important;color:#fff!important}
