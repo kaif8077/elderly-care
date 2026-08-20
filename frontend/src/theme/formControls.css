@@ -25,6 +25,12 @@
 .ant-btn-dashed:not(.ant-btn-dangerous):not(:disabled):hover,
 .ant-btn-dashed:not(.ant-btn-dangerous):not(:disabled):focus-visible,
 .ant-btn-dashed:not(.ant-btn-dangerous):not(:disabled):active{border-color:#ff6b00!important;background:#ff6b00!important;color:#fff!important}
+.ant-btn-default:not(.ant-btn-dangerous):not(:disabled):hover,
+.ant-btn-default:not(.ant-btn-dangerous):not(:disabled):focus-visible,
+.ant-btn-default:not(.ant-btn-dangerous):not(:disabled):active,
+.ant-btn-link:not(.ant-btn-dangerous):not(:disabled):hover,
+.ant-btn-link:not(.ant-btn-dangerous):not(:disabled):focus-visible,
+.ant-btn-link:not(.ant-btn-dangerous):not(:disabled):active{border-color:transparent!important}
 
 /* Text buttons lose decorative icons; icon-only navigation controls remain usable. */
 .ant-btn:has(>span:not(.anticon))>.anticon{display:none}

@@ -333,6 +333,7 @@ test('member pages use a shared responsive portal and compact Ant Design buttons
   expect(theme).toContain('fontWeight: 400');
   expect(theme).toContain("itemSelectedBg: '#edf3ff'");
   expect(controls).toContain('.medical-form{width:min(100%,980px)');
+  expect(controls).toContain('border-color:transparent!important');
   expect(controls).toContain('background:#0066ff!important');
   expect(controls).toContain('background:#ff6b00!important');
 });
