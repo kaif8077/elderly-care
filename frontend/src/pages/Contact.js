@@ -65,7 +65,7 @@ const Contact = () => {
           headingOnly
         />
 
-        <Flex vertical gap={28} style={{ width: 'min(1100px, calc(100% - 32px))', margin: '48px auto' }}>
+        <Flex vertical gap={20} style={{ width: 'min(1100px, calc(100% - 32px))', margin: '32px auto' }}>
           <Flex vertical align="center" gap={8}>
             <Title level={2} className="care-eyebrow">WE ARE HERE TO HELP</Title>
             <h6 className="care-section-heading care-secondary-heading">Talk to the ElderlyCare team</h6>
@@ -74,11 +74,11 @@ const Contact = () => {
             </Paragraph>
           </Flex>
 
-          <Row gutter={[24, 24]} align="stretch">
+          <Row gutter={[20, 20]} align="top">
             <Col xs={24} lg={12}>
-              <Flex vertical gap={16} style={{ height: '100%' }}>
+              <Flex vertical gap={12}>
                 {contactMethods.map((method) => (
-                  <Card key={method.title} hoverable style={{ flex: 1 }}>
+                  <Card key={method.title} size="small" hoverable>
                     <Flex align="center" gap={16}>
                       <Button type="primary" shape="circle" size="large" icon={method.icon} aria-label={method.title} />
                       <Flex vertical gap={2}>
@@ -93,8 +93,8 @@ const Contact = () => {
             </Col>
 
             <Col xs={24} lg={12}>
-              <Card title={<Space><SendOutlined />Send us a message</Space>} style={{ height: '100%' }}>
-                <Paragraph type="secondary">
+              <Card size="small" title={<Space><SendOutlined />Send us a message</Space>}>
+                <Paragraph type="secondary" style={{ marginBottom: 12 }}>
                   Complete the form and our team will respond using the email address or phone number you provide.
                 </Paragraph>
                 {error && (
@@ -111,6 +111,7 @@ const Contact = () => {
                   <Form.Item
                     name="name"
                     label="Full name"
+                    style={{ marginBottom: 12 }}
                     rules={[{ required: true, message: 'Enter your full name' }]}
                   >
                     <Input placeholder="Enter your full name" />
@@ -118,6 +119,7 @@ const Contact = () => {
                   <Form.Item
                     name="email"
                     label="Email address"
+                    style={{ marginBottom: 12 }}
                     rules={[
                       { required: true, message: 'Enter your email address' },
                       { type: 'email', message: 'Enter a valid email address' }
@@ -128,6 +130,7 @@ const Contact = () => {
                   <Form.Item
                     name="phone"
                     label="Phone number"
+                    style={{ marginBottom: 12 }}
                     rules={[
                       { required: true, message: 'Enter your phone number' },
                       { pattern: /^[+0-9()\-\s]{8,20}$/, message: 'Enter a valid phone number' }
@@ -138,12 +141,13 @@ const Contact = () => {
                   <Form.Item
                     name="message"
                     label="Message"
+                    style={{ marginBottom: 12 }}
                     rules={[
                       { required: true, message: 'Enter your message' },
                       { min: 10, message: 'Use at least 10 characters' }
                     ]}
                   >
-                    <Input.TextArea rows={6} showCount maxLength={2000} placeholder="Describe your question or support request" />
+                    <Input.TextArea rows={4} showCount maxLength={2000} placeholder="Describe your question or support request" />
                   </Form.Item>
                   <Button type="primary" size="large" htmlType="submit" block icon={<SendOutlined />} loading={loading}>
                     Send message
