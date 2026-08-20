@@ -11,7 +11,7 @@ const elderlyCareTheme = {
   components: {
     Button: {
       fontWeight: 400,
-      controlHeight: 30,
+      controlHeight: 32,
       controlHeightSM: 28,
       controlHeightLG: 42,
       paddingInline: 14,
