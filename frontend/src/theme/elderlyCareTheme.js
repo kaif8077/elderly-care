@@ -5,7 +5,7 @@ const elderlyCareTheme = {
     colorLink: '#0066ff', colorLinkHover: '#ff6b00', colorLinkActive: '#ff6b00',
     colorInfo: '#0066ff', colorSuccess: '#0066ff', colorWarning: '#ff6b00', colorError: '#ff6b00',
     colorText: '#1f2937', colorTextSecondary: '#667085', colorBgLayout: '#f6f8fc', colorBgContainer: '#ffffff', colorBorder: '#d8dee9',
-    borderRadius: 10, borderRadiusLG: 16, controlHeight: 32, fontSize: 14,
+    borderRadius: 5, borderRadiusLG: 16, controlHeight: 32, fontSize: 14,
     fontFamily: "'Inter', 'Segoe UI', Arial, sans-serif", boxShadowSecondary: '0 18px 48px rgba(18, 63, 53, 0.12)'
   },
   components: {
