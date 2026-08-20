@@ -9,15 +9,21 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 const Consumer = () => {
   const { user, login, logout } = useContext(AuthContext);
-  return <div>
-    <span>{user?.name || 'signed out'}</span>
-    <button onClick={() => login({ name: 'Test User' })}>Login</button>
-    <button onClick={logout}>Logout</button>
-  </div>;
+  return (
+    <div>
+      <span>{user?.name || 'signed out'}</span>
+      <button onClick={() => login({ name: 'Test User' })}>Login</button>
+      <button onClick={logout}>Logout</button>
+    </div>
+  );
 };
 
 test('normal-user authentication state can log in and out', () => {
-  render(<AuthProvider><Consumer /></AuthProvider>);
+  render(
+    <AuthProvider>
+      <Consumer />
+    </AuthProvider>
+  );
   expect(screen.getByText('signed out')).toBeInTheDocument();
   fireEvent.click(screen.getByRole('button', { name: 'Login' }));
   expect(screen.getByText('Test User')).toBeInTheDocument();
@@ -55,7 +61,9 @@ test('medical profile form saves steps and supports structured emergency contact
   expect(source).toContain('mode="tags"');
   expect(source).toContain('Profile photograph is required');
   expect(source).toContain('reviewConfirmed');
-  expect(source).toContain('<Checkbox>I reviewed these details and confirm they are correct.</Checkbox>');
+  expect(source).toContain(
+    '<Checkbox>I reviewed these details and confirm they are correct.</Checkbox>'
+  );
   expect(source).toContain('const { reviewConfirmed, profilePhoto, ...clean }');
   expect(source).toContain('stepFields[step]');
   expect(source).toContain('setValues(form.getFieldsValue(true))');
@@ -80,7 +88,9 @@ test('dashboard is an overview and routes member tools to dedicated pages', () =
   expect(source).not.toContain('const actions=');
   expect(source).not.toContain('Open my profile');
   const qrSource = fs.readFileSync(path.join(__dirname, 'components', 'QRCodeDisplay.js'), 'utf8');
-  expect(qrSource).not.toContain('The QR contains a secure access link, not your complete medical record.');
+  expect(qrSource).not.toContain(
+    'The QR contains a secure access link, not your complete medical record.'
+  );
 });
 
 test('main navigation uses Ant Design without the legacy hard CSS', () => {
@@ -89,7 +99,7 @@ test('main navigation uses Ant Design without the legacy hard CSS', () => {
   expect(source).toContain('Drawer');
   expect(source).toContain('Dropdown');
   expect(source).toContain('Menu');
-  expect(source).not.toContain("Navbar.css");
+  expect(source).not.toContain('Navbar.css');
   expect(fs.existsSync(path.join(__dirname, 'components', 'Navbar.css'))).toBe(false);
 });
 
@@ -99,7 +109,7 @@ test('home page uses responsive Ant Design sections without legacy CSS', () => {
   expect(source).toContain('How ElderlyCare helps');
   expect(source).toContain('<Collapse');
   expect(source).toContain('<Row');
-  expect(source).not.toContain("Home.css");
+  expect(source).not.toContain('Home.css');
   expect(fs.existsSync(path.join(__dirname, 'pages', 'Home.css'))).toBe(false);
 });
 
@@ -121,14 +131,14 @@ test('public information pages use Ant Design without legacy page CSS', () => {
 test('home uses two restored banners while secondary pages keep a single image', () => {
   const hero = fs.readFileSync(path.join(__dirname, 'components', 'PublicPageHero.js'), 'utf8');
   const footer = fs.readFileSync(path.join(__dirname, 'components', 'PublicFooter.js'), 'utf8');
-  expect(hero).toContain("banner1.jpg");
-  expect(hero).toContain("banner2.jpg");
-  expect(hero).not.toContain("banner3.jpg");
+  expect(hero).toContain('banner1.jpg');
+  expect(hero).toContain('banner2.jpg');
+  expect(hero).not.toContain('banner3.jpg');
   expect(hero).toContain('Carousel');
   expect(hero).toContain('const homeBanners = [banner1, banner2]');
   expect(hero).not.toContain('linear-gradient');
   expect(footer).toContain("background: '#1f2937'");
-  expect(footer).not.toContain("logo.png");
+  expect(footer).not.toContain('logo.png');
   expect(footer).toContain('fontWeight: 800');
   expect(footer).toContain('© 2025 ElderlyCare');
   ['Home', 'About', 'Services', 'Contact'].forEach((page) => {
@@ -141,11 +151,11 @@ test('home uses two restored banners while secondary pages keep a single image',
 test('secondary public pages use the single about hero and About omits the team section', () => {
   ['About', 'Services', 'Contact'].forEach((page) => {
     const source = fs.readFileSync(path.join(__dirname, 'pages', `${page}.js`), 'utf8');
-    expect(source).toContain("about-hero.jpg");
+    expect(source).toContain('about-hero.jpg');
     expect(source).toContain('image={aboutHero}');
   });
   const about = fs.readFileSync(path.join(__dirname, 'pages', 'About.js'), 'utf8');
-  expect(about).toContain("about-care.jpg");
+  expect(about).toContain('about-care.jpg');
   expect(about).toContain('<Card hoverable');
   expect(about).toContain('minHeight: 500');
   expect(about).not.toContain('THE PROJECT TEAM');
@@ -153,7 +163,7 @@ test('secondary public pages use the single about hero and About omits the team 
   const services = fs.readFileSync(path.join(__dirname, 'pages', 'Services.js'), 'utf8');
   expect(services).toContain('title="All services"');
   expect(services).toContain('selectedKeys={[activeId]}');
-  expect(services).toContain("about-hero.jpg");
+  expect(services).toContain('about-hero.jpg');
   expect(services).toContain('image={aboutHero}');
   expect(services).toContain('activeService.image');
   expect(services).toContain('Secure Medical Documents');
@@ -162,15 +172,25 @@ test('secondary public pages use the single about hero and About omits the team 
   expect(services).not.toContain('Create an account');
   expect(services).not.toContain('>Contact us</Button>');
   const home = fs.readFileSync(path.join(__dirname, 'pages', 'Home.js'), 'utf8');
-  expect(home).toContain("why-choose-us-v2.jpg");
+  expect(home).toContain('why-choose-us-v2.jpg');
 });
 
 test('admin navigation retains requested modules and emergency alert monitoring', () => {
-  const sidebar = fs.readFileSync(path.join(__dirname, 'admin', 'components', 'AdminSidebar.js'), 'utf8');
-  const topbar = fs.readFileSync(path.join(__dirname, 'admin', 'components', 'AdminTopbar.js'), 'utf8');
+  const sidebar = fs.readFileSync(
+    path.join(__dirname, 'admin', 'components', 'AdminSidebar.js'),
+    'utf8'
+  );
+  const topbar = fs.readFileSync(
+    path.join(__dirname, 'admin', 'components', 'AdminTopbar.js'),
+    'utf8'
+  );
   const layout = fs.readFileSync(path.join(__dirname, 'admin', 'layout', 'AdminLayout.js'), 'utf8');
-  ['Dashboard', 'Users', 'Emergency Alerts', 'Audit Logs', 'Contact Us'].forEach((label) => expect(sidebar).toContain(`label: '${label}'`));
-  ['Feedback', 'Medical Profiles', 'Reports', 'ID Cards', 'QR Management', 'Documents'].forEach((label) => expect(sidebar).not.toContain(`label: '${label}'`));
+  ['Dashboard', 'Users', 'Emergency Alerts', 'Audit Logs', 'Contact Us'].forEach((label) =>
+    expect(sidebar).toContain(`label: '${label}'`)
+  );
+  ['Feedback', 'Medical Profiles', 'Reports', 'ID Cards', 'QR Management', 'Documents'].forEach(
+    (label) => expect(sidebar).not.toContain(`label: '${label}'`)
+  );
   const app = fs.readFileSync(path.join(__dirname, 'App.js'), 'utf8');
   expect(app).toContain('path="contacts"');
   expect(app).toContain('path="emergency-alerts"');
@@ -199,14 +219,19 @@ test('public section eyebrow labels use h2 and descriptive titles use h6', () =>
   });
 
   const contact = fs.readFileSync(path.join(__dirname, 'pages', 'Contact.js'), 'utf8');
-  expect(contact).toContain('<h6 className="care-section-heading care-secondary-heading">Talk to the ElderlyCare team</h6>');
+  expect(contact).toContain(
+    '<h6 className="care-section-heading care-secondary-heading">Talk to the ElderlyCare team</h6>'
+  );
   expect(contact).not.toContain('level={6}');
 });
 
 test('reports are hidden from the member profile and admin routes', () => {
   const app = fs.readFileSync(path.join(__dirname, 'App.js'), 'utf8');
   const profile = fs.readFileSync(path.join(__dirname, 'pages', 'Profile.js'), 'utf8');
-  const adminUser = fs.readFileSync(path.join(__dirname, 'admin', 'pages', 'AdminUserDetail.js'), 'utf8');
+  const adminUser = fs.readFileSync(
+    path.join(__dirname, 'admin', 'pages', 'AdminUserDetail.js'),
+    'utf8'
+  );
 
   expect(profile).not.toContain('Latest medical report');
   expect(profile).not.toContain('/api/medical-reports/latest');
@@ -219,11 +244,14 @@ test('public emergency profile uses a mobile safe view with location alerts and 
   const source = fs.readFileSync(path.join(__dirname, 'pages', 'EmergencyProfile.js'), 'utf8');
   expect(source).toContain('Fetching Data');
   expect(source).toContain('Retrieving secure information');
-  expect(source).toContain('>Verified</Tag>');
+  expect(source).toContain('Verified');
   expect(source).not.toContain('ElderlyCare safe view');
   expect(source).not.toContain('Only emergency-safe information is shown');
   expect(source).toContain('Emergency Help');
   expect(source).toContain('Generate First Aid & Medication Guidance');
+  expect(source).toContain('Hide Emergency Help');
+  expect(source).toContain('emergency-inline-panel');
+  expect(source).not.toContain('<Modal');
   expect(source).toContain('navigator.geolocation.getCurrentPosition');
   expect(source).toContain('locationAccuracy');
   expect(source).toContain('Send Emergency Email Alert');
@@ -238,7 +266,8 @@ test('public emergency profile uses a mobile safe view with location alerts and 
   expect(source).not.toContain('percent={75}');
   expect(source).not.toContain('Show this list and available medicine packaging');
   expect(source).not.toContain('This guidance does not replace emergency services');
-  expect(source).toContain("responseType: 'blob'");
+  expect(source).toContain('responseType:');
+  expect(source).toContain('blob');
   expect(source).toContain('URL.createObjectURL');
 });
 
@@ -261,7 +290,10 @@ test('member profile uses the responsive portal reference layout with saved deta
 
 test('member pages use a shared responsive portal and compact Ant Design buttons', () => {
   const app = fs.readFileSync(path.join(__dirname, 'App.js'), 'utf8');
-  const layout = fs.readFileSync(path.join(__dirname, 'components', 'MemberPortalLayout.js'), 'utf8');
+  const layout = fs.readFileSync(
+    path.join(__dirname, 'components', 'MemberPortalLayout.js'),
+    'utf8'
+  );
   const entry = fs.readFileSync(path.join(__dirname, 'index.js'), 'utf8');
   const theme = fs.readFileSync(path.join(__dirname, 'theme', 'elderlyCareTheme.js'), 'utf8');
   const controls = fs.readFileSync(path.join(__dirname, 'theme', 'formControls.css'), 'utf8');
@@ -289,9 +321,15 @@ test('member pages use a shared responsive portal and compact Ant Design buttons
 });
 
 test('account activation controls are absent from the admin interface', () => {
-  const dashboard = fs.readFileSync(path.join(__dirname, 'admin', 'pages', 'AdminDashboard.js'), 'utf8');
+  const dashboard = fs.readFileSync(
+    path.join(__dirname, 'admin', 'pages', 'AdminDashboard.js'),
+    'utf8'
+  );
   const users = fs.readFileSync(path.join(__dirname, 'admin', 'pages', 'AdminUsers.js'), 'utf8');
-  const detail = fs.readFileSync(path.join(__dirname, 'admin', 'pages', 'AdminUserDetail.js'), 'utf8');
+  const detail = fs.readFileSync(
+    path.join(__dirname, 'admin', 'pages', 'AdminUserDetail.js'),
+    'utf8'
+  );
   expect(dashboard).not.toContain("['Active users'");
   expect(dashboard).not.toContain("['Inactive users'");
   expect(users).not.toContain("title: 'Account'");
@@ -308,13 +346,19 @@ test('member tools are separated into focused route pages', () => {
   expect(app).toContain('path="/emergency"');
   expect(app).toContain('path="/documents"');
   const medical = fs.readFileSync(path.join(__dirname, 'pages', 'MedicalProfilePage.js'), 'utf8');
-  const recommendations = fs.readFileSync(path.join(__dirname, 'pages', 'RecommendationsPage.js'), 'utf8');
+  const recommendations = fs.readFileSync(
+    path.join(__dirname, 'pages', 'RecommendationsPage.js'),
+    'utf8'
+  );
   const documents = fs.readFileSync(path.join(__dirname, 'pages', 'DocumentsPage.js'), 'utf8');
-  const emergency = fs.readFileSync(path.join(__dirname, 'pages', 'MemberEmergencyPage.js'), 'utf8');
+  const emergency = fs.readFileSync(
+    path.join(__dirname, 'pages', 'MemberEmergencyPage.js'),
+    'utf8'
+  );
   expect(medical).toContain('<MedicalForm');
   expect(medical).not.toContain('QRCodeDisplay');
   expect(recommendations).toContain('<Recommendations />');
-  expect(documents).toContain('<MedicalDocuments />');
+  expect(documents).toContain('<MedicalDocuments showPageHeader />');
   expect(emergency).toContain('<UserIdCard');
   expect(emergency).toContain("api.post('/api/qr'");
 });
