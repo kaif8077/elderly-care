@@ -314,6 +314,10 @@ test('member pages use a shared responsive portal and compact Ant Design buttons
     path.join(__dirname, 'components', 'MemberPortalLayout.js'),
     'utf8'
   );
+  const layoutStyles = fs.readFileSync(
+    path.join(__dirname, 'components', 'MemberPortalLayout.css'),
+    'utf8'
+  );
   const entry = fs.readFileSync(path.join(__dirname, 'index.js'), 'utf8');
   const theme = fs.readFileSync(path.join(__dirname, 'theme', 'elderlyCareTheme.js'), 'utf8');
   const controls = fs.readFileSync(path.join(__dirname, 'theme', 'formControls.css'), 'utf8');
@@ -330,6 +334,8 @@ test('member pages use a shared responsive portal and compact Ant Design buttons
   expect(layout).not.toContain('<Dropdown');
   expect(layout).toContain('member-global-search');
   expect(layout).toContain('>Search</Button>');
+  expect(layoutStyles).toContain('grid-template-columns:42px minmax(280px,470px) 42px');
+  expect(layoutStyles).toContain('.member-global-search{width:100%;margin:0}');
   expect(layout).toContain("responseType: 'blob'");
   expect(entry).toContain('componentSize="small"');
   expect(theme).toContain('controlHeight: 32');
