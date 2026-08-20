@@ -334,8 +334,9 @@ test('member pages use a shared responsive portal and compact Ant Design buttons
   expect(layout).not.toContain('<Dropdown');
   expect(layout).toContain('member-global-search');
   expect(layout).toContain('>Search</Button>');
-  expect(layoutStyles).toContain('grid-template-columns:42px minmax(280px,470px) 42px');
-  expect(layoutStyles).toContain('.member-global-search{width:100%;margin:0}');
+  expect(layoutStyles).toContain('.member-portal-header{position:sticky');
+  expect(layoutStyles).toContain('height:80px');
+  expect(layoutStyles).toContain('.member-global-search{width:min(470px,42vw);margin-left:auto}');
   expect(layout).toContain("responseType: 'blob'");
   expect(entry).toContain('componentSize="small"');
   expect(theme).toContain('controlHeight: 32');
