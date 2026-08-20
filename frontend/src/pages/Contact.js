@@ -74,11 +74,11 @@ const Contact = () => {
             </Paragraph>
           </Flex>
 
-          <Row gutter={[20, 20]} align="top">
+          <Row gutter={[20, 20]} align="stretch">
             <Col xs={24} lg={12}>
-              <Flex vertical gap={12}>
+              <Flex vertical gap={12} style={{ height: '100%' }}>
                 {contactMethods.map((method) => (
-                  <Card key={method.title} size="small" hoverable>
+                  <Card key={method.title} size="small" hoverable style={{ flex: 1 }}>
                     <Flex align="center" gap={16}>
                       <Button type="primary" shape="circle" size="large" icon={method.icon} aria-label={method.title} />
                       <Flex vertical gap={2}>
@@ -93,7 +93,7 @@ const Contact = () => {
             </Col>
 
             <Col xs={24} lg={12}>
-              <Card size="small" title={<Space><SendOutlined />Send us a message</Space>}>
+              <Card size="small" title={<Space><SendOutlined />Send us a message</Space>} style={{ height: '100%' }}>
                 <Paragraph type="secondary" style={{ marginBottom: 12 }}>
                   Complete the form and our team will respond using the email address or phone number you provide.
                 </Paragraph>

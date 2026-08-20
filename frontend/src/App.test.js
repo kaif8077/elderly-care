@@ -128,8 +128,8 @@ test('public information pages use Ant Design without legacy page CSS', () => {
   expect(contact).toContain('size="large"');
   expect(contact).toContain('htmlType="submit"');
   expect(contact).toContain('rows={4}');
-  expect(contact).not.toContain("style={{ flex: 1 }}");
-  expect(contact).not.toContain("style={{ height: '100%' }}");
+  expect(contact).toContain("style={{ flex: 1 }}");
+  expect(contact).toContain("style={{ height: '100%' }}");
   expect(contact).not.toContain('submitFeedbackForm');
   expect(contact).not.toContain('Do not use this page for an active medical emergency');
 });
