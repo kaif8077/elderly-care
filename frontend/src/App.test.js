@@ -124,6 +124,9 @@ test('public information pages use Ant Design without legacy page CSS', () => {
   const contact = fs.readFileSync(path.join(__dirname, 'pages', 'Contact.js'), 'utf8');
   expect(contact).toContain('submitContactForm');
   expect(contact).toContain('name="phone"');
+  expect(contact).toContain('layout="vertical"');
+  expect(contact).toContain('size="large"');
+  expect(contact).toContain('htmlType="submit"');
   expect(contact).not.toContain('submitFeedbackForm');
   expect(contact).not.toContain('Do not use this page for an active medical emergency');
 });
@@ -197,6 +200,7 @@ test('admin navigation retains requested modules and emergency alert monitoring'
   expect(app).not.toContain('path="feedback"');
   expect(sidebar).toContain('admin-portal-brand');
   expect(sidebar).toContain('admin-portal-logout');
+  expect(sidebar).toContain("navigate('/', { replace: true })");
   expect(topbar).not.toContain('admin-portal-avatar');
   expect(topbar).not.toContain('Dropdown');
   expect(topbar).not.toContain('Input.Search');
@@ -211,6 +215,20 @@ test('admin navigation retains requested modules and emergency alert monitoring'
   });
 });
 
+test('member and admin logout return to the public home page', () => {
+  const memberLayout = fs.readFileSync(
+    path.join(__dirname, 'components', 'MemberPortalLayout.js'),
+    'utf8'
+  );
+  const adminSidebar = fs.readFileSync(
+    path.join(__dirname, 'admin', 'components', 'AdminSidebar.js'),
+    'utf8'
+  );
+  expect(memberLayout).toContain("navigate('/', { replace: true })");
+  expect(adminSidebar).toContain("navigate('/', { replace: true })");
+  expect(adminSidebar).not.toContain("navigate('/admin/login', { replace: true })");
+});
+
 test('public section eyebrow labels use h2 and descriptive titles use h6', () => {
   ['Home', 'About', 'Services', 'Contact'].forEach((page) => {
     const source = fs.readFileSync(path.join(__dirname, 'pages', `${page}.js`), 'utf8');
@@ -219,9 +237,8 @@ test('public section eyebrow labels use h2 and descriptive titles use h6', () =>
   });
 
   const contact = fs.readFileSync(path.join(__dirname, 'pages', 'Contact.js'), 'utf8');
-  expect(contact).toContain(
-    '<h6 className="care-section-heading care-secondary-heading">Talk to the ElderlyCare team</h6>'
-  );
+  expect(contact).toContain('<h6 className="care-section-heading care-secondary-heading">');
+  expect(contact).toContain('Talk to the ElderlyCare team');
   expect(contact).not.toContain('level={6}');
 });
 
