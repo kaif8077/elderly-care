@@ -29,7 +29,7 @@ const AdminSidebar = ({ collapsed = false, onClose }) => {
     try {
       await logout();
       message.success('Administrator logged out.');
-      navigate('/admin/login', { replace: true });
+      navigate('/', { replace: true });
     } finally {
       setLoggingOut(false);
       onClose?.();

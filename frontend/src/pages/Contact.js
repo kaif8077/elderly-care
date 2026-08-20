@@ -107,7 +107,7 @@ const Contact = () => {
                     style={{ marginBottom: 18 }}
                   />
                 )}
-                <Form form={form} layout="vertical" requiredMark onFinish={submitContact}>
+                <Form form={form} layout="vertical" size="large" requiredMark onFinish={submitContact}>
                   <Form.Item
                     name="name"
                     label="Full name"
@@ -145,7 +145,7 @@ const Contact = () => {
                   >
                     <Input.TextArea rows={6} showCount maxLength={2000} placeholder="Describe your question or support request" />
                   </Form.Item>
-                  <Button type="primary" htmlType="submit" block icon={<SendOutlined />} loading={loading}>
+                  <Button type="primary" size="large" htmlType="submit" block icon={<SendOutlined />} loading={loading}>
                     Send message
                   </Button>
                 </Form>
