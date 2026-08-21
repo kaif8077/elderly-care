@@ -7,37 +7,52 @@ const { hashIp } = require('../services/emergencyAlertService');
 const mongoose = require('mongoose');
 const { bucket } = require('../services/profilePhotoService');
 
+// Calculates an approximate age while rejecting missing or invalid dates.
 const calculateAge = (dob) => {
   if (!dob) return null;
   const birth = new Date(dob);
   if (Number.isNaN(birth.getTime())) return null;
   const today = new Date();
   let age = today.getUTCFullYear() - birth.getUTCFullYear();
-  const beforeBirthday = today.getUTCMonth() < birth.getUTCMonth()
-    || (today.getUTCMonth() === birth.getUTCMonth() && today.getUTCDate() < birth.getUTCDate());
+  const beforeBirthday =
+    today.getUTCMonth() < birth.getUTCMonth() ||
+    (today.getUTCMonth() === birth.getUTCMonth() && today.getUTCDate() < birth.getUTCDate());
   if (beforeBirthday) age -= 1;
   return age >= 0 && age <= 130 ? age : null;
 };
 
+// Reads the backend-enforced visibility level for a medical-profile field.
 const visibilityLevel = (profile, field) => {
   const settings = profile.visibilitySettings;
   if (!settings) return 'public_emergency';
   return typeof settings.get === 'function' ? settings.get(field) : settings[field];
 };
-const isPublic = (profile, field) => (visibilityLevel(profile, field) || 'public_emergency') === 'public_emergency';
+// Checks whether a field is permitted on the public emergency page.
+const isPublic = (profile, field) =>
+  (visibilityLevel(profile, field) || 'public_emergency') === 'public_emergency';
 
+// Builds the minimal emergency-safe profile returned for a valid QR token.
 const emergencyProjection = (profile, qr) => ({
   qrId: String(qr._id),
   elderlyCareId: profile.elderlyCareId || `EC-${String(profile.userId).slice(-8).toUpperCase()}`,
   name: isPublic(profile, 'name') ? profile.name : 'ElderlyCare member',
   approximateAge: isPublic(profile, 'approximateAge') ? calculateAge(profile.dob) : null,
-  bloodGroup: isPublic(profile, 'bloodGroup') ? (profile.bloodGroup || 'Unknown') : 'Hidden',
-  severeAllergies: isPublic(profile, 'allergies') ? [...(profile.allergies || []), profile.allergiesOther].filter(Boolean) : [],
-  majorConditions: isPublic(profile, 'medicalHistory') ? [...(profile.medicalHistory || []), profile.medicalHistoryOther].filter(Boolean) : [],
-  criticalMedications: isPublic(profile, 'medications') ? [...(profile.medications || []), profile.medicationsOther].filter(Boolean) : [],
+  bloodGroup: isPublic(profile, 'bloodGroup') ? profile.bloodGroup || 'Unknown' : 'Hidden',
+  severeAllergies: isPublic(profile, 'allergies')
+    ? [...(profile.allergies || []), profile.allergiesOther].filter(Boolean)
+    : [],
+  majorConditions: isPublic(profile, 'medicalHistory')
+    ? [...(profile.medicalHistory || []), profile.medicalHistoryOther].filter(Boolean)
+    : [],
+  criticalMedications: isPublic(profile, 'medications')
+    ? [...(profile.medications || []), profile.medicationsOther].filter(Boolean)
+    : [],
   mobilityStatus: isPublic(profile, 'mobilityStatus') ? profile.mobilityStatus : null,
-  preferredLanguage: isPublic(profile, 'preferredLanguage') ? [...(profile.preferredLanguage || []), profile.otherLanguage].filter(Boolean) : [],
-  emergencyInstruction: 'Contact the listed guardian and local emergency services when immediate help is needed.',
+  preferredLanguage: isPublic(profile, 'preferredLanguage')
+    ? [...(profile.preferredLanguage || []), profile.otherLanguage].filter(Boolean)
+    : [],
+  emergencyInstruction:
+    'Contact the listed guardian and local emergency services when immediate help is needed.',
   emergencyContacts: profile.emergencyContacts?.length
     ? profile.emergencyContacts.map((contact, index) => ({
         name: contact.name,
@@ -45,19 +60,38 @@ const emergencyProjection = (profile, qr) => ({
         relationship: contact.relationship,
         priority: index + 1
       }))
-    : [{ name: profile.emergencyContact, phone: profile.emergencyPhone, relationship: profile.emergencyRelationship, priority: 1 }],
+    : [
+        {
+          name: profile.emergencyContact,
+          phone: profile.emergencyPhone,
+          relationship: profile.emergencyRelationship,
+          priority: 1
+        }
+      ],
   lastUpdatedAt: profile.updatedAt
 });
 
+// Streams the reduced public profile image for a valid, active QR token.
 exports.getPublicEmergencyPhoto = async (req, res) => {
   try {
-    const qr = await QRCode.findOne({ token: req.params.token, status: 'active' }).select('userId').lean();
+    const qr = await QRCode.findOne({ token: req.params.token, status: 'active' })
+      .select('userId')
+      .lean();
     if (!qr) return res.status(410).json({ message: 'This emergency QR code is unavailable.' });
     const [user, profile] = await Promise.all([
       User.findById(qr.userId).select('accountStatus isDeleted').lean(),
-      MedicalProfile.findOne({ userId: qr.userId }).sort({ createdAt: -1 }).select('profilePhoto consent').lean()
+      MedicalProfile.findOne({ userId: qr.userId })
+        .sort({ createdAt: -1 })
+        .select('profilePhoto consent')
+        .lean()
     ]);
-    if (!user || user.accountStatus !== 'active' || user.isDeleted || !profile || profile.consent?.emergencySharing === false) {
+    if (
+      !user ||
+      user.accountStatus !== 'active' ||
+      user.isDeleted ||
+      !profile ||
+      profile.consent?.emergencySharing === false
+    ) {
       return res.status(410).json({ message: 'This emergency photograph is unavailable.' });
     }
     const photo = profile.profilePhoto;
@@ -68,19 +102,26 @@ exports.getPublicEmergencyPhoto = async (req, res) => {
       'Content-Length': String(photo.bytes),
       'Content-Disposition': 'inline; filename="emergency-profile-photo"'
     });
-    return bucket().openDownloadStream(new mongoose.Types.ObjectId(photo.fileId))
-      .on('error', () => { if (!res.headersSent) res.status(404).end(); else res.destroy(); })
+    return bucket()
+      .openDownloadStream(new mongoose.Types.ObjectId(photo.fileId))
+      .on('error', () => {
+        if (!res.headersSent) res.status(404).end();
+        else res.destroy();
+      })
       .pipe(res);
   } catch (error) {
     return res.status(500).json({ message: 'Unable to load the emergency photograph.' });
   }
 };
 
+// Creates or rotates an opaque QR token for the authenticated profile owner.
 exports.createQRCode = async (req, res) => {
   const userId = req.body.userId;
   try {
     if (String(req.user.id) !== String(userId)) {
-      return res.status(403).json({ success: false, message: 'You can only generate your own QR code' });
+      return res
+        .status(403)
+        .json({ success: false, message: 'You can only generate your own QR code' });
     }
     const result = await generateQr({ userId, adminId: null });
     return res.status(201).json({
@@ -97,6 +138,7 @@ exports.createQRCode = async (req, res) => {
   }
 };
 
+// Returns the owner's current QR metadata without exposing private records.
 exports.getQRCode = async (req, res) => {
   if (String(req.user.id) !== String(req.params.userId)) {
     return res.status(403).json({ success: false, message: 'Unauthorized QR access' });
@@ -106,7 +148,8 @@ exports.getQRCode = async (req, res) => {
       .sort({ createdAt: -1 })
       .select('data status createdAt updatedAt')
       .lean();
-    if (!qrCode) return res.status(404).json({ success: false, message: 'Active QR code not found' });
+    if (!qrCode)
+      return res.status(404).json({ success: false, message: 'Active QR code not found' });
     return res.json({ success: true, qrCode });
   } catch (error) {
     return res.status(500).json({ success: false, message: 'Unable to load QR code' });
@@ -114,42 +157,72 @@ exports.getQRCode = async (req, res) => {
 };
 
 exports.serveLegacyLink = (req, res) => {
-  res.status(410).send('This legacy QR link has been retired. Ask the account owner to generate a new secure QR code.');
+  res
+    .status(410)
+    .send(
+      'This legacy QR link has been retired. Ask the account owner to generate a new secure QR code.'
+    );
 };
 
+// Redirects a valid QR token to the mobile emergency profile page.
 exports.serveTokenAccess = async (req, res) => {
   try {
     const qr = await QRCode.findOne({ token: req.params.token }).select('_id userId status').lean();
-    if (!qr || qr.status !== 'active') return res.status(410).send('This emergency QR code is invalid or has been revoked.');
+    if (!qr || qr.status !== 'active')
+      return res.status(410).send('This emergency QR code is invalid or has been revoked.');
     const user = await User.findById(qr.userId).select('accountStatus isDeleted').lean();
-    if (!user || user.accountStatus !== 'active' || user.isDeleted) return res.status(410).send('This emergency QR code is no longer active.');
-    const frontend = String(process.env.FRONTEND_URL || 'http://localhost:3000').split(',')[0].trim().replace(/\/+$/, '');
+    if (!user || user.accountStatus !== 'active' || user.isDeleted)
+      return res.status(410).send('This emergency QR code is no longer active.');
+    const frontend = String(process.env.FRONTEND_URL || 'http://localhost:3000')
+      .split(',')[0]
+      .trim()
+      .replace(/\/+$/, '');
     return res.redirect(302, `${frontend}/emergency/${encodeURIComponent(req.params.token)}`);
   } catch (error) {
     return res.status(500).send('Unable to validate this emergency QR code.');
   }
 };
 
+// Returns only backend-approved emergency fields for a valid QR token.
 exports.getPublicEmergencyProfile = async (req, res) => {
   try {
-    const qr = await QRCode.findOne({ token: req.params.token }).select('_id userId status updatedAt').lean();
-    if (!qr || qr.status !== 'active') return res.status(410).json({ message: 'This emergency QR code is invalid or has been revoked.', code: 'QR_ACCESS_REVOKED' });
+    const qr = await QRCode.findOne({ token: req.params.token })
+      .select('_id userId status updatedAt')
+      .lean();
+    if (!qr || qr.status !== 'active')
+      return res.status(410).json({
+        message: 'This emergency QR code is invalid or has been revoked.',
+        code: 'QR_ACCESS_REVOKED'
+      });
     const [user, profile] = await Promise.all([
       User.findById(qr.userId).select('accountStatus isDeleted').lean(),
       MedicalProfile.findOne({ userId: qr.userId }).sort({ createdAt: -1 }).lean()
     ]);
-    if (!user || user.accountStatus !== 'active' || user.isDeleted || !profile) return res.status(410).json({ message: 'This emergency profile is no longer available.', code: 'EMERGENCY_PROFILE_INACTIVE' });
-    if (profile.consent?.emergencySharing === false) return res.status(403).json({ message: 'Public emergency sharing is disabled by the account owner.', code: 'EMERGENCY_SHARING_DISABLED' });
+    if (!user || user.accountStatus !== 'active' || user.isDeleted || !profile)
+      return res.status(410).json({
+        message: 'This emergency profile is no longer available.',
+        code: 'EMERGENCY_PROFILE_INACTIVE'
+      });
+    if (profile.consent?.emergencySharing === false)
+      return res.status(403).json({
+        message: 'Public emergency sharing is disabled by the account owner.',
+        code: 'EMERGENCY_SHARING_DISABLED'
+      });
     if (profile.consent?.qrAccessLogging !== false) {
       QrAccessLog.create({
-        qrId: qr._id, userId: qr.userId, event: 'viewed', ipHash: hashIp(req.ip),
+        qrId: qr._id,
+        userId: qr.userId,
+        event: 'viewed',
+        ipHash: hashIp(req.ip),
         userAgentFamily: String(req.get('user-agent') || 'Unknown').slice(0, 80)
       }).catch(() => {});
     }
     res.set('Cache-Control', 'no-store, private');
     return res.json({ emergencyProfile: emergencyProjection(profile, qr) });
   } catch (error) {
-    return res.status(500).json({ message: 'Unable to load the emergency profile.', code: 'EMERGENCY_PROFILE_ERROR' });
+    return res
+      .status(500)
+      .json({ message: 'Unable to load the emergency profile.', code: 'EMERGENCY_PROFILE_ERROR' });
   }
 };
 

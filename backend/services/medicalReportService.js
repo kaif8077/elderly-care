@@ -8,12 +8,18 @@ const DEFAULT_HIDDEN = ['insurance'];
 const snapshotProfile = (profile) => ({
   profileId: profile._id,
   personal: {
-    name: profile.name, dob: profile.dob, gender: profile.gender,
-    bloodGroup: profile.bloodGroup, height: profile.height, weight: profile.weight,
+    name: profile.name,
+    dob: profile.dob,
+    gender: profile.gender,
+    bloodGroup: profile.bloodGroup,
+    height: profile.height,
+    weight: profile.weight,
     dietPreference: profile.dietPreference
   },
   contact: { phone: profile.phone, address: profile.address },
-  emergencyContacts: [{ name: profile.emergencyContact, phone: profile.emergencyPhone, priority: 1 }],
+  emergencyContacts: [
+    { name: profile.emergencyContact, phone: profile.emergencyPhone, priority: 1 }
+  ],
   medical: {
     medicalHistory: profile.medicalHistory || [],
     medicalHistoryOther: profile.medicalHistoryOther || null,
@@ -41,7 +47,9 @@ const createReport = async ({ userId, generatedBy }) => {
     throw error;
   }
   const previous = await MedicalReport.findOne({ elderProfileId: profile._id })
-    .sort({ reportVersion: -1 }).select('reportVersion').lean();
+    .sort({ reportVersion: -1 })
+    .select('reportVersion')
+    .lean();
   const report = await MedicalReport.create({
     userId,
     elderProfileId: profile._id,
@@ -65,11 +73,16 @@ const parsePage = (page, limit) => ({
 
 const listReports = async ({ match, page, limit, includeSnapshot = false }) => {
   const parsed = parsePage(page, limit);
-  const query = MedicalReport.find(match).sort({ reportVersion: -1, createdAt: -1 })
-    .skip((parsed.page - 1) * parsed.limit).limit(parsed.limit);
+  const query = MedicalReport.find(match)
+    .sort({ reportVersion: -1, createdAt: -1 })
+    .skip((parsed.page - 1) * parsed.limit)
+    .limit(parsed.limit);
   if (!includeSnapshot) query.select('-snapshotData -pdfUrl');
   const [reports, total] = await Promise.all([query.lean(), MedicalReport.countDocuments(match)]);
-  return { reports, pagination: { ...parsed, total, pages: Math.max(Math.ceil(total / parsed.limit), 1) } };
+  return {
+    reports,
+    pagination: { ...parsed, total, pages: Math.max(Math.ceil(total / parsed.limit), 1) }
+  };
 };
 
 const getReport = async ({ reportId, userId = null }) => {

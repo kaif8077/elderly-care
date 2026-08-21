@@ -1,25 +1,84 @@
 /* Compact medical form layout */
-.medical-form{width:min(100%,980px);margin:0 auto}
-.medical-form-progress{display:flex;justify-content:flex-end;margin-bottom:8px}
-.medical-form>.ant-steps{margin:0 0 22px}
-.medical-step-card{border-color:#e5eaf1;background:#fbfcfe}
-.medical-step-card>.ant-card-body{padding:20px}
-.medical-step-card .ant-form-item{margin-bottom:14px}
-.medical-step-card .ant-form-item-label{padding-inline-end:14px;text-align:left}
-.medical-step-card h4.ant-typography{margin:0 0 16px;color:#0066ff}
-.medical-step-card .ant-card{background:#fff}
-.medical-contact-permissions{min-height:46px;align-items:center}.medical-contact-permissions .ant-form-item{margin-bottom:0}
-.medical-form>.ant-form>.ant-divider{margin:18px 0}
+.medical-form {
+  width: min(100%, 980px);
+  margin: 0 auto;
+}
+.medical-form-progress {
+  display: flex;
+  justify-content: flex-end;
+  margin-bottom: 8px;
+}
+.medical-form > .ant-steps {
+  margin: 0 0 22px;
+}
+.medical-step-card {
+  border-color: #e5eaf1;
+  background: #fbfcfe;
+}
+.medical-step-card > .ant-card-body {
+  padding: 20px;
+}
+.medical-step-card .ant-form-item {
+  margin-bottom: 14px;
+}
+.medical-step-card .ant-form-item-label {
+  padding-inline-end: 14px;
+  text-align: left;
+}
+.medical-step-card h4.ant-typography {
+  margin: 0 0 16px;
+  color: #0066ff;
+}
+.medical-step-card .ant-card {
+  background: #fff;
+}
+.medical-contact-permissions {
+  min-height: 46px;
+  align-items: center;
+}
+.medical-contact-permissions .ant-form-item {
+  margin-bottom: 0;
+}
+.medical-form > .ant-form > .ant-divider {
+  margin: 18px 0;
+}
 
 /* Consistent standard action buttons */
-.ant-btn{font-size:14px!important;font-weight:400!important}
-.ant-btn:not(.ant-btn-circle),.ant-input,.ant-input-affix-wrapper,.ant-input-number,.ant-picker,.ant-select-selector,.ant-cascader-picker,.ant-mentions{border-radius:5px!important}
-.ant-space-compact>.ant-input:first-child,.ant-space-compact>.ant-input-affix-wrapper:first-child,.ant-space-compact>.ant-select:first-child .ant-select-selector{border-radius:5px 0 0 5px!important}
-.ant-space-compact>.ant-btn:last-child{margin-inline-start:-1px;border-inline-start:0!important;border-radius:0 5px 5px 0!important}
-.ant-space-compact>*:not(:first-child):not(:last-child),.ant-space-compact>*:not(:first-child):not(:last-child) .ant-select-selector{border-radius:0!important}
+.ant-btn {
+  font-size: 14px !important;
+  font-weight: 400 !important;
+}
+.ant-btn:not(.ant-btn-circle),
+.ant-input,
+.ant-input-affix-wrapper,
+.ant-input-number,
+.ant-picker,
+.ant-select-selector,
+.ant-cascader-picker,
+.ant-mentions {
+  border-radius: 5px !important;
+}
+.ant-space-compact > .ant-input:first-child,
+.ant-space-compact > .ant-input-affix-wrapper:first-child,
+.ant-space-compact > .ant-select:first-child .ant-select-selector {
+  border-radius: 5px 0 0 5px !important;
+}
+.ant-space-compact > .ant-btn:last-child {
+  margin-inline-start: -1px;
+  border-inline-start: 0 !important;
+  border-radius: 0 5px 5px 0 !important;
+}
+.ant-space-compact > *:not(:first-child):not(:last-child),
+.ant-space-compact > *:not(:first-child):not(:last-child) .ant-select-selector {
+  border-radius: 0 !important;
+}
 .ant-btn-primary:not(:disabled),
 .ant-btn-default:not(.ant-btn-dangerous):not(:disabled),
-.ant-btn-dashed:not(.ant-btn-dangerous):not(:disabled){border-color:#0066ff!important;background:#0066ff!important;color:#fff!important}
+.ant-btn-dashed:not(.ant-btn-dangerous):not(:disabled) {
+  border-color: #0066ff !important;
+  background: #0066ff !important;
+  color: #fff !important;
+}
 .ant-btn-primary:not(:disabled):hover,
 .ant-btn-primary:not(:disabled):focus-visible,
 .ant-btn-primary:not(:disabled):active,
@@ -28,20 +87,41 @@
 .ant-btn-default:not(.ant-btn-dangerous):not(:disabled):active,
 .ant-btn-dashed:not(.ant-btn-dangerous):not(:disabled):hover,
 .ant-btn-dashed:not(.ant-btn-dangerous):not(:disabled):focus-visible,
-.ant-btn-dashed:not(.ant-btn-dangerous):not(:disabled):active{border-color:#ff6b00!important;background:#ff6b00!important;color:#fff!important}
+.ant-btn-dashed:not(.ant-btn-dangerous):not(:disabled):active {
+  border-color: #ff6b00 !important;
+  background: #ff6b00 !important;
+  color: #fff !important;
+}
 .ant-btn-default:not(.ant-btn-dangerous):not(:disabled):hover,
 .ant-btn-default:not(.ant-btn-dangerous):not(:disabled):focus-visible,
 .ant-btn-default:not(.ant-btn-dangerous):not(:disabled):active,
 .ant-btn-link:not(.ant-btn-dangerous):not(:disabled):hover,
 .ant-btn-link:not(.ant-btn-dangerous):not(:disabled):focus-visible,
-.ant-btn-link:not(.ant-btn-dangerous):not(:disabled):active{border-color:transparent!important}
+.ant-btn-link:not(.ant-btn-dangerous):not(:disabled):active {
+  border-color: transparent !important;
+}
 
 /* Text buttons lose decorative icons; icon-only navigation controls remain usable. */
-.ant-btn:has(>span:not(.anticon))>.anticon{display:none}
-.member-profile-photo-edit{position:relative}.member-profile-photo-edit>.ant-btn{position:absolute;right:1px;bottom:5px}
+.ant-btn:has(> span:not(.anticon)) > .anticon {
+  display: none;
+}
+.member-profile-photo-edit {
+  position: relative;
+}
+.member-profile-photo-edit > .ant-btn {
+  position: absolute;
+  right: 1px;
+  bottom: 5px;
+}
 
-@media(max-width:767px){
-  .medical-step-card>.ant-card-body{padding:14px}
-  .medical-form-progress{justify-content:flex-start}
-  .medical-form>.ant-steps{margin-bottom:16px}
+@media (max-width: 767px) {
+  .medical-step-card > .ant-card-body {
+    padding: 14px;
+  }
+  .medical-form-progress {
+    justify-content: flex-start;
+  }
+  .medical-form > .ant-steps {
+    margin-bottom: 16px;
+  }
 }

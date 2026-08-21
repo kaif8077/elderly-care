@@ -66,7 +66,7 @@
   background-color: #fff;
   padding: 30px;
   border-radius: 12px;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
 }
 
 .section-title {
@@ -109,7 +109,7 @@
   padding: 40px;
   background-color: #fff;
   border-radius: 12px;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
 }
 
 .id-card-instructions {
@@ -146,7 +146,7 @@
   background: white;
   border-radius: 12px;
   padding: 30px;
-  box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
   text-align: center;
   display: flex;
   flex-direction: column;
@@ -233,7 +233,7 @@
   .id-card-section {
     flex-direction: column;
   }
-  
+
   .id-card-content {
     width: 100%;
     max-width: 400px;
@@ -245,7 +245,6 @@
   padding: 25px;
   background: #0066ff;
   color: white;
-  
 }
 
 /* ===== Loading State ===== */
@@ -261,11 +260,11 @@
   .profile-section {
     padding: 25px;
   }
-  
+
   .profile-grid {
     grid-template-columns: 1fr;
   }
-  
+
   .id-card-content {
     width: 100%;
     max-width: 320px;
@@ -276,15 +275,15 @@
   .profile-hero {
     height: 200px;
   }
-  
+
   .hero-overlay h1 {
     font-size: 2rem;
   }
-  
+
   .profile-container {
     padding: 0 15px;
   }
-  
+
   .profile-section {
     padding: 20px;
   }

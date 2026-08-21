@@ -1,6 +1,10 @@
 const test = require('node:test');
 const assert = require('node:assert/strict');
-const { generateMedicalReportPdf, calculateAge, textList } = require('../services/medicalReportPdfService');
+const {
+  generateMedicalReportPdf,
+  calculateAge,
+  textList
+} = require('../services/medicalReportPdfService');
 
 const sampleReport = {
   reportVersion: 2,
@@ -42,7 +46,9 @@ test('Emergency Medical Summary PDF generation returns a valid PDF buffer', asyn
 });
 
 test('private insurance inclusion is opt-in for PDF generation', async () => {
-  const withoutInsurance = await generateMedicalReportPdf(sampleReport, { includeInsurance: false });
+  const withoutInsurance = await generateMedicalReportPdf(sampleReport, {
+    includeInsurance: false
+  });
   const withInsurance = await generateMedicalReportPdf(sampleReport, { includeInsurance: true });
   assert.ok(withInsurance.length > withoutInsurance.length);
 });

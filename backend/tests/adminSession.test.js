@@ -18,7 +18,11 @@ const {
   requireRole
 } = require('../middleware/requirePermission');
 const { configuredOrigins, requireTrustedOrigin } = require('../middleware/requireTrustedOrigin');
-const { calculateCompletion, isProfileComplete, parseQuery } = require('../services/adminUserQueryService');
+const {
+  calculateCompletion,
+  isProfileComplete,
+  parseQuery
+} = require('../services/adminUserQueryService');
 const { getAdminUserDetail } = require('../services/adminUserDetailService');
 const { getCard } = require('../services/adminIdCardService');
 const QRCodeModel = require('../models/QRCode');
@@ -85,41 +89,50 @@ test('admin user query pagination is bounded and sort fields are allowlisted', (
 
 test('profile completion is calculated from the minimized directory projection', () => {
   assert.equal(calculateCompletion(null), 0);
-  assert.equal(calculateCompletion({
-    name: 'Test User',
-    dob: new Date(),
-    gender: 'other',
-    bloodGroup: 'O+',
-    height: 170,
-    weight: 70,
-    phone: '+910000000000',
-    address: 'Test',
-    emergencyContact: 'Contact',
-    emergencyPhone: '+910000000001',
-    dietPreference: 'Vegetarian'
-  }), 100);
+  assert.equal(
+    calculateCompletion({
+      name: 'Test User',
+      dob: new Date(),
+      gender: 'other',
+      bloodGroup: 'O+',
+      height: 170,
+      weight: 70,
+      phone: '+910000000000',
+      address: 'Test',
+      emergencyContact: 'Contact',
+      emergencyPhone: '+910000000001',
+      dietPreference: 'Vegetarian'
+    }),
+    100
+  );
 });
 
 test('profile completeness requires emergency-ready contact fields', () => {
   assert.equal(isProfileComplete(null), false);
   assert.equal(isProfileComplete({ name: 'Test User' }), false);
-  assert.equal(isProfileComplete({
-    name: 'Test User',
-    dob: new Date(),
-    gender: 'other',
-    phone: '+910000000000',
-    address: 'Test',
-    emergencyContact: 'Contact',
-    emergencyPhone: '+910000000001'
-  }), true);
-  assert.equal(isProfileComplete({
-    name: 'Structured User',
-    dob: new Date(),
-    gender: 'female',
-    phone: '+910000000000',
-    address: 'Test',
-    emergencyContacts: [{ name: 'Guardian', phone: '+910000000001', relationship: 'Daughter' }]
-  }), true);
+  assert.equal(
+    isProfileComplete({
+      name: 'Test User',
+      dob: new Date(),
+      gender: 'other',
+      phone: '+910000000000',
+      address: 'Test',
+      emergencyContact: 'Contact',
+      emergencyPhone: '+910000000001'
+    }),
+    true
+  );
+  assert.equal(
+    isProfileComplete({
+      name: 'Structured User',
+      dob: new Date(),
+      gender: 'female',
+      phone: '+910000000000',
+      address: 'Test',
+      emergencyContacts: [{ name: 'Guardian', phone: '+910000000001', relationship: 'Daughter' }]
+    }),
+    true
+  );
 });
 
 test('admin user detail rejects malformed identifiers before querying MongoDB', async () => {
@@ -141,7 +154,10 @@ test('QR records support opaque tokens and revocation metadata', () => {
 
 test('archive validation requires a reason and exact confirmation word', () => {
   assert.equal(validateArchiveRequest({ reason: 'User request', confirmation: 'DELETE' }), null);
-  assert.match(validateArchiveRequest({ reason: 'User request', confirmation: 'delete' }), /DELETE/);
+  assert.match(
+    validateArchiveRequest({ reason: 'User request', confirmation: 'delete' }),
+    /DELETE/
+  );
   assert.match(validateArchiveRequest({ reason: '', confirmation: 'DELETE' }), /reason/);
 });
 
@@ -159,7 +175,9 @@ test('security headers prevent framing and MIME sniffing', () => {
   const headers = {};
   const res = { set: (values) => Object.assign(headers, values) };
   let called = false;
-  securityHeaders({}, res, () => { called = true; });
+  securityHeaders({}, res, () => {
+    called = true;
+  });
   assert.equal(called, true);
   assert.equal(headers['X-Frame-Options'], 'DENY');
   assert.equal(headers['X-Content-Type-Options'], 'nosniff');
@@ -173,8 +191,19 @@ test('normal users fail the backend admin role boundary', () => {
   let nextCalled = false;
   middleware(
     { admin: { role: 'user' } },
-    { status: (code) => { statusCode = code; return { json: (value) => { body = value; } }; } },
-    () => { nextCalled = true; }
+    {
+      status: (code) => {
+        statusCode = code;
+        return {
+          json: (value) => {
+            body = value;
+          }
+        };
+      }
+    },
+    () => {
+      nextCalled = true;
+    }
   );
   assert.equal(statusCode, 403);
   assert.equal(body.code, 'ADMIN_ROLE_REQUIRED');
@@ -191,8 +220,19 @@ test('untrusted browser origins fail state-changing admin requests', () => {
   let nextCalled = false;
   requireTrustedOrigin(
     { get: () => 'https://attacker.example.com' },
-    { status: (code) => { statusCode = code; return { json: (value) => { body = value; } }; } },
-    () => { nextCalled = true; }
+    {
+      status: (code) => {
+        statusCode = code;
+        return {
+          json: (value) => {
+            body = value;
+          }
+        };
+      }
+    },
+    () => {
+      nextCalled = true;
+    }
   );
   process.env.NODE_ENV = previousNodeEnv;
   process.env.FRONTEND_URL = previousFrontendUrl;

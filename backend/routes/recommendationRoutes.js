@@ -8,5 +8,18 @@ router.post('/health', authMiddleware, healthController.generate);
 router.get('/health', authMiddleware, healthController.list);
 router.get('/health/:id/download', authMiddleware, healthController.download);
 router.patch('/health/:id/feedback', authMiddleware, healthController.feedback);
-router.get('/firstaid/:profileId', authMiddleware, async (req,res)=>{try{const profile=await MedicalProfile.findOne({_id:req.params.profileId,userId:req.user.id});if(!profile)return res.status(404).json({error:'Medical profile not found'});res.json({recommendations:await recommendationController.generateFirstAidRecommendations(profile)});}catch(error){res.status(500).json({error:error.message});}});
-module.exports=router;
+router.get('/firstaid/:profileId', authMiddleware, async (req, res) => {
+  try {
+    const profile = await MedicalProfile.findOne({
+      _id: req.params.profileId,
+      userId: req.user.id
+    });
+    if (!profile) return res.status(404).json({ error: 'Medical profile not found' });
+    res.json({
+      recommendations: await recommendationController.generateFirstAidRecommendations(profile)
+    });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+module.exports = router;

@@ -18,7 +18,9 @@ exports.getCard = async (req, res) => {
 exports.getPhoto = async (req, res) => {
   try {
     const profile = await MedicalProfile.findOne({ userId: req.params.userId })
-      .sort({ createdAt: -1 }).select('profilePhoto').lean();
+      .sort({ createdAt: -1 })
+      .select('profilePhoto')
+      .lean();
     const photo = profile?.profilePhoto;
     if (!photo?.fileId) return res.status(404).json({ message: 'Profile photograph not found' });
     res.set({
@@ -27,8 +29,12 @@ exports.getPhoto = async (req, res) => {
       'Cache-Control': 'private, max-age=300',
       'Content-Disposition': 'inline; filename="profile-photo"'
     });
-    return bucket().openDownloadStream(new mongoose.Types.ObjectId(photo.fileId))
-      .on('error', () => { if (!res.headersSent) res.status(404).end(); else res.destroy(); })
+    return bucket()
+      .openDownloadStream(new mongoose.Types.ObjectId(photo.fileId))
+      .on('error', () => {
+        if (!res.headersSent) res.status(404).end();
+        else res.destroy();
+      })
       .pipe(res);
   } catch (error) {
     return res.status(500).json({ message: 'Unable to load profile photograph' });
@@ -40,8 +46,12 @@ exports.regenerateQr = async (req, res) => {
     const result = await generateQr({ userId: req.params.userId, adminId: req.admin._id });
     if (!result) return res.status(404).json({ message: 'User not found' });
     await writeAuditLog({
-      req, actor: req.admin, action: 'ADMIN_QR_REGENERATED', resourceType: 'QRCode',
-      resourceId: result.qr._id, affectedUserId: result.user._id,
+      req,
+      actor: req.admin,
+      action: 'ADMIN_QR_REGENERATED',
+      resourceType: 'QRCode',
+      resourceId: result.qr._id,
+      affectedUserId: result.user._id,
       description: 'Admin generated a new opaque emergency QR token'
     });
     res.status(201).json({ message: 'QR code generated', qrStatus: 'active' });
@@ -59,8 +69,12 @@ exports.revokeQr = async (req, res) => {
     const result = await revokeQr({ userId: req.params.userId, adminId: req.admin._id });
     if (!result) return res.status(404).json({ message: 'User not found' });
     await writeAuditLog({
-      req, actor: req.admin, action: 'ADMIN_QR_REVOKED', resourceType: 'QRCode',
-      affectedUserId: result.user._id, description: 'Admin revoked active QR access'
+      req,
+      actor: req.admin,
+      action: 'ADMIN_QR_REVOKED',
+      resourceType: 'QRCode',
+      affectedUserId: result.user._id,
+      description: 'Admin revoked active QR access'
     });
     res.json({ message: 'QR access revoked', revokedCount: result.revokedCount });
   } catch (error) {

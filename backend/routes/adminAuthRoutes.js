@@ -10,7 +10,12 @@ const router = express.Router();
 router.post('/login', requireTrustedOrigin, adminLoginRateLimiter, adminAuthController.login);
 router.get('/me', authenticateAdmin, requireRole('admin', 'super_admin'), adminAuthController.me);
 router.post('/logout', requireTrustedOrigin, authenticateAdmin, adminAuthController.logout);
-router.post('/change-password', requireTrustedOrigin, authenticateAdmin, adminAuthController.changePassword);
+router.post(
+  '/change-password',
+  requireTrustedOrigin,
+  authenticateAdmin,
+  adminAuthController.changePassword
+);
 router.get(
   '/session-check',
   authenticateAdmin,

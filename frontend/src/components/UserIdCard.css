@@ -1,12 +1,317 @@
-.user-id-module{padding:20px;border-radius:16px;background:#fff;box-shadow:0 10px 30px rgba(0,102,255,.1)}.user-card-pair{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:20px;padding:18px;background:#f4f7ff;border-radius:16px}.user-wallet-card{position:relative;aspect-ratio:1.586/1;overflow:hidden;border:1px solid #b9ccff;border-radius:16px;background:#fff;color:#1d2733}.user-wallet-card header,.user-wallet-card footer{display:flex;justify-content:space-between;gap:10px;padding:12px 16px;background:#0066ff;color:#fff;font-size:.68rem;font-weight:900}.user-wallet-card header span{display:flex;align-items:center;gap:6px}.user-wallet-card footer{position:absolute;inset:auto 0 0;background:#edf3ff;color:#34445a}.user-card-main{display:grid;grid-template-columns:1fr 105px;gap:10px;padding:14px}.user-card-person{display:flex;gap:10px;align-items:center}.user-card-person h3,.user-card-person p{margin:2px 0}.user-card-person h3{font-size:1rem}.user-card-person p{font-size:.68rem}.user-card-photo{display:grid;width:52px;height:58px;place-items:center;overflow:hidden;border-radius:10px;background:#eaf0ff;color:#0066ff;font-size:1.5rem;font-weight:900}.user-card-photo img{width:100%;height:100%;object-fit:cover}.user-card-blood{display:grid;margin-top:10px;padding:7px;border-left:4px solid #ff6b00;background:#fff5ed;color:#c65200;font-size:1.25rem}.user-card-blood small{font-size:.55rem}.user-card-qr{grid-column:2;grid-row:1/span 2;display:grid;justify-items:center;text-align:center;font-size:4rem;color:#0066ff}.user-card-qr img{width:95px;height:95px}.user-card-qr b{font-size:.55rem}.user-wallet-back dl{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin:14px}.user-wallet-back dt{font-size:.6rem;color:#5f6f85;text-transform:uppercase}.user-wallet-back dd{margin:2px 0;font-size:.76rem;font-weight:800}.user-card-warning{grid-column:1/-1;padding:6px;border-left:4px solid #ff6b00;background:#fff5ed}.user-wallet-back>p,.user-wallet-back>aside{margin:8px 14px;font-size:.65rem}.user-wallet-back>aside{color:#5f6f85}.user-card-actions{display:flex;gap:12px;margin-top:16px}@media(max-width:850px){.user-card-pair{grid-template-columns:1fr}.user-wallet-card{max-width:600px;width:100%}}@media(max-width:480px){.user-card-pair{padding:8px}.user-wallet-card{aspect-ratio:auto;min-height:310px}.user-card-main{grid-template-columns:1fr 95px}.user-card-actions{flex-direction:column;width:100%}.user-card-actions .ant-btn{width:100%}}@media print{body.id-card-print-mode *{visibility:hidden!important}body.id-card-print-mode .user-card-pair,body.id-card-print-mode .user-card-pair *{visibility:visible!important}body.id-card-print-mode .user-card-pair{position:fixed;inset:0 auto auto 0;display:grid;grid-template-columns:1fr;gap:8mm;padding:0;background:#fff}body.id-card-print-mode .user-wallet-card{width:85.6mm;height:53.98mm;break-inside:avoid}.user-card-actions{display:none!important}}
-.user-wallet-card header img{width:18px;height:18px;object-fit:contain;background:#fff;border-radius:4px}.user-card-number{font-size:.82rem!important;font-weight:900;letter-spacing:.08em}.user-card-address{grid-column:1/-1}.user-card-back-qr{position:absolute;right:14px;bottom:30px;display:grid;width:68px;height:68px;place-items:center;color:#0066ff;font-size:40px}.user-card-back-qr img{width:68px;height:68px}
-.user-card-emergency-guide{max-width:62%;padding-top:14px;font-size:.76rem!important;font-weight:700;line-height:1.5}
-.user-card-pair{grid-template-columns:minmax(0,600px);justify-content:center}
-.user-card-main{grid-template-columns:72px minmax(0,1fr) 112px;align-items:center;gap:16px;padding:18px 16px}.user-card-photo{width:68px;height:78px;border-radius:10px}.user-card-person{display:block}.user-card-person small{color:#0066ff;font-size:.55rem;font-weight:900;letter-spacing:.09em}.user-card-person h3{margin:4px 0 10px;font-size:1.15rem;line-height:1.15}.user-card-person p{margin:0;color:#53647a;font-size:.72rem;line-height:1.45}.user-card-qr{grid-column:3;grid-row:1;align-self:center}.user-wallet-card footer{align-items:center}.user-wallet-card footer .user-card-number{color:#0066ff;font-size:.84rem!important;letter-spacing:.12em}@media(max-width:480px){.user-card-main{grid-template-columns:64px minmax(0,1fr) 90px;gap:10px}.user-card-photo{width:60px;height:70px}.user-card-qr img{width:82px;height:82px}}
-.user-card-main{grid-template-columns:96px minmax(0,1fr) 132px;min-height:calc(100% - 75px);gap:18px;padding:12px 16px 28px}.user-card-photo{width:92px;height:108px}.user-card-qr img{width:120px;height:120px}.user-wallet-card footer{justify-content:center;text-align:center}.user-wallet-card footer .user-card-number{font-size:1rem!important;letter-spacing:.18em}@media(max-width:480px){.user-card-main{grid-template-columns:76px minmax(0,1fr) 102px;min-height:220px;gap:8px;padding-inline:10px}.user-card-photo{width:72px;height:88px}.user-card-qr img{width:96px;height:96px}}
-.user-card-pair{grid-template-columns:minmax(0,500px);padding:12px}.user-card-main{grid-template-columns:96px minmax(0,1fr) 112px;min-height:calc(100% - 70px);gap:12px;padding:10px 14px 25px}.user-card-photo{width:92px;height:108px}.user-card-person h3{margin-top:0}.user-card-qr img{width:104px;height:104px}@media(max-width:480px){.user-card-main{grid-template-columns:68px minmax(0,1fr) 92px;min-height:190px;gap:7px;padding:8px 9px 24px}.user-card-photo{width:64px;height:78px}.user-card-qr img{width:86px;height:86px}}
+.user-id-module {
+  padding: 20px;
+  border-radius: 10px;
+  background: #fff;
+  box-shadow: 0 10px 30px rgba(0, 102, 255, 0.1);
+}
+
+.user-card-pair {
+  display: grid;
+  grid-template-columns: minmax(0, 500px);
+  justify-content: center;
+  gap: 20px;
+  padding: 12px;
+  border-radius: 10px;
+  background: #f4f7ff;
+}
+
+.user-wallet-card {
+  position: relative;
+  aspect-ratio: 1.586/1;
+  overflow: hidden;
+  border: 1px solid #b9ccff;
+  border-radius: 10px;
+  background: #fff;
+  color: #1d2733;
+}
+
+.user-wallet-card header,
+.user-wallet-card footer {
+  display: flex;
+  gap: 10px;
+  padding: 12px 16px;
+  background: #0066ff;
+  color: #fff;
+  font-size: 0.68rem;
+  font-weight: 900;
+}
+
+.user-wallet-card header {
+  justify-content: space-between;
+}
+
+.user-wallet-card header span {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.user-wallet-card header img {
+  width: 18px;
+  height: 18px;
+  border-radius: 4px;
+  background: #fff;
+  object-fit: contain;
+}
+
+.user-card-main {
+  display: grid;
+  grid-template-columns: 96px minmax(0, 1fr) 112px;
+  min-height: calc(100% - 70px);
+  align-items: center;
+  gap: 12px;
+  padding: 10px 14px 25px;
+}
+
+.user-card-photo {
+  display: grid;
+  width: 92px;
+  height: 108px;
+  place-items: center;
+  overflow: hidden;
+  border-radius: 10px;
+  background: #eaf0ff;
+  color: #0066ff;
+  font-size: 1.5rem;
+  font-weight: 900;
+}
+
+.user-card-photo img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.user-card-person h3 {
+  margin: 0 0 10px;
+  font-size: 1.15rem;
+  line-height: 1.15;
+}
+
+.user-card-person p {
+  margin: 0;
+  color: #53647a;
+  font-size: 0.72rem;
+  line-height: 1.45;
+}
+
+.user-card-qr {
+  display: grid;
+  grid-column: 3;
+  grid-row: 1;
+  align-self: center;
+  justify-items: center;
+  color: #0066ff;
+  text-align: center;
+  font-size: 4rem;
+}
+
+.user-card-qr img {
+  width: 104px;
+  height: 104px;
+}
+
+.user-card-qr b {
+  font-size: 0.55rem;
+}
+
+.user-wallet-card footer {
+  position: absolute;
+  inset: auto 0 0;
+  justify-content: center;
+  background: #edf3ff;
+  color: #34445a;
+  text-align: center;
+}
+
+.user-card-number {
+  color: #0066ff;
+  font-size: 1rem !important;
+  font-weight: 900;
+  letter-spacing: 0.18em;
+}
+
+.user-card-actions {
+  display: flex;
+  gap: 12px;
+  margin-top: 16px;
+}
+
+.member-focused-page .user-id-module {
+  padding: 8px;
+  box-shadow: none;
+}
 
 /* Fixed capture dimensions keep downloaded PDFs identical on mobile and desktop. */
-.member-focused-page .user-id-module{padding:8px;box-shadow:none}
-.user-wallet-card.pdf-capture{width:856px!important;height:540px!important;min-height:540px!important;max-width:none!important;aspect-ratio:auto!important;border-radius:24px!important}.user-wallet-card.pdf-capture header{padding:20px 28px!important;font-size:18px!important}.user-wallet-card.pdf-capture header img{width:30px!important;height:30px!important}.user-wallet-card.pdf-capture .user-card-main{grid-template-columns:165px minmax(0,1fr) 205px!important;min-height:430px!important;gap:28px!important;padding:28px 30px 58px!important}.user-wallet-card.pdf-capture .user-card-photo{width:155px!important;height:185px!important;font-size:46px!important}.user-wallet-card.pdf-capture .user-card-person h3{font-size:30px!important}.user-wallet-card.pdf-capture .user-card-person p{font-size:18px!important}.user-wallet-card.pdf-capture .user-card-qr{grid-column:3!important}.user-wallet-card.pdf-capture .user-card-qr img{width:190px!important;height:190px!important}.user-wallet-card.pdf-capture .user-card-qr b{font-size:13px!important}.user-wallet-card.pdf-capture footer{padding:15px 28px!important}.user-wallet-card.pdf-capture footer .user-card-number{font-size:22px!important}
-@media(max-width:600px){.user-id-module{padding:10px}.user-card-pair{padding:6px;border-radius:12px}.user-wallet-card{min-height:0;aspect-ratio:1.586/1;border-radius:11px}.user-wallet-card header{padding:8px 10px;font-size:.52rem}.user-wallet-card header img{width:14px;height:14px}.user-card-main{grid-template-columns:62px minmax(0,1fr) 74px;min-height:145px;gap:6px;padding:7px 8px 21px}.user-card-photo{width:60px;height:72px;border-radius:7px;font-size:1.15rem}.user-card-person h3{margin:0 0 6px;font-size:.78rem}.user-card-person p{font-size:.54rem;line-height:1.25}.user-card-qr img{width:70px;height:70px}.user-card-qr b{font-size:.42rem}.user-wallet-card footer{padding:5px 8px}.user-wallet-card footer .user-card-number{font-size:.56rem!important;letter-spacing:.08em}.user-card-actions{margin-top:12px}}
+.user-wallet-card.pdf-capture {
+  width: 856px !important;
+  height: 540px !important;
+  min-height: 540px !important;
+  max-width: none !important;
+  aspect-ratio: auto !important;
+  border-radius: 24px !important;
+}
+
+.user-wallet-card.pdf-capture header {
+  padding: 20px 28px !important;
+  font-size: 18px !important;
+}
+
+.user-wallet-card.pdf-capture header img {
+  width: 30px !important;
+  height: 30px !important;
+}
+
+.user-wallet-card.pdf-capture .user-card-main {
+  grid-template-columns: 165px minmax(0, 1fr) 205px !important;
+  min-height: 430px !important;
+  gap: 28px !important;
+  padding: 28px 30px 58px !important;
+}
+
+.user-wallet-card.pdf-capture .user-card-photo {
+  width: 155px !important;
+  height: 185px !important;
+  font-size: 46px !important;
+}
+
+.user-wallet-card.pdf-capture .user-card-person h3 {
+  font-size: 30px !important;
+}
+
+.user-wallet-card.pdf-capture .user-card-person p {
+  font-size: 18px !important;
+}
+
+.user-wallet-card.pdf-capture .user-card-qr {
+  grid-column: 3 !important;
+}
+
+.user-wallet-card.pdf-capture .user-card-qr img {
+  width: 190px !important;
+  height: 190px !important;
+}
+
+.user-wallet-card.pdf-capture .user-card-qr b {
+  font-size: 13px !important;
+}
+
+.user-wallet-card.pdf-capture footer {
+  padding: 15px 28px !important;
+}
+
+.user-wallet-card.pdf-capture footer .user-card-number {
+  font-size: 22px !important;
+}
+
+@media (max-width: 600px) {
+  .user-id-module {
+    padding: 10px;
+  }
+
+  .user-card-pair {
+    padding: 6px;
+  }
+
+  .user-wallet-card {
+    min-height: 0;
+  }
+
+  .user-wallet-card header {
+    padding: 8px 10px;
+    font-size: 0.52rem;
+  }
+
+  .user-wallet-card header img {
+    width: 14px;
+    height: 14px;
+  }
+
+  .user-card-main {
+    grid-template-columns: 62px minmax(0, 1fr) 74px;
+    min-height: 145px;
+    gap: 6px;
+    padding: 7px 8px 21px;
+  }
+
+  .user-card-photo {
+    width: 60px;
+    height: 72px;
+    border-radius: 7px;
+    font-size: 1.15rem;
+  }
+
+  .user-card-person h3 {
+    margin-bottom: 6px;
+    font-size: 0.78rem;
+  }
+
+  .user-card-person p {
+    font-size: 0.54rem;
+    line-height: 1.25;
+  }
+
+  .user-card-qr img {
+    width: 70px;
+    height: 70px;
+  }
+
+  .user-card-qr b {
+    font-size: 0.42rem;
+  }
+
+  .user-wallet-card footer {
+    padding: 5px 8px;
+  }
+
+  .user-wallet-card footer .user-card-number {
+    font-size: 0.56rem !important;
+    letter-spacing: 0.08em;
+  }
+
+  .user-card-actions {
+    margin-top: 12px;
+  }
+}
+
+@media (max-width: 480px) {
+  .user-card-actions {
+    flex-direction: column;
+    width: 100%;
+  }
+
+  .user-card-actions .ant-btn {
+    width: 100%;
+  }
+}
+
+@media print {
+  body.id-card-print-mode * {
+    visibility: hidden !important;
+  }
+
+  body.id-card-print-mode .user-card-pair,
+  body.id-card-print-mode .user-card-pair * {
+    visibility: visible !important;
+  }
+
+  body.id-card-print-mode .user-card-pair {
+    position: fixed;
+    inset: 0 auto auto 0;
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 8mm;
+    padding: 0;
+    background: #fff;
+  }
+
+  body.id-card-print-mode .user-wallet-card {
+    width: 85.6mm;
+    height: 53.98mm;
+    break-inside: avoid;
+  }
+
+  .user-card-actions {
+    display: none !important;
+  }
+}

@@ -15,7 +15,8 @@ const QRCodeDisplay = () => {
 
   useEffect(() => {
     if (!user?._id) return;
-    api.get(`/api/qr/${user._id}`)
+    api
+      .get(`/api/qr/${user._id}`)
       .then(({ data }) => setQrCode(data.qrCode?.data || ''))
       .catch((error) => {
         if (error.response?.status !== 404) toast.error('Unable to load the emergency QR code.');
@@ -29,7 +30,9 @@ const QRCodeDisplay = () => {
       setQrCode(data.qrCode?.data || '');
       toast.success('Emergency QR code generated.');
     } catch (error) {
-      toast.error(error.response?.data?.message || 'Save your medical profile before generating a QR code.');
+      toast.error(
+        error.response?.data?.message || 'Save your medical profile before generating a QR code.'
+      );
     } finally {
       setLoading(false);
     }
@@ -41,15 +44,38 @@ const QRCodeDisplay = () => {
         <QrcodeOutlined className="qr-heading-icon" />
         <div className="qr-copy">
           <Title level={2}>Emergency QR</Title>
-          <Paragraph type="secondary">Generate a revocable emergency-access QR after saving your profile.</Paragraph>
+          <Paragraph type="secondary">
+            Generate a revocable emergency-access QR after saving your profile.
+          </Paragraph>
         </div>
-        {loading ? <Skeleton.Image active className="qr-skeleton" /> : qrCode
-          ? <Image src={qrCode} width={260} preview={false} alt="Emergency QR code" className="qr-image" />
-          : <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} description="No emergency QR generated yet" />}
-        <Button type="primary" size="large" block icon={qrCode ? <ReloadOutlined /> : <QrcodeOutlined />} loading={loading} onClick={generate}>
+        {loading ? (
+          <Skeleton.Image active className="qr-skeleton" />
+        ) : qrCode ? (
+          <Image
+            src={qrCode}
+            width={260}
+            preview={false}
+            alt="Emergency QR code"
+            className="qr-image"
+          />
+        ) : (
+          <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} description="No emergency QR generated yet" />
+        )}
+        <Button
+          type="primary"
+          size="large"
+          block
+          icon={qrCode ? <ReloadOutlined /> : <QrcodeOutlined />}
+          loading={loading}
+          onClick={generate}
+        >
           {qrCode ? 'Regenerate emergency QR' : 'Generate emergency QR'}
         </Button>
-        {qrCode && <Text type="secondary">Keep this QR on your ElderlyCare ID card for emergency access.</Text>}
+        {qrCode && (
+          <Text type="secondary">
+            Keep this QR on your ElderlyCare ID card for emergency access.
+          </Text>
+        )}
       </Space>
     </Card>
   );

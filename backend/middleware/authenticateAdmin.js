@@ -9,7 +9,9 @@ const {
 const authenticateAdmin = async (req, res, next) => {
   const token = readCookie(req, ADMIN_COOKIE_NAME);
   if (!token) {
-    return res.status(401).json({ message: 'Admin authentication required', code: 'ADMIN_AUTH_REQUIRED' });
+    return res
+      .status(401)
+      .json({ message: 'Admin authentication required', code: 'ADMIN_AUTH_REQUIRED' });
   }
 
   try {
@@ -30,7 +32,9 @@ const authenticateAdmin = async (req, res, next) => {
     next();
   } catch (error) {
     clearAdminCookie(res);
-    return res.status(401).json({ message: 'Admin session expired', code: 'ADMIN_SESSION_EXPIRED' });
+    return res
+      .status(401)
+      .json({ message: 'Admin session expired', code: 'ADMIN_SESSION_EXPIRED' });
   }
 };
 

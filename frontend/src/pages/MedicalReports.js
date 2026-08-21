@@ -6,7 +6,8 @@ import { AuthContext } from '../context/AuthContext';
 import './MedicalReports.css';
 
 const apiBase = import.meta.env.VITE_BACKEND_URI || 'http://localhost:5000';
-const listText = (items, other) => [...(items || []), other].filter(Boolean).join(', ') || 'None reported';
+const listText = (items, other) =>
+  [...(items || []), other].filter(Boolean).join(', ') || 'None reported';
 
 const MedicalReports = () => {
   const { user } = useContext(AuthContext);
@@ -29,11 +30,13 @@ const MedicalReports = () => {
     } finally {
       setLoading(false);
     }
-  // The token is read from the active browser session and changes with login.
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // The token is read from the active browser session and changes with login.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user, token]);
 
-  useEffect(() => { load(); }, [load]);
+  useEffect(() => {
+    load();
+  }, [load]);
 
   const generate = async () => {
     setWorking(true);
@@ -78,35 +81,132 @@ const MedicalReports = () => {
     }
   };
 
-  if (!user) return <main className="medical-reports-page"><div className="report-state"><h1>Sign in required</h1><p>Please sign in to access private medical reports.</p></div></main>;
+  if (!user)
+    return (
+      <main className="medical-reports-page">
+        <div className="report-state">
+          <h1>Sign in required</h1>
+          <p>Please sign in to access private medical reports.</p>
+        </div>
+      </main>
+    );
 
   return (
     <main className="medical-reports-page">
       <header className="medical-reports-header">
-        <div><p>ElderlyCare</p><h1>Emergency Medical Summaries</h1><span>Versioned, private snapshots of your submitted medical profile.</span></div>
-        <Button type="primary" ghost icon={<PlusOutlined />} onClick={generate} loading={working}>Generate new report</Button>
+        <div>
+          <p>ElderlyCare</p>
+          <h1>Emergency Medical Summaries</h1>
+          <span>Versioned, private snapshots of your submitted medical profile.</span>
+        </div>
+        <Button type="primary" ghost icon={<PlusOutlined />} onClick={generate} loading={working}>
+          Generate new report
+        </Button>
       </header>
-      {message && <p className="medical-report-message" role="status">{message}</p>}
-      {loading ? <div className="report-state">Loading reports…</div>
-        : !reports.length ? <div className="report-state"><h2>No saved reports</h2><p>Generate your first emergency summary after completing the medical form.</p></div>
-          : <section className="medical-report-list" aria-label="Saved report versions">
-            {reports.map((report) => <article key={report._id}>
-              <div><strong>Version {report.reportVersion}</strong>{report.isLatest && <span className="report-latest">Latest</span>}
-                <p>Generated {new Date(report.generatedAt).toLocaleString()}</p></div>
+      {message && (
+        <p className="medical-report-message" role="status">
+          {message}
+        </p>
+      )}
+      {loading ? (
+        <div className="report-state">Loading reports…</div>
+      ) : !reports.length ? (
+        <div className="report-state">
+          <h2>No saved reports</h2>
+          <p>Generate your first emergency summary after completing the medical form.</p>
+        </div>
+      ) : (
+        <section className="medical-report-list" aria-label="Saved report versions">
+          {reports.map((report) => (
+            <article key={report._id}>
+              <div>
+                <strong>Version {report.reportVersion}</strong>
+                {report.isLatest && <span className="report-latest">Latest</span>}
+                <p>Generated {new Date(report.generatedAt).toLocaleString()}</p>
+              </div>
               <span>{report.verificationStatus.replace('_', ' ')}</span>
-              <div><Button icon={<EyeOutlined />} onClick={() => preview(report._id)}>Preview</Button><Button icon={<DownloadOutlined />} onClick={() => download(report)} loading={working}>Download PDF</Button></div>
-            </article>)}
-          </section>}
+              <div>
+                <Button icon={<EyeOutlined />} onClick={() => preview(report._id)}>
+                  Preview
+                </Button>
+                <Button
+                  icon={<DownloadOutlined />}
+                  onClick={() => download(report)}
+                  loading={working}
+                >
+                  Download PDF
+                </Button>
+              </div>
+            </article>
+          ))}
+        </section>
+      )}
 
-      {selected && <div className="medical-report-modal"><article role="dialog" aria-modal="true" aria-labelledby="user-report-title">
-        <Button className="medical-report-close" type="text" shape="circle" icon={<CloseOutlined />} onClick={() => setSelected(null)} aria-label="Close preview" />
-        <header><p>Emergency Medical Summary</p><h2 id="user-report-title">{selected.snapshotData.personal.name}</h2><span>Version {selected.reportVersion}</span></header>
-        <section className="medical-report-critical"><strong>Blood group: {selected.snapshotData.personal.bloodGroup || 'Unknown'}</strong><p>Allergies: {listText(selected.snapshotData.medical.allergies, selected.snapshotData.medical.allergiesOther)}</p></section>
-        <section><h3>Medical conditions</h3><p>{listText(selected.snapshotData.medical.medicalHistory, selected.snapshotData.medical.medicalHistoryOther)}</p></section>
-        <section><h3>Current medications</h3><p>{listText(selected.snapshotData.medical.medications, selected.snapshotData.medical.medicationsOther)}</p></section>
-        <section><h3>Emergency contact</h3><p>{selected.snapshotData.emergencyContacts[0]?.name} · {selected.snapshotData.emergencyContacts[0]?.phone}</p></section>
-        <footer><p>This emergency summary is not a replacement for professional medical advice.</p><Button type="primary" ghost icon={<DownloadOutlined />} onClick={() => download(selected)}>Download authenticated PDF</Button></footer>
-      </article></div>}
+      {selected && (
+        <div className="medical-report-modal">
+          <article role="dialog" aria-modal="true" aria-labelledby="user-report-title">
+            <Button
+              className="medical-report-close"
+              type="text"
+              shape="circle"
+              icon={<CloseOutlined />}
+              onClick={() => setSelected(null)}
+              aria-label="Close preview"
+            />
+            <header>
+              <p>Emergency Medical Summary</p>
+              <h2 id="user-report-title">{selected.snapshotData.personal.name}</h2>
+              <span>Version {selected.reportVersion}</span>
+            </header>
+            <section className="medical-report-critical">
+              <strong>Blood group: {selected.snapshotData.personal.bloodGroup || 'Unknown'}</strong>
+              <p>
+                Allergies:{' '}
+                {listText(
+                  selected.snapshotData.medical.allergies,
+                  selected.snapshotData.medical.allergiesOther
+                )}
+              </p>
+            </section>
+            <section>
+              <h3>Medical conditions</h3>
+              <p>
+                {listText(
+                  selected.snapshotData.medical.medicalHistory,
+                  selected.snapshotData.medical.medicalHistoryOther
+                )}
+              </p>
+            </section>
+            <section>
+              <h3>Current medications</h3>
+              <p>
+                {listText(
+                  selected.snapshotData.medical.medications,
+                  selected.snapshotData.medical.medicationsOther
+                )}
+              </p>
+            </section>
+            <section>
+              <h3>Emergency contact</h3>
+              <p>
+                {selected.snapshotData.emergencyContacts[0]?.name} ·{' '}
+                {selected.snapshotData.emergencyContacts[0]?.phone}
+              </p>
+            </section>
+            <footer>
+              <p>This emergency summary is not a replacement for professional medical advice.</p>
+              <Button
+                type="primary"
+                ghost
+                icon={<DownloadOutlined />}
+                onClick={() => download(selected)}
+              >
+                Download authenticated PDF
+              </Button>
+            </footer>
+          </article>
+        </div>
+      )}
     </main>
   );
 };

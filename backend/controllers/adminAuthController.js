@@ -11,7 +11,10 @@ const { getPermissions } = require('../middleware/requirePermission');
 const MAX_FAILED_ATTEMPTS = 5;
 const LOCKOUT_MS = 15 * 60 * 1000;
 
-const normalizeEmail = (email) => String(email || '').trim().toLowerCase();
+const normalizeEmail = (email) =>
+  String(email || '')
+    .trim()
+    .toLowerCase();
 
 const adminResponse = (admin) => ({
   id: admin._id,
@@ -23,14 +26,13 @@ const adminResponse = (admin) => ({
   lastLoginAt: admin.lastLoginAt
 });
 
-const isStrongPassword = (password) => (
-  typeof password === 'string'
-  && password.length >= 12
-  && /[a-z]/.test(password)
-  && /[A-Z]/.test(password)
-  && /\d/.test(password)
-  && /[^A-Za-z0-9]/.test(password)
-);
+const isStrongPassword = (password) =>
+  typeof password === 'string' &&
+  password.length >= 12 &&
+  /[a-z]/.test(password) &&
+  /[A-Z]/.test(password) &&
+  /\d/.test(password) &&
+  /[^A-Za-z0-9]/.test(password);
 
 exports.login = async (req, res) => {
   const email = normalizeEmail(req.body.email);
@@ -152,7 +154,8 @@ exports.changePassword = async (req, res) => {
     }
     if (!isStrongPassword(newPassword)) {
       return res.status(400).json({
-        message: 'New password must be at least 12 characters and include uppercase, lowercase, number, and special character.',
+        message:
+          'New password must be at least 12 characters and include uppercase, lowercase, number, and special character.',
         code: 'WEAK_ADMIN_PASSWORD'
       });
     }
@@ -160,7 +163,9 @@ exports.changePassword = async (req, res) => {
       return res.status(401).json({ message: 'Current password is incorrect' });
     }
     if (await bcrypt.compare(newPassword, req.admin.password)) {
-      return res.status(400).json({ message: 'New password must differ from the current password' });
+      return res
+        .status(400)
+        .json({ message: 'New password must differ from the current password' });
     }
 
     req.admin.password = await bcrypt.hash(newPassword, 12);

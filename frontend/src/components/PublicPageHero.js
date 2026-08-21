@@ -22,11 +22,19 @@ const PublicPageHero = ({
 
   return (
     <section aria-label={`${title} banner`}>
-      <Carousel autoplay={backgrounds.length > 1} autoplaySpeed={4500} arrows={backgrounds.length > 1} draggable={backgrounds.length > 1} dots={backgrounds.length > 1}>
+      <Carousel
+        autoplay={backgrounds.length > 1}
+        autoplaySpeed={4500}
+        arrows={backgrounds.length > 1}
+        draggable={backgrounds.length > 1}
+        dots={backgrounds.length > 1}
+      >
         {backgrounds.map((banner, index) => (
           <div key={banner}>
             <Flex
-              className={!image ? `care-home-banner-slide care-home-banner-slide-${index + 1}` : undefined}
+              className={
+                !image ? `care-home-banner-slide care-home-banner-slide-${index + 1}` : undefined
+              }
               vertical
               justify="center"
               align={centered ? 'center' : 'flex-start'}
@@ -44,12 +52,47 @@ const PublicPageHero = ({
               }}
             >
               {!headingOnly && showEyebrow && <Tag color="blue">{eyebrow}</Tag>}
-              <Title style={{ margin: 0, maxWidth: 900, color: '#fff', fontSize: 'clamp(2.2rem, 5vw, 4rem)', lineHeight: 1.08, textShadow: '0 2px 12px rgba(0, 0, 0, .45)' }}>{title}</Title>
-              {!headingOnly && description && <Paragraph style={{ margin: 0, maxWidth: 660, color: '#ff6b00', fontSize: compact ? 15 : 16, fontWeight: 700, lineHeight: 1.5, textShadow: '0 1px 6px rgba(0, 0, 0, .65)' }}>{description}</Paragraph>}
+              <Title
+                style={{
+                  margin: 0,
+                  maxWidth: 900,
+                  color: '#fff',
+                  fontSize: 'clamp(2.2rem, 5vw, 4rem)',
+                  lineHeight: 1.08,
+                  textShadow: '0 2px 12px rgba(0, 0, 0, .45)'
+                }}
+              >
+                {title}
+              </Title>
+              {!headingOnly && description && (
+                <Paragraph
+                  style={{
+                    margin: 0,
+                    maxWidth: 660,
+                    color: '#ff6b00',
+                    fontSize: compact ? 15 : 16,
+                    fontWeight: 700,
+                    lineHeight: 1.5,
+                    textShadow: '0 1px 6px rgba(0, 0, 0, .65)'
+                  }}
+                >
+                  {description}
+                </Paragraph>
+              )}
               {!headingOnly && (primaryAction || secondaryAction) && (
                 <Space wrap size="middle">
-                  {primaryAction && <Link to={primaryAction.to}><Button type="primary" size="large">{primaryAction.label}</Button></Link>}
-                  {secondaryAction && <Link to={secondaryAction.to}><Button size="large">{secondaryAction.label}</Button></Link>}
+                  {primaryAction && (
+                    <Link to={primaryAction.to}>
+                      <Button type="primary" size="large">
+                        {primaryAction.label}
+                      </Button>
+                    </Link>
+                  )}
+                  {secondaryAction && (
+                    <Link to={secondaryAction.to}>
+                      <Button size="large">{secondaryAction.label}</Button>
+                    </Link>
+                  )}
                 </Space>
               )}
             </Flex>

@@ -128,7 +128,7 @@ test('public information pages use Ant Design without legacy page CSS', () => {
   expect(contact).toContain('size="large"');
   expect(contact).toContain('htmlType="submit"');
   expect(contact).toContain('rows={4}');
-  expect(contact).toContain("style={{ flex: 1 }}");
+  expect(contact).toContain('style={{ flex: 1 }}');
   expect(contact).toContain("style={{ height: '100%' }}");
   expect(contact).not.toContain('submitFeedbackForm');
   expect(contact).not.toContain('Do not use this page for an active medical emergency');
@@ -321,6 +321,8 @@ test('member pages use a shared responsive portal and compact Ant Design buttons
   const entry = fs.readFileSync(path.join(__dirname, 'index.js'), 'utf8');
   const theme = fs.readFileSync(path.join(__dirname, 'theme', 'elderlyCareTheme.js'), 'utf8');
   const controls = fs.readFileSync(path.join(__dirname, 'theme', 'formControls.css'), 'utf8');
+  const compactLayoutStyles = layoutStyles.replace(/\s+/g, '');
+  const compactControls = controls.replace(/\s+/g, '');
   expect(app).toContain('<MemberPortalLayout />');
   expect(app).toContain('!isMemberRoute');
   expect(layout).toContain('member-bottom-nav');
@@ -333,24 +335,26 @@ test('member pages use a shared responsive portal and compact Ant Design buttons
   expect(layout).not.toContain('BellOutlined');
   expect(layout).not.toContain('<Dropdown');
   expect(layout).toContain('member-global-search');
-  expect(layout).toContain('>Search</Button>');
-  expect(layoutStyles).toContain('.member-portal-header{position:sticky');
-  expect(layoutStyles).toContain('height:80px');
-  expect(layoutStyles).toContain('.member-global-search{width:min(470px,42vw);margin-left:auto}');
+  expect(layout).toMatch(/>\s*Search\s*<\/Button>/);
+  expect(compactLayoutStyles).toContain('.member-portal-header{position:sticky');
+  expect(compactLayoutStyles).toContain('height:80px');
+  expect(compactLayoutStyles).toContain(
+    '.member-global-search{width:min(470px,42vw);margin-left:auto;}'
+  );
   expect(layout).toContain("responseType: 'blob'");
   expect(entry).toContain('componentSize="small"');
   expect(theme).toContain('controlHeight: 32');
   expect(theme).toContain('borderRadiusLG: 10');
   expect(theme).toContain('fontWeight: 400');
   expect(theme).toContain("itemSelectedBg: '#edf3ff'");
-  expect(controls).toContain('.medical-form{width:min(100%,980px)');
-  expect(controls).toContain('border-radius:5px!important');
-  expect(controls).toContain('border-radius:5px 0 0 5px!important');
-  expect(controls).toContain('border-radius:0 5px 5px 0!important');
-  expect(controls).toContain('border-inline-start:0!important');
-  expect(controls).toContain('border-color:transparent!important');
-  expect(controls).toContain('background:#0066ff!important');
-  expect(controls).toContain('background:#ff6b00!important');
+  expect(compactControls).toContain('.medical-form{width:min(100%,980px)');
+  expect(compactControls).toContain('border-radius:5px!important');
+  expect(compactControls).toContain('border-radius:5px005px!important');
+  expect(compactControls).toContain('border-radius:05px5px0!important');
+  expect(compactControls).toContain('border-inline-start:0!important');
+  expect(compactControls).toContain('border-color:transparent!important');
+  expect(compactControls).toContain('background:#0066ff!important');
+  expect(compactControls).toContain('background:#ff6b00!important');
 });
 
 test('account activation controls are absent from the admin interface', () => {

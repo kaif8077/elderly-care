@@ -1,11 +1,13 @@
-const normalizeOrigin = (value) => String(value || '').trim().replace(/\/$/, '');
+const normalizeOrigin = (value) =>
+  String(value || '')
+    .trim()
+    .replace(/\/$/, '');
 
-const configuredOrigins = () => String(
-  process.env.FRONTEND_URL || 'http://localhost:3000'
-)
-  .split(',')
-  .map(normalizeOrigin)
-  .filter(Boolean);
+const configuredOrigins = () =>
+  String(process.env.FRONTEND_URL || 'http://localhost:3000')
+    .split(',')
+    .map(normalizeOrigin)
+    .filter(Boolean);
 
 const requireTrustedOrigin = (req, res, next) => {
   const origin = normalizeOrigin(req.get('origin'));

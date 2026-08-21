@@ -13,7 +13,8 @@ exports.list = async (req, res) => {
 
 exports.getOne = async (req, res) => {
   try {
-    if (!mongoose.isValidObjectId(req.params.id)) return res.status(400).json({ message: 'Invalid emergency alert ID' });
+    if (!mongoose.isValidObjectId(req.params.id))
+      return res.status(400).json({ message: 'Invalid emergency alert ID' });
     const alert = await getAlert(req.params.id);
     if (!alert) return res.status(404).json({ message: 'Emergency alert not found' });
     AuditLog.create({
@@ -24,7 +25,11 @@ exports.getOne = async (req, res) => {
       resourceId: String(alert.id),
       affectedUserId: alert.elderlyPerson?.id || null,
       description: 'Administrator viewed an emergency alert timeline',
-      metadata: { ipHash: hashIp(req.ip), userAgent: String(req.get('user-agent') || '').slice(0, 200), success: true }
+      metadata: {
+        ipHash: hashIp(req.ip),
+        userAgent: String(req.get('user-agent') || '').slice(0, 200),
+        success: true
+      }
     }).catch(() => {});
     return res.json({ alert });
   } catch (error) {

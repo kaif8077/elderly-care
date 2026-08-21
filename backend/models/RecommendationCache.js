@@ -4,7 +4,7 @@ const recommendationCacheSchema = new mongoose.Schema({
   cacheKey: {
     type: String,
     required: true,
-    unique: true   // auto index
+    unique: true // auto index
   },
   value: {
     type: String,
@@ -22,12 +22,6 @@ const recommendationCacheSchema = new mongoose.Schema({
 });
 
 // TTL index (only one index here)
-recommendationCacheSchema.index(
-  { createdAt: 1 },
-  { expireAfterSeconds: 86400 }
-);
+recommendationCacheSchema.index({ createdAt: 1 }, { expireAfterSeconds: 86400 });
 
-module.exports = mongoose.model(
-  'RecommendationCache',
-  recommendationCacheSchema
-);
+module.exports = mongoose.model('RecommendationCache', recommendationCacheSchema);

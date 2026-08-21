@@ -43,16 +43,22 @@ test('blood group remains mandatory for emergency readiness', async () => {
 });
 
 test('JSON profile updates discard browser fake paths for photographs', () => {
-  const normalized = normalizeProfileData({
-    firstName: 'Asha',
-    lastName: 'Sharma',
-    profilePhoto: 'C:\\fakepath\\signature.jpg'
-  }, '507f1f77bcf86cd799439011');
+  const normalized = normalizeProfileData(
+    {
+      firstName: 'Asha',
+      lastName: 'Sharma',
+      profilePhoto: 'C:\\fakepath\\signature.jpg'
+    },
+    '507f1f77bcf86cd799439011'
+  );
   assert.equal(Object.hasOwn(normalized, 'profilePhoto'), false);
 });
 
 test('draft section saves use atomic updates for legacy profile compatibility', () => {
-  const source = fs.readFileSync(path.join(__dirname, '..', 'controllers', 'medicalController.js'), 'utf8');
+  const source = fs.readFileSync(
+    path.join(__dirname, '..', 'controllers', 'medicalController.js'),
+    'utf8'
+  );
   assert.match(source, /existingProfile && !req\.body\.finalize/);
   assert.match(source, /findByIdAndUpdate/);
   assert.match(source, /runValidators: true/);

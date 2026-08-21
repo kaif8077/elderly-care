@@ -8,9 +8,8 @@ exports.sendSMS = async (req, res) => {
     }
 
     const { body, latitude, longitude } = req.body;
-    const locationUrl = latitude && longitude
-      ? `https://maps.google.com/?q=${latitude},${longitude}`
-      : null;
+    const locationUrl =
+      latitude && longitude ? `https://maps.google.com/?q=${latitude},${longitude}` : null;
 
     await sendEmail({
       to: notificationEmail,

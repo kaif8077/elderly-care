@@ -2,8 +2,12 @@ import { useContext, useState } from 'react';
 import { Button, Menu, message } from 'antd';
 import { useLocation, useNavigate } from 'react-router-dom';
 import {
-  AlertOutlined, AuditOutlined, DashboardOutlined, LogoutOutlined,
-  MessageOutlined, UserOutlined
+  AlertOutlined,
+  AuditOutlined,
+  DashboardOutlined,
+  LogoutOutlined,
+  MessageOutlined,
+  UserOutlined
 } from '@ant-design/icons';
 import { AdminAuthContext } from '../context/AdminAuthContext';
 import logo from '../../assests/logo.png';
@@ -21,8 +25,10 @@ const AdminSidebar = ({ collapsed = false, onClose }) => {
   const location = useLocation();
   const navigate = useNavigate();
   const [loggingOut, setLoggingOut] = useState(false);
-  const selected = location.pathname.startsWith('/admin/users') || location.pathname.startsWith('/admin/id-cards')
-    ? '/admin/users' : location.pathname;
+  const selected =
+    location.pathname.startsWith('/admin/users') || location.pathname.startsWith('/admin/id-cards')
+      ? '/admin/users'
+      : location.pathname;
 
   const exit = async () => {
     setLoggingOut(true);
@@ -38,7 +44,12 @@ const AdminSidebar = ({ collapsed = false, onClose }) => {
 
   return (
     <div className="admin-portal-sidebar-inner">
-      <Button type="text" className="admin-portal-brand" onClick={() => navigate('/admin/dashboard')} aria-label="ElderlyCare administration dashboard">
+      <Button
+        type="text"
+        className="admin-portal-brand"
+        onClick={() => navigate('/admin/dashboard')}
+        aria-label="ElderlyCare administration dashboard"
+      >
         <img src={collapsed ? '/favicon.png' : logo} alt="ElderlyCare" />
       </Button>
       <nav aria-label="Administration navigation">
@@ -46,10 +57,20 @@ const AdminSidebar = ({ collapsed = false, onClose }) => {
           mode="inline"
           selectedKeys={[selected]}
           items={entries}
-          onClick={({ key }) => { navigate(key); onClose?.(); }}
+          onClick={({ key }) => {
+            navigate(key);
+            onClose?.();
+          }}
         />
       </nav>
-      <Button type="text" danger icon={<LogoutOutlined />} className="admin-portal-logout" loading={loggingOut} onClick={exit}>
+      <Button
+        type="text"
+        danger
+        icon={<LogoutOutlined />}
+        className="admin-portal-logout"
+        loading={loggingOut}
+        onClick={exit}
+      >
         {!collapsed && 'Logout'}
       </Button>
     </div>

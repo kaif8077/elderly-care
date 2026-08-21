@@ -12,6 +12,10 @@ import './theme/formControls.css';
 const root = createRoot(document.getElementById('root'));
 root.render(
   <ConfigProvider theme={elderlyCareTheme} componentSize="small">
-    <AntApp><AuthProvider><App /></AuthProvider></AntApp>
+    <AntApp>
+      <AuthProvider>
+        <App />
+      </AuthProvider>
+    </AntApp>
   </ConfigProvider>
 );

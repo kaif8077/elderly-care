@@ -40,7 +40,8 @@ test('report pagination is bounded', () => {
 test('medical report schema enforces immutable snapshots and version uniqueness', () => {
   assert.equal(MedicalReport.schema.path('snapshotData').options.immutable, true);
   assert.equal(MedicalReport.schema.path('generatedAt').options.immutable, true);
-  const versionIndex = MedicalReport.schema.indexes()
+  const versionIndex = MedicalReport.schema
+    .indexes()
     .find(([fields]) => fields.elderProfileId === 1 && fields.reportVersion === 1);
   assert.equal(versionIndex[1].unique, true);
 });

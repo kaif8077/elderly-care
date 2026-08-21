@@ -49,7 +49,8 @@ exports.updateStatus = async (req, res) => {
     await writeAuditLog({
       req,
       actor: req.admin,
-      action: result.user.accountStatus === 'active' ? 'ADMIN_USER_ACTIVATED' : 'ADMIN_USER_DEACTIVATED',
+      action:
+        result.user.accountStatus === 'active' ? 'ADMIN_USER_ACTIVATED' : 'ADMIN_USER_DEACTIVATED',
       resourceType: 'User',
       resourceId: result.user._id,
       affectedUserId: result.user._id,
@@ -93,7 +94,9 @@ exports.archive = async (req, res) => {
     res.json({ message: 'User account archived', revokedQrCodes: result.revokedCount });
   } catch (error) {
     if (['INVALID_ARCHIVE_REQUEST', 'ALREADY_ARCHIVED'].includes(error.code)) {
-      return res.status(error.code === 'ALREADY_ARCHIVED' ? 409 : 400).json({ message: error.message, code: error.code });
+      return res
+        .status(error.code === 'ALREADY_ARCHIVED' ? 409 : 400)
+        .json({ message: error.message, code: error.code });
     }
     console.error('Admin archive error:', error.message);
     res.status(500).json({ message: 'Unable to archive user' });
@@ -115,7 +118,8 @@ exports.restore = async (req, res) => {
     });
     res.json({ message: 'User account restored', accountStatus: user.accountStatus });
   } catch (error) {
-    if (error.code === 'NOT_ARCHIVED') return res.status(409).json({ message: error.message, code: error.code });
+    if (error.code === 'NOT_ARCHIVED')
+      return res.status(409).json({ message: error.message, code: error.code });
     console.error('Admin restore error:', error.message);
     res.status(500).json({ message: 'Unable to restore user' });
   }

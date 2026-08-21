@@ -1,14 +1,22 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
-import { FaArrowLeft, FaDownload, FaQrcode, FaShieldAlt, FaSyncAlt, FaTimesCircle } from 'react-icons/fa';
+import {
+  FaArrowLeft,
+  FaDownload,
+  FaQrcode,
+  FaShieldAlt,
+  FaSyncAlt,
+  FaTimesCircle
+} from 'react-icons/fa';
 import html2canvas from 'html2canvas';
 import { Link, useParams } from 'react-router-dom';
 import { Button, Space } from 'antd';
 import adminApi from '../../services/adminApi';
 import AdminStatusBadge from '../components/AdminStatusBadge';
 
-const formatDob = (dob) => dob && !Number.isNaN(new Date(dob).getTime())
-  ? new Date(dob).toLocaleDateString('en-GB')
-  : 'Not available';
+const formatDob = (dob) =>
+  dob && !Number.isNaN(new Date(dob).getTime())
+    ? new Date(dob).toLocaleDateString('en-GB')
+    : 'Not available';
 
 const AdminIdCard = () => {
   const { userId } = useParams();
@@ -33,26 +41,32 @@ const AdminIdCard = () => {
     }
   }, [userId]);
 
-  useEffect(() => { load(); }, [load]);
+  useEffect(() => {
+    load();
+  }, [load]);
   useEffect(() => {
     let objectUrl = '';
     if (!data?.card?.hasPhoto) {
       setPhotoUrl('');
       return undefined;
     }
-    adminApi.get(`/id-cards/${userId}/photo`, { responseType: 'blob' })
+    adminApi
+      .get(`/id-cards/${userId}/photo`, { responseType: 'blob' })
       .then((response) => {
         objectUrl = URL.createObjectURL(response.data);
         setPhotoUrl(objectUrl);
       })
       .catch(() => setPhotoUrl(''));
-    return () => { if (objectUrl) URL.revokeObjectURL(objectUrl); };
+    return () => {
+      if (objectUrl) URL.revokeObjectURL(objectUrl);
+    };
   }, [data?.card?.hasPhoto, userId]);
 
   const runAction = async (action) => {
-    const description = action === 'revoke'
-      ? 'Revoke this QR code? Printed copies will stop working.'
-      : 'Generate a new QR code? Any existing active QR code will be revoked.';
+    const description =
+      action === 'revoke'
+        ? 'Revoke this QR code? Printed copies will stop working.'
+        : 'Generate a new QR code? Any existing active QR code will be revoked.';
     if (!window.confirm(description)) return;
     setWorking(true);
     setMessage('');
@@ -71,7 +85,11 @@ const AdminIdCard = () => {
     if (!cardRef.current || !data?.card) return;
     setWorking(true);
     try {
-      const canvas = await html2canvas(cardRef.current, { scale: 4, backgroundColor: '#f3f6fc', useCORS: true });
+      const canvas = await html2canvas(cardRef.current, {
+        scale: 4,
+        backgroundColor: '#f3f6fc',
+        useCORS: true
+      });
       const link = document.createElement('a');
       link.download = `${data.card.elderlyCareId}-id-card.png`;
       link.href = canvas.toDataURL('image/png');
@@ -84,49 +102,122 @@ const AdminIdCard = () => {
     }
   };
 
-  if (loading) return <div className="admin-detail-skeleton skeleton" aria-label="Loading ID card" />;
-  if (error) return <div className="admin-state-card" role="alert"><h2>ID card unavailable</h2><p>{error}</p><Link to={`/admin/users/${userId}`}>Back to user</Link></div>;
-  if (!data.card) return <div className="admin-state-card"><h2>No medical profile</h2><p>An ID card cannot be generated until the user has a medical profile.</p><Link to={`/admin/users/${userId}`}>Back to user</Link></div>;
+  if (loading)
+    return <div className="admin-detail-skeleton skeleton" aria-label="Loading ID card" />;
+  if (error)
+    return (
+      <div className="admin-state-card" role="alert">
+        <h2>ID card unavailable</h2>
+        <p>{error}</p>
+        <Link to={`/admin/users/${userId}`}>Back to user</Link>
+      </div>
+    );
+  if (!data.card)
+    return (
+      <div className="admin-state-card">
+        <h2>No medical profile</h2>
+        <p>An ID card cannot be generated until the user has a medical profile.</p>
+        <Link to={`/admin/users/${userId}`}>Back to user</Link>
+      </div>
+    );
 
   const { card, user } = data;
   return (
     <div className="admin-id-card-page">
-      <Link className="admin-back-link" to={`/admin/users/${userId}`}><FaArrowLeft /> Back to user</Link>
+      <Link className="admin-back-link" to={`/admin/users/${userId}`}>
+        <FaArrowLeft /> Back to user
+      </Link>
       <div className="admin-page-actions">
-        <div><p>Wallet-size emergency ID for {user.name}.</p><small>Only emergency-safe details are printed on the card.</small></div>
+        <div>
+          <p>Wallet-size emergency ID for {user.name}.</p>
+          <small>Only emergency-safe details are printed on the card.</small>
+        </div>
         <AdminStatusBadge status={card.status} />
       </div>
 
       <div className="admin-card-workspace">
         <div className="elder-card-pair" ref={cardRef} aria-label="ElderlyCare ID card preview">
           <section className="wallet-card wallet-card-front" aria-label="ID card front side">
-            <div className="wallet-card-brand"><span><FaShieldAlt /> ELDERLYCARE</span><b>EMERGENCY ID</b></div>
+            <div className="wallet-card-brand">
+              <span>
+                <FaShieldAlt /> ELDERLYCARE
+              </span>
+              <b>EMERGENCY ID</b>
+            </div>
             <div className="wallet-card-main">
               <span className="wallet-photo" aria-label="Profile photograph">
-                {photoUrl ? <img src={photoUrl} alt={`${card.name} profile`} /> : card.name.charAt(0).toUpperCase()}
+                {photoUrl ? (
+                  <img src={photoUrl} alt={`${card.name} profile`} />
+                ) : (
+                  card.name.charAt(0).toUpperCase()
+                )}
               </span>
               <div className="wallet-card-person">
-                <div><h2>{card.name}</h2><p>Date of birth<br /><strong>{formatDob(card.dob)}</strong></p></div>
+                <div>
+                  <h2>{card.name}</h2>
+                  <p>
+                    Date of birth
+                    <br />
+                    <strong>{formatDob(card.dob)}</strong>
+                  </p>
+                </div>
               </div>
               <div className="wallet-qr">
-                {card.qr?.image ? <img src={card.qr.image} alt="Revocable emergency access QR code" /> : <div><FaQrcode /><span>No active QR</span></div>}
+                {card.qr?.image ? (
+                  <img src={card.qr.image} alt="Revocable emergency access QR code" />
+                ) : (
+                  <div>
+                    <FaQrcode />
+                    <span>No active QR</span>
+                  </div>
+                )}
                 <b>SCAN IN CASE OF EMERGENCY</b>
               </div>
             </div>
-            <div className="wallet-card-meta"><strong>{card.elderlyCareId}</strong></div>
+            <div className="wallet-card-meta">
+              <strong>{card.elderlyCareId}</strong>
+            </div>
           </section>
-
         </div>
 
         <aside className="admin-card-controls">
           <h2>Card controls</h2>
-          <p>The QR contains a random revocable token, never a user ID or complete medical record.</p>
+          <p>
+            The QR contains a random revocable token, never a user ID or complete medical record.
+          </p>
           <Space direction="vertical" style={{ width: '100%' }}>
-            <Button type="primary" block icon={<FaDownload />} onClick={downloadImage} disabled={working || !card.qr}>Download ID card PNG</Button>
-            <Button block icon={<FaSyncAlt />} onClick={() => runAction('regenerate')} disabled={working || user.isDeleted}>Generate new QR</Button>
-            <Button danger block icon={<FaTimesCircle />} onClick={() => runAction('revoke')} disabled={working || !card.qr}>Revoke QR</Button>
+            <Button
+              type="primary"
+              block
+              icon={<FaDownload />}
+              onClick={downloadImage}
+              disabled={working || !card.qr}
+            >
+              Download ID card PNG
+            </Button>
+            <Button
+              block
+              icon={<FaSyncAlt />}
+              onClick={() => runAction('regenerate')}
+              disabled={working || user.isDeleted}
+            >
+              Generate new QR
+            </Button>
+            <Button
+              danger
+              block
+              icon={<FaTimesCircle />}
+              onClick={() => runAction('revoke')}
+              disabled={working || !card.qr}
+            >
+              Revoke QR
+            </Button>
           </Space>
-          {message && <p className="admin-action-message" role="status">{message}</p>}
+          {message && (
+            <p className="admin-action-message" role="status">
+              {message}
+            </p>
+          )}
           <small>Print at 100% scale for the intended wallet-card proportions.</small>
         </aside>
       </div>

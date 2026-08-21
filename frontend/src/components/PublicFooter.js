@@ -10,15 +10,20 @@ const PublicFooter = () => (
     <Row gutter={[32, 28]}>
       <Col xs={24} md={10}>
         <Flex vertical gap={14}>
-          <Title level={3} style={{ margin: 0, color: '#fff', fontWeight: 800 }}>ElderlyCare</Title>
+          <Title level={3} style={{ margin: 0, color: '#fff', fontWeight: 800 }}>
+            ElderlyCare
+          </Title>
           <Text style={{ color: '#d1d5db', maxWidth: 430, lineHeight: 1.7 }}>
-            ElderlyCare helps families organize essential health information, create emergency-ready profiles, and connect responders with trusted contacts when timely support matters most.
+            ElderlyCare helps families organize essential health information, create emergency-ready
+            profiles, and connect responders with trusted contacts when timely support matters most.
           </Text>
         </Flex>
       </Col>
       <Col xs={12} md={7}>
         <Space direction="vertical">
-          <Text strong style={{ color: '#fff' }}>Explore</Text>
+          <Text strong style={{ color: '#fff' }}>
+            Explore
+          </Text>
           <Link to="/about">About Us</Link>
           <Link to="/services">Services</Link>
           <Link to="/contact">Contact Us</Link>
@@ -26,15 +31,35 @@ const PublicFooter = () => (
       </Col>
       <Col xs={12} md={7}>
         <Space direction="vertical">
-          <Text strong style={{ color: '#fff' }}>Contact</Text>
-          <Button className="care-footer-contact-link" type="link" href="tel:+918528576249" icon={<PhoneOutlined />} style={{ padding: 0 }}>Call us</Button>
-          <Button className="care-footer-contact-link" type="link" href="mailto:mohdkaif90275@gmail.com" icon={<MailOutlined />} style={{ padding: 0 }}>Email us</Button>
+          <Text strong style={{ color: '#fff' }}>
+            Contact
+          </Text>
+          <Button
+            className="care-footer-contact-link"
+            type="link"
+            href="tel:+918528576249"
+            icon={<PhoneOutlined />}
+            style={{ padding: 0 }}
+          >
+            Call us
+          </Button>
+          <Button
+            className="care-footer-contact-link"
+            type="link"
+            href="mailto:mohdkaif90275@gmail.com"
+            icon={<MailOutlined />}
+            style={{ padding: 0 }}
+          >
+            Email us
+          </Button>
         </Space>
       </Col>
     </Row>
     <Divider style={{ borderColor: '#4b5563' }} />
     <Flex justify="center">
-      <Text style={{ color: '#9ca3af', textAlign: 'center' }}>© 2025 ElderlyCare. All rights reserved.</Text>
+      <Text style={{ color: '#9ca3af', textAlign: 'center' }}>
+        © 2025 ElderlyCare. All rights reserved.
+      </Text>
     </Flex>
   </Footer>
 );

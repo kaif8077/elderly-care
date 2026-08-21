@@ -44,6 +44,9 @@ test('new care records remain owner-scoped and avoid storing document bytes in M
 
 test('document signature validation recognizes supported content only', () => {
   assert.equal(detectContentType(Buffer.from('%PDF-1.7')), 'application/pdf');
-  assert.equal(detectContentType(Buffer.from([0xff, 0xd8, 0xff, 0x00, 0x00, 0x00, 0x00, 0x00])), 'image/jpeg');
+  assert.equal(
+    detectContentType(Buffer.from([0xff, 0xd8, 0xff, 0x00, 0x00, 0x00, 0x00, 0x00])),
+    'image/jpeg'
+  );
   assert.equal(detectContentType(Buffer.from('not a medical document')), null);
 });

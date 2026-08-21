@@ -4,7 +4,11 @@ const { requirePermission, requireRole } = require('../middleware/requirePermiss
 const controller = require('../controllers/adminEmergencyAlertController');
 
 const router = express.Router();
-router.use(authenticateAdmin, requireRole('admin', 'super_admin'), requirePermission('alerts.read'));
+router.use(
+  authenticateAdmin,
+  requireRole('admin', 'super_admin'),
+  requirePermission('alerts.read')
+);
 router.get('/', controller.list);
 router.get('/:id', controller.getOne);
 
