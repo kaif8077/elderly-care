@@ -1,8 +1,5 @@
 const express = require('express');
-const { 
-    sendScannerOtp,
-    verifyScannerOtp
-} = require('../controllers/qrController');
+const { sendScannerOtp, verifyScannerOtp } = require('../controllers/qrController');
 const authMiddleware = require('../middleware/authmiddleware');
 const secureQrController = require('../controllers/secureQrController');
 

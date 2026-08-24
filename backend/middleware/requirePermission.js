@@ -22,12 +22,14 @@ const getPermissions = (admin) => {
   return admin.permissions?.length ? admin.permissions : DEFAULT_ADMIN_PERMISSIONS;
 };
 
-const requireRole = (...roles) => (req, res, next) => {
-  if (!req.admin || !roles.includes(req.admin.role)) {
-    return res.status(403).json({ message: 'Admin role required', code: 'ADMIN_ROLE_REQUIRED' });
-  }
-  next();
-};
+const requireRole =
+  (...roles) =>
+  (req, res, next) => {
+    if (!req.admin || !roles.includes(req.admin.role)) {
+      return res.status(403).json({ message: 'Admin role required', code: 'ADMIN_ROLE_REQUIRED' });
+    }
+    next();
+  };
 
 const requirePermission = (permission) => (req, res, next) => {
   const permissions = getPermissions(req.admin);

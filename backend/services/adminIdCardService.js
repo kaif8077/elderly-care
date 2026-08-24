@@ -13,13 +13,17 @@ const findManagedUser = (userId) => {
 const getCard = async (userId) => {
   const userQuery = findManagedUser(userId);
   if (!userQuery) return null;
-  const user = await userQuery.select('name email accountStatus isDeleted createdAt updatedAt').lean();
+  const user = await userQuery
+    .select('name email accountStatus isDeleted createdAt updatedAt')
+    .lean();
   if (!user) return null;
 
   const [profile, qr] = await Promise.all([
     MedicalProfile.findOne({ userId }).sort({ createdAt: -1 }).lean(),
     QRCode.findOne({ userId, status: 'active', token: { $exists: true, $ne: null } })
-      .sort({ createdAt: -1 }).select('_id data status createdAt updatedAt token').lean()
+      .sort({ createdAt: -1 })
+      .select('_id data status createdAt updatedAt token')
+      .lean()
   ]);
   const primaryEmergency = profile?.emergencyContacts?.[0];
 
@@ -31,25 +35,34 @@ const getCard = async (userId) => {
       accountStatus: user.accountStatus,
       isDeleted: user.isDeleted
     },
-    card: profile ? {
-      elderlyCareId: profile.elderlyCareId || `EC-${String(user._id).slice(-8).toUpperCase()}`,
-      name: profile.name,
-      dob: profile.dob,
-      bloodGroup: profile.bloodGroup || 'Unknown',
-      emergencyContact: profile.emergencyContact || primaryEmergency?.name,
-      emergencyPhone: profile.emergencyPhone || primaryEmergency?.phone,
-      allergyWarning: [...(profile.allergies || []), profile.allergiesOther].filter(Boolean).join(', ') || 'None reported',
-      preferredLanguage: [...(profile.preferredLanguage || []), profile.otherLanguage].filter(Boolean).join(', ') || 'Not provided',
-      hasPhoto: Boolean(profile.profilePhoto?.fileId),
-      status: user.accountStatus === 'active' && !user.isDeleted ? 'active' : 'inactive',
-      lastUpdatedAt: profile.updatedAt,
-      qr: qr ? {
-        id: qr._id,
-        image: qr.data,
-        status: qr.status,
-        generatedAt: qr.createdAt
-      } : null
-    } : null
+    card: profile
+      ? {
+          elderlyCareId: profile.elderlyCareId || `EC-${String(user._id).slice(-8).toUpperCase()}`,
+          name: profile.name,
+          dob: profile.dob,
+          bloodGroup: profile.bloodGroup || 'Unknown',
+          emergencyContact: profile.emergencyContact || primaryEmergency?.name,
+          emergencyPhone: profile.emergencyPhone || primaryEmergency?.phone,
+          allergyWarning:
+            [...(profile.allergies || []), profile.allergiesOther].filter(Boolean).join(', ') ||
+            'None reported',
+          preferredLanguage:
+            [...(profile.preferredLanguage || []), profile.otherLanguage]
+              .filter(Boolean)
+              .join(', ') || 'Not provided',
+          hasPhoto: Boolean(profile.profilePhoto?.fileId),
+          status: user.accountStatus === 'active' && !user.isDeleted ? 'active' : 'inactive',
+          lastUpdatedAt: profile.updatedAt,
+          qr: qr
+            ? {
+                id: qr._id,
+                image: qr.data,
+                status: qr.status,
+                generatedAt: qr.createdAt
+              }
+            : null
+        }
+      : null
   };
 };
 
@@ -88,10 +101,23 @@ const generateQr = async ({ userId, adminId }) => {
 
   const token = crypto.randomBytes(32).toString('base64url');
   const frontendUrl = String(process.env.FRONTEND_URL || 'http://localhost:3000')
-    .split(',')[0].trim().replace(/\/+$/, '');
+    .split(',')[0]
+    .trim()
+    .replace(/\/+$/, '');
   const profileUrl = `${frontendUrl}/emergency/${token}`;
-  const data = await QRCodeGenerator.toDataURL(profileUrl, { errorCorrectionLevel: 'H', width: 640, margin: 3 });
-  const qr = await QRCode.create({ userId, data, token, profileUrl, status: 'active', generatedBy: adminId });
+  const data = await QRCodeGenerator.toDataURL(profileUrl, {
+    errorCorrectionLevel: 'H',
+    width: 640,
+    margin: 3
+  });
+  const qr = await QRCode.create({
+    userId,
+    data,
+    token,
+    profileUrl,
+    status: 'active',
+    generatedBy: adminId
+  });
 
   profile.qrCodeImage = data;
   await profile.save();

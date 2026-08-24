@@ -3,6 +3,7 @@ import adminApi from '../../services/adminApi';
 
 export const AdminAuthContext = createContext(null);
 
+// Restores the secure admin session and exposes admin login/logout actions.
 export const AdminAuthProvider = ({ children }) => {
   const [admin, setAdmin] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -41,15 +42,18 @@ export const AdminAuthProvider = ({ children }) => {
     }
   }, []);
 
-  const value = useMemo(() => ({
-    admin,
-    loading,
-    login,
-    logout,
-    restoreSession,
-    sessionMessage,
-    setSessionMessage
-  }), [admin, loading, login, logout, restoreSession, sessionMessage]);
+  const value = useMemo(
+    () => ({
+      admin,
+      loading,
+      login,
+      logout,
+      restoreSession,
+      sessionMessage,
+      setSessionMessage
+    }),
+    [admin, loading, login, logout, restoreSession, sessionMessage]
+  );
 
   return <AdminAuthContext.Provider value={value}>{children}</AdminAuthContext.Provider>;
 };

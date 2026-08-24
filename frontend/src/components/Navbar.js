@@ -1,12 +1,31 @@
 import React, { useContext, useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import {
-  Avatar, Button, Drawer, Dropdown, Flex, Grid, Image, Layout, Menu, Space, Typography, message
+  Avatar,
+  Button,
+  Drawer,
+  Dropdown,
+  Flex,
+  Grid,
+  Image,
+  Layout,
+  Menu,
+  Space,
+  Typography,
+  message
 } from 'antd';
 import {
-  AlertOutlined, AppstoreOutlined, ContactsOutlined, HomeOutlined, InfoCircleOutlined,
-  LoginOutlined, LogoutOutlined, MenuOutlined, ProfileOutlined,
-  UserAddOutlined, UserOutlined
+  AlertOutlined,
+  AppstoreOutlined,
+  ContactsOutlined,
+  HomeOutlined,
+  InfoCircleOutlined,
+  LoginOutlined,
+  LogoutOutlined,
+  MenuOutlined,
+  ProfileOutlined,
+  UserAddOutlined,
+  UserOutlined
 } from '@ant-design/icons';
 import { AuthContext } from '../context/AuthContext';
 import logoImage from '../assests/logo.png';
@@ -73,7 +92,7 @@ const Navbar = () => {
         zIndex: 1000,
         width: '100%',
         paddingInline: 35,
-        padding:7,
+        padding: 7,
         background: '#fff',
         borderBottom: '1px solid #d8dee9'
       }}
@@ -92,7 +111,11 @@ const Navbar = () => {
               onClick={openRoute}
               style={{ flex: 1, justifyContent: 'center', minWidth: 0, borderBottom: 0 }}
             />
-            <Dropdown menu={{ items: accountItems, onClick: accountClick }} trigger={['click']} placement="bottomRight">
+            <Dropdown
+              menu={{ items: accountItems, onClick: accountClick }}
+              trigger={['click']}
+              placement="bottomRight"
+            >
               <Button type="text" icon={<Avatar size="small" icon={<UserOutlined />} />}>
                 {user?.name || 'Account'}
               </Button>

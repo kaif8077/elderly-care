@@ -4,9 +4,17 @@ import { Button, Space, message } from 'antd';
 import { DownloadOutlined, QrcodeOutlined } from '@ant-design/icons';
 import './UserIdCard.css';
 
-const formatId = (value) => String(value || '').replace(/\D/g, '').padStart(12, '0').slice(-12).replace(/(\d{4})(?=\d)/g, '$1 ');
-const formatDob = (value) => value ? new Date(value).toLocaleDateString('en-GB') : 'Not provided';
+// Normalizes stored identifiers into the 12-digit number printed on the card.
+const formatId = (value) =>
+  String(value || '')
+    .replace(/\D/g, '')
+    .padStart(12, '0')
+    .slice(-12)
+    .replace(/(\d{4})(?=\d)/g, '$1 ');
+// Formats the member's date of birth consistently for the card preview and PDF.
+const formatDob = (value) => (value ? new Date(value).toLocaleDateString('en-GB') : 'Not provided');
 
+// Displays the emergency ID card and generates a fixed-size downloadable PDF.
 const UserIdCard = ({ profile, qrCode, photoUrl }) => {
   const frontRef = useRef(null);
   const [working, setWorking] = useState(false);
@@ -14,19 +22,22 @@ const UserIdCard = ({ profile, qrCode, photoUrl }) => {
   if (!profile) return null;
   const elderlyCareId = formatId(profile.elderlyCareId || profile.userId || profile._id);
 
-  const renderCard = (element) => html2canvas(element, {
-    scale: 2,
-    backgroundColor: '#ffffff',
-    useCORS: true,
-    width: 856,
-    height: 540,
-    windowWidth: 1200,
-    windowHeight: 800,
-    onclone: (documentClone) => {
-      documentClone.querySelector('.user-wallet-card')?.classList.add('pdf-capture');
-    }
-  });
+  // Captures the card at fixed dimensions so mobile and desktop downloads match.
+  const renderCard = (element) =>
+    html2canvas(element, {
+      scale: 2,
+      backgroundColor: '#ffffff',
+      useCORS: true,
+      width: 856,
+      height: 540,
+      windowWidth: 1200,
+      windowHeight: 800,
+      onclone: (documentClone) => {
+        documentClone.querySelector('.user-wallet-card')?.classList.add('pdf-capture');
+      }
+    });
 
+  // Converts the visible front card into a wallet-sized PDF download.
   const downloadPdf = async () => {
     if (!frontRef.current) return;
     setWorking(true);
@@ -55,20 +66,37 @@ const UserIdCard = ({ profile, qrCode, photoUrl }) => {
     <section className="user-id-module">
       <div className="user-card-pair">
         <article className="user-wallet-card" ref={frontRef}>
-          <header><span><img src="/favicon.png" alt="" /> ELDERLYCARE</span><b>IDENTITY CARD</b></header>
+          <header>
+            <span>
+              <img src="/favicon.png" alt="" /> ELDERLYCARE
+            </span>
+            <b>IDENTITY CARD</b>
+          </header>
           <div className="user-card-main">
             <span className="user-card-photo">
-              {photoUrl ? <img src={photoUrl} alt={`${profile.name} profile`} /> : profile.name?.charAt(0)}
+              {photoUrl ? (
+                <img src={photoUrl} alt={`${profile.name} profile`} />
+              ) : (
+                profile.name?.charAt(0)
+              )}
             </span>
             <div className="user-card-person">
               <h3>{profile.name}</h3>
-              <p><strong>Date of birth</strong><br />{formatDob(profile.dob)}</p>
+              <p>
+                <strong>Date of birth</strong>
+                <br />
+                {formatDob(profile.dob)}
+              </p>
             </div>
-            <div className="user-card-qr">{qrCode ? <img src={qrCode} alt="Emergency QR code" /> : <QrcodeOutlined />}<b>SCAN IN EMERGENCY</b></div>
+            <div className="user-card-qr">
+              {qrCode ? <img src={qrCode} alt="Emergency QR code" /> : <QrcodeOutlined />}
+              <b>SCAN IN EMERGENCY</b>
+            </div>
           </div>
-          <footer><strong className="user-card-number">{elderlyCareId}</strong></footer>
+          <footer>
+            <strong className="user-card-number">{elderlyCareId}</strong>
+          </footer>
         </article>
-
       </div>
 
       <Space className="user-card-actions" wrap>

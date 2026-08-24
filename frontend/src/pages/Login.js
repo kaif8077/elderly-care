@@ -1,7 +1,19 @@
 import React, { useContext, useState } from 'react';
 import axios from 'axios';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
-import { Alert, Button, Card, Checkbox, ConfigProvider, Divider, Flex, Form, Input, Space, Typography } from 'antd';
+import {
+  Alert,
+  Button,
+  Card,
+  Checkbox,
+  ConfigProvider,
+  Divider,
+  Flex,
+  Form,
+  Input,
+  Space,
+  Typography
+} from 'antd';
 import { LockOutlined, MailOutlined } from '@ant-design/icons';
 import { AuthContext } from '../context/AuthContext';
 import { toast } from 'react-toastify';
@@ -28,7 +40,8 @@ const Login = () => {
       toast.success('Login successful');
       navigate(location.state?.from || '/dashboard', { replace: true });
     } catch (requestError) {
-      const message = requestError.response?.data?.message || 'Login failed. Check your details and try again.';
+      const message =
+        requestError.response?.data?.message || 'Login failed. Check your details and try again.';
       setError(message);
       toast.error(message);
     } finally {
@@ -37,37 +50,86 @@ const Login = () => {
   };
 
   return (
-    <ConfigProvider componentSize="middle"><main className="care-auth-page">
-      <AuthShowcase />
-      <Card className="care-auth-card" styles={{ body: { padding: 28 } }}>
-        <div className="care-auth-brand">
-          <span className="care-auth-logo"><AuthBrand /></span>
-          <div><Text className="care-eyebrow">ELDERLYCARE</Text><br /><Text type="secondary">Secure member access</Text></div>
-        </div>
-        <Title level={2}>Welcome back</Title>
-        <Text type="secondary">Sign in with your email and password to manage emergency health information.</Text>
-        {location.state?.message && <Alert style={{ marginTop: 18 }} type="success" showIcon message={location.state.message} />}
-        {error && <Alert style={{ marginTop: 18 }} type="error" showIcon message={error} />}
-        <Form layout="vertical" requiredMark={false} onFinish={submit} style={{ marginTop: 22 }}>
-          <Form.Item label="Email address" name="email" rules={[
-            { required: true, message: 'Enter your email address' },
-            { type: 'email', message: 'Enter a valid email address' }
-          ]}>
-            <Input size="middle" prefix={<MailOutlined />} autoComplete="email" placeholder="Enter your email address" />
-          </Form.Item>
-          <Form.Item label="Password" name="password" rules={[{ required: true, message: 'Enter your password' }]}>
-            <Input.Password size="middle" prefix={<LockOutlined />} autoComplete="current-password" placeholder="Enter your password" />
-          </Form.Item>
-          <Flex justify="space-between" align="center" style={{ margin: '-8px 0 16px' }}><Checkbox>Remember me</Checkbox><Link to="/forgot-password">Forgot password?</Link></Flex>
-          <Button size="middle" type="primary" htmlType="submit" loading={loading} block>Sign in securely</Button>
-        </Form>
-        <Divider plain>or</Divider>
-        <Space direction="vertical" size={6} className="care-auth-footer" style={{ width: '100%' }}>
-          <Text>New to ElderlyCare? <Link to="/register">Create an account</Link></Text>
-          <Button type="link" onClick={() => navigate('/')}>Return home</Button>
-        </Space>
-      </Card>
-    </main></ConfigProvider>
+    <ConfigProvider componentSize="middle">
+      <main className="care-auth-page">
+        <AuthShowcase />
+        <Card className="care-auth-card" styles={{ body: { padding: 28 } }}>
+          <div className="care-auth-brand">
+            <span className="care-auth-logo">
+              <AuthBrand />
+            </span>
+            <div>
+              <Text className="care-eyebrow">ELDERLYCARE</Text>
+              <br />
+              <Text type="secondary">Secure member access</Text>
+            </div>
+          </div>
+          <Title level={2}>Welcome back</Title>
+          <Text type="secondary">
+            Sign in with your email and password to manage emergency health information.
+          </Text>
+          {location.state?.message && (
+            <Alert
+              style={{ marginTop: 18 }}
+              type="success"
+              showIcon
+              message={location.state.message}
+            />
+          )}
+          {error && <Alert style={{ marginTop: 18 }} type="error" showIcon message={error} />}
+          <Form layout="vertical" requiredMark={false} onFinish={submit} style={{ marginTop: 22 }}>
+            <Form.Item
+              label="Email address"
+              name="email"
+              rules={[
+                { required: true, message: 'Enter your email address' },
+                { type: 'email', message: 'Enter a valid email address' }
+              ]}
+            >
+              <Input
+                size="middle"
+                prefix={<MailOutlined />}
+                autoComplete="email"
+                placeholder="Enter your email address"
+              />
+            </Form.Item>
+            <Form.Item
+              label="Password"
+              name="password"
+              rules={[{ required: true, message: 'Enter your password' }]}
+            >
+              <Input.Password
+                size="middle"
+                prefix={<LockOutlined />}
+                autoComplete="current-password"
+                placeholder="Enter your password"
+              />
+            </Form.Item>
+            <Flex justify="space-between" align="center" style={{ margin: '-8px 0 16px' }}>
+              <Checkbox>Remember me</Checkbox>
+              <Link to="/forgot-password">Forgot password?</Link>
+            </Flex>
+            <Button size="middle" type="primary" htmlType="submit" loading={loading} block>
+              Sign in securely
+            </Button>
+          </Form>
+          <Divider plain>or</Divider>
+          <Space
+            direction="vertical"
+            size={6}
+            className="care-auth-footer"
+            style={{ width: '100%' }}
+          >
+            <Text>
+              New to ElderlyCare? <Link to="/register">Create an account</Link>
+            </Text>
+            <Button type="link" onClick={() => navigate('/')}>
+              Return home
+            </Button>
+          </Space>
+        </Card>
+      </main>
+    </ConfigProvider>
   );
 };
 

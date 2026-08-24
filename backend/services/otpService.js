@@ -4,12 +4,16 @@ const Otp = require('../models/Otp');
 const OTP_TTL_MS = 10 * 60 * 1000;
 const MAX_ATTEMPTS = 5;
 
-const normalizeIdentifier = (identifier) => String(identifier || '').trim().toLowerCase();
+const normalizeIdentifier = (identifier) =>
+  String(identifier || '')
+    .trim()
+    .toLowerCase();
 
-const hashOtp = (identifier, purpose, otp) => crypto
-  .createHmac('sha256', process.env.JWT_SECRET)
-  .update(`${normalizeIdentifier(identifier)}:${purpose}:${otp}`)
-  .digest('hex');
+const hashOtp = (identifier, purpose, otp) =>
+  crypto
+    .createHmac('sha256', process.env.JWT_SECRET)
+    .update(`${normalizeIdentifier(identifier)}:${purpose}:${otp}`)
+    .digest('hex');
 
 const generateOtp = () => crypto.randomInt(100000, 1000000).toString();
 
@@ -30,8 +34,7 @@ const createOtp = async ({ identifier, purpose }) => {
 
 const verifyOtp = async ({ identifier, purpose, otp }) => {
   const normalized = normalizeIdentifier(identifier);
-  const record = await Otp.findOne({ identifier: normalized, purpose })
-    .sort({ createdAt: -1 });
+  const record = await Otp.findOne({ identifier: normalized, purpose }).sort({ createdAt: -1 });
 
   if (!record || record.expiresAt <= new Date()) {
     if (record) await Otp.deleteOne({ _id: record._id });

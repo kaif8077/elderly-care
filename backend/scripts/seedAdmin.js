@@ -4,14 +4,16 @@ const mongoose = require('mongoose');
 const User = require('../models/User');
 const { DEFAULT_ADMIN_PERMISSIONS } = require('../middleware/requirePermission');
 
-const normalizeEmail = (email) => String(email || '').trim().toLowerCase();
-const isStrongPassword = (password) => (
-  password.length >= 12
-  && /[a-z]/.test(password)
-  && /[A-Z]/.test(password)
-  && /\d/.test(password)
-  && /[^A-Za-z0-9]/.test(password)
-);
+const normalizeEmail = (email) =>
+  String(email || '')
+    .trim()
+    .toLowerCase();
+const isStrongPassword = (password) =>
+  password.length >= 12 &&
+  /[a-z]/.test(password) &&
+  /[A-Z]/.test(password) &&
+  /\d/.test(password) &&
+  /[^A-Za-z0-9]/.test(password);
 
 const seedAdmin = async () => {
   const email = normalizeEmail(process.env.ADMIN_EMAIL);
@@ -19,7 +21,8 @@ const seedAdmin = async () => {
 
   if (!process.env.MONGO_URI) throw new Error('MONGO_URI is required');
   if (!email || !/^\S+@\S+\.\S+$/.test(email)) throw new Error('A valid ADMIN_EMAIL is required');
-  if (!password || password.length < 8) throw new Error('ADMIN_PASSWORD must be at least 8 characters');
+  if (!password || password.length < 8)
+    throw new Error('ADMIN_PASSWORD must be at least 8 characters');
   if (process.env.NODE_ENV === 'production' && !isStrongPassword(password)) {
     throw new Error('ADMIN_PASSWORD does not meet production password requirements');
   }
@@ -29,7 +32,9 @@ const seedAdmin = async () => {
 
   if (existing) {
     if (!['admin', 'super_admin'].includes(existing.role)) {
-      throw new Error('An existing non-admin account uses ADMIN_EMAIL; refusing privilege escalation');
+      throw new Error(
+        'An existing non-admin account uses ADMIN_EMAIL; refusing privilege escalation'
+      );
     }
     console.log('Admin account already exists. No changes were made.');
     return;

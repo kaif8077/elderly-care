@@ -21,12 +21,13 @@ const getFromAddress = () => {
   return process.env.RESEND_FROM_EMAIL;
 };
 
-const escapeHtml = (value = '') => String(value)
-  .replace(/&/g, '&amp;')
-  .replace(/</g, '&lt;')
-  .replace(/>/g, '&gt;')
-  .replace(/"/g, '&quot;')
-  .replace(/'/g, '&#39;');
+const escapeHtml = (value = '') =>
+  String(value)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;');
 
 const sendEmail = async ({ to, subject, html, text, replyTo }) => {
   const { data, error } = await getClient().emails.send({

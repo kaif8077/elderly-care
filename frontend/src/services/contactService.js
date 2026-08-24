@@ -1,8 +1,8 @@
 import api from './api';
 
+// Sends a validated contact request through the shared API client.
 export const submitContactForm = async (formData) => {
   try {
-    console.log('Sending contact form to:', '/api/contact');
     const response = await api.post('/api/contact', formData);
     return response.data;
   } catch (error) {

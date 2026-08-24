@@ -3,10 +3,17 @@ const authMiddleware = require('../middleware/authmiddleware');
 const controller = require('../controllers/careWorkflowController');
 
 const router = express.Router();
-const safe = (handler) => (req, res, next) => Promise.resolve(handler(req, res, next)).catch((error) => {
-  console.error('Care workflow error:', error.message);
-  if (!res.headersSent) res.status(error.code === 11000 ? 409 : 500).json({ message: error.code === 11000 ? 'This care-team invitation already exists' : 'Unable to complete this care workflow request' });
-});
+const safe = (handler) => (req, res, next) =>
+  Promise.resolve(handler(req, res, next)).catch((error) => {
+    console.error('Care workflow error:', error.message);
+    if (!res.headersSent)
+      res.status(error.code === 11000 ? 409 : 500).json({
+        message:
+          error.code === 11000
+            ? 'This care-team invitation already exists'
+            : 'Unable to complete this care workflow request'
+      });
+  });
 router.post('/emergency-contact-verification/:token', safe(controller.verifyEmergencyContact));
 router.use(authMiddleware);
 router.get('/overview', safe(controller.getOverview));

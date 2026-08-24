@@ -34,7 +34,9 @@ const getProfileStatistics = async () => {
       }
     },
     { $set: { user: { $first: '$user' } } },
-    { $match: { 'user.role': { $nin: ['admin', 'super_admin'] }, 'user.isDeleted': { $ne: true } } },
+    {
+      $match: { 'user.role': { $nin: ['admin', 'super_admin'] }, 'user.isDeleted': { $ne: true } }
+    },
     {
       $project: {
         complete: {
@@ -50,11 +52,13 @@ const getProfileStatistics = async () => {
         }
       }
     },
-    { $group: {
-      _id: null,
-      withProfile: { $sum: 1 },
-      complete: { $sum: { $cond: ['$complete', 1, 0] } }
-    } }
+    {
+      $group: {
+        _id: null,
+        withProfile: { $sum: 1 },
+        complete: { $sum: { $cond: ['$complete', 1, 0] } }
+      }
+    }
   ]);
 
   return latestProfiles[0] || { withProfile: 0, complete: 0 };
@@ -73,12 +77,22 @@ const getQrStatistics = async () => {
       }
     },
     { $set: { user: { $first: '$user' } } },
-    { $match: { 'user.role': { $nin: ['admin', 'super_admin'] }, 'user.isDeleted': { $ne: true } } },
+    {
+      $match: { 'user.role': { $nin: ['admin', 'super_admin'] }, 'user.isDeleted': { $ne: true } }
+    },
     {
       $group: {
         _id: null,
         generated: { $sum: 1 },
-        active: { $sum: { $cond: [{ $and: [{ $eq: ['$qr.status', 'active'] }, { $ne: ['$qr.token', null] }] }, 1, 0] } },
+        active: {
+          $sum: {
+            $cond: [
+              { $and: [{ $eq: ['$qr.status', 'active'] }, { $ne: ['$qr.token', null] }] },
+              1,
+              0
+            ]
+          }
+        },
         revoked: { $sum: { $cond: [{ $eq: ['$qr.status', 'revoked'] }, 1, 0] } },
         legacy: { $sum: { $cond: [{ $eq: [{ $ifNull: ['$qr.token', null] }, null] }, 1, 0] } }
       }
@@ -164,7 +178,11 @@ const getDashboardStatistics = async () => {
       capability: 'revocable_tokens'
     },
     reports: { total: null, capability: 'not_implemented' },
-    emergencyAlerts: { today: alertsToday, unresolved: unresolvedAlerts, capability: 'email_activation' },
+    emergencyAlerts: {
+      today: alertsToday,
+      unresolved: unresolvedAlerts,
+      capability: 'email_activation'
+    },
     idCards: { total: null, capability: 'not_implemented' },
     registrationsByMonth,
     refreshedAt: new Date().toISOString()

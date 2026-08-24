@@ -11,10 +11,16 @@ const list = (Model, fields) => async (req, res) => {
     const { page, limit } = pagination(req.query);
     const search = String(req.query.search || '').trim();
     const match = search
-      ? { $or: fields.map((field) => ({ [field]: { $regex: escapeRegExp(search), $options: 'i' } })) }
+      ? {
+          $or: fields.map((field) => ({ [field]: { $regex: escapeRegExp(search), $options: 'i' } }))
+        }
       : {};
     const [items, total] = await Promise.all([
-      Model.find(match).sort({ createdAt: -1 }).skip((page - 1) * limit).limit(limit).lean(),
+      Model.find(match)
+        .sort({ createdAt: -1 })
+        .skip((page - 1) * limit)
+        .limit(limit)
+        .lean(),
       Model.countDocuments(match)
     ]);
     return res.json({

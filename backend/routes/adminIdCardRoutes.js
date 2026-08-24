@@ -8,7 +8,17 @@ const router = express.Router();
 router.use(authenticateAdmin, requireRole('admin', 'super_admin'));
 router.get('/:userId', requirePermission('idCards.read'), controller.getCard);
 router.get('/:userId/photo', requirePermission('idCards.read'), controller.getPhoto);
-router.post('/:userId/regenerate', requireTrustedOrigin, requirePermission('qr.regenerate'), controller.regenerateQr);
-router.post('/:userId/revoke', requireTrustedOrigin, requirePermission('qr.revoke'), controller.revokeQr);
+router.post(
+  '/:userId/regenerate',
+  requireTrustedOrigin,
+  requirePermission('qr.regenerate'),
+  controller.regenerateQr
+);
+router.post(
+  '/:userId/revoke',
+  requireTrustedOrigin,
+  requirePermission('qr.revoke'),
+  controller.revokeQr
+);
 
 module.exports = router;

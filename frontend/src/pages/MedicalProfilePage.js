@@ -9,9 +9,19 @@ const MedicalProfilePage = () => {
     <main className="care-page member-focused-page">
       <div className="member-page-title">
         <Typography.Title level={2}>Medical Profile</Typography.Title>
-        <Typography.Text type="secondary">Add or update the information used across your private profile and emergency tools.</Typography.Text>
+        <Typography.Text type="secondary">
+          Add or update the information used across your private profile and emergency tools.
+        </Typography.Text>
       </div>
-      <Card className="member-content-card" title={<Space><SafetyCertificateOutlined />Health information form</Space>}>
+      <Card
+        className="member-content-card"
+        title={
+          <Space>
+            <SafetyCertificateOutlined />
+            Health information form
+          </Space>
+        }
+      >
         <MedicalForm onSubmissionSuccess={() => navigate('/profile')} />
       </Card>
     </main>

@@ -1,14 +1,14 @@
 const mongoose = require('mongoose');
 
 const ContactSchema = new mongoose.Schema({
-  name: { 
-    type: String, 
+  name: {
+    type: String,
     required: [true, 'Name is required'],
     trim: true,
     maxlength: [100, 'Name is too long']
   },
-  email: { 
-    type: String, 
+  email: {
+    type: String,
     required: [true, 'Email is required'],
     trim: true,
     lowercase: true,
@@ -28,9 +28,9 @@ const ContactSchema = new mongoose.Schema({
     maxlength: [2000, 'Message should be 2000 characters or fewer']
   },
   duplicateKey: { type: String, select: false },
-  createdAt: { 
-    type: Date, 
-    default: Date.now 
+  createdAt: {
+    type: Date,
+    default: Date.now
   }
 });
 

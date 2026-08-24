@@ -3,10 +3,7 @@ const AuditLog = require('../models/AuditLog');
 
 const hashIp = (ip) => {
   if (!ip) return null;
-  return crypto
-    .createHmac('sha256', process.env.JWT_SECRET)
-    .update(String(ip))
-    .digest('hex');
+  return crypto.createHmac('sha256', process.env.JWT_SECRET).update(String(ip)).digest('hex');
 };
 
 const writeAuditLog = async ({

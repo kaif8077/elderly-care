@@ -1,6 +1,21 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
-import { Alert, Button, Card, Col, Descriptions, Drawer, Empty, Input, Row, Select, Space, Table, Tag, Typography } from 'antd';
+import {
+  Alert,
+  Button,
+  Card,
+  Col,
+  Descriptions,
+  Drawer,
+  Empty,
+  Input,
+  Row,
+  Select,
+  Space,
+  Table,
+  Tag,
+  Typography
+} from 'antd';
 import { ReloadOutlined, SearchOutlined } from '@ant-design/icons';
 import adminApi from '../../services/adminApi';
 
@@ -9,7 +24,10 @@ const { Text } = Typography;
 const AdminAuditLogs = () => {
   const [searchParams, setSearchParams] = useSearchParams();
   const [search, setSearch] = useState(searchParams.get('search') || '');
-  const [data, setData] = useState({ logs: [], pagination: { page: 1, pages: 1, total: 0, limit: 10 } });
+  const [data, setData] = useState({
+    logs: [],
+    pagination: { page: 1, pages: 1, total: 0, limit: 10 }
+  });
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [selected, setSelected] = useState(null);
@@ -17,7 +35,9 @@ const AdminAuditLogs = () => {
 
   const updateQuery = (updates) => {
     const next = new URLSearchParams(searchParams);
-    Object.entries(updates).forEach(([key, value]) => value ? next.set(key, value) : next.delete(key));
+    Object.entries(updates).forEach(([key, value]) =>
+      value ? next.set(key, value) : next.delete(key)
+    );
     if (!Object.hasOwn(updates, 'page')) next.set('page', '1');
     setSearchParams(next);
   };
@@ -34,42 +54,187 @@ const AdminAuditLogs = () => {
     }
   }, [query]);
 
-  useEffect(() => { load(); }, [load]);
+  useEffect(() => {
+    load();
+  }, [load]);
 
   const columns = [
-    { title: 'Date', dataIndex: 'createdAt', key: 'createdAt', width: 180, render: (value) => new Date(value).toLocaleString() },
-    { title: 'Admin', key: 'actor', width: 210, render: (_, log) => <div><Text strong>{log.actor?.name || 'System'}</Text><br /><Text type="secondary">{log.actor?.email || log.actorRole || 'Unknown'}</Text></div> },
-    { title: 'Action', dataIndex: 'action', key: 'action', render: (value) => String(value).replaceAll('_', ' ') },
-    { title: 'Resource', key: 'resource', render: (_, log) => <div>{log.resourceType}<br /><Text type="secondary">{log.resourceId || '—'}</Text></div> },
-    { title: 'Result', dataIndex: 'success', key: 'success', render: (value) => <Tag color={value ? 'blue' : 'orange'}>{value ? 'Succeeded' : 'Failed'}</Tag> },
-    { title: 'Reason / description', key: 'description', width: 300, render: (_, log) => log.reason || log.description || '—' },
-    { title: 'Action', key: 'details', fixed: 'right', width: 100, render: (_, log) => <Button onClick={() => setSelected(log)}>Details</Button> }
+    {
+      title: 'Date',
+      dataIndex: 'createdAt',
+      key: 'createdAt',
+      width: 180,
+      render: (value) => new Date(value).toLocaleString()
+    },
+    {
+      title: 'Admin',
+      key: 'actor',
+      width: 210,
+      render: (_, log) => (
+        <div>
+          <Text strong>{log.actor?.name || 'System'}</Text>
+          <br />
+          <Text type="secondary">{log.actor?.email || log.actorRole || 'Unknown'}</Text>
+        </div>
+      )
+    },
+    {
+      title: 'Action',
+      dataIndex: 'action',
+      key: 'action',
+      render: (value) => String(value).replaceAll('_', ' ')
+    },
+    {
+      title: 'Resource',
+      key: 'resource',
+      render: (_, log) => (
+        <div>
+          {log.resourceType}
+          <br />
+          <Text type="secondary">{log.resourceId || '—'}</Text>
+        </div>
+      )
+    },
+    {
+      title: 'Result',
+      dataIndex: 'success',
+      key: 'success',
+      render: (value) => (
+        <Tag color={value ? 'blue' : 'orange'}>{value ? 'Succeeded' : 'Failed'}</Tag>
+      )
+    },
+    {
+      title: 'Reason / description',
+      key: 'description',
+      width: 300,
+      render: (_, log) => log.reason || log.description || '—'
+    },
+    {
+      title: 'Action',
+      key: 'details',
+      fixed: 'right',
+      width: 100,
+      render: (_, log) => <Button onClick={() => setSelected(log)}>Details</Button>
+    }
   ];
 
   return (
     <Space direction="vertical" size={18} style={{ width: '100%' }}>
-      <Alert type="info" showIcon message="Administrative activity" description="Passwords, tokens, and complete medical records are not stored in audit logs." />
-      {error && <Alert type="error" showIcon message={error} action={<Button onClick={load}>Retry</Button>} />}
+      <Alert
+        type="info"
+        showIcon
+        message="Administrative activity"
+        description="Passwords, tokens, and complete medical records are not stored in audit logs."
+      />
+      {error && (
+        <Alert
+          type="error"
+          showIcon
+          message={error}
+          action={<Button onClick={load}>Retry</Button>}
+        />
+      )}
       <Card size="small">
         <Row gutter={[12, 12]} align="middle">
-          <Col xs={24} lg={10}><Space.Compact block><Input size="middle" value={search} onChange={(event) => setSearch(event.target.value)} onPressEnter={() => updateQuery({ search: search.trim() })} prefix={<SearchOutlined />} placeholder="Action, resource, or reason" allowClear /><Button size="middle" type="primary" onClick={() => updateQuery({ search: search.trim() })}>Search</Button></Space.Compact></Col>
-          <Col xs={24} sm={12} lg={4}><Select size="middle" allowClear value={query.success} onChange={(value) => updateQuery({ success: value })} placeholder="Result" style={{ width: '100%' }} options={[{ value: 'true', label: 'Succeeded' }, { value: 'false', label: 'Failed' }]} /></Col>
-          <Col xs={24} sm={12} lg={3}><Button size="middle" block icon={<ReloadOutlined />} onClick={load}>Refresh</Button></Col>
+          <Col xs={24} lg={10}>
+            <Space.Compact block>
+              <Input
+                size="middle"
+                value={search}
+                onChange={(event) => setSearch(event.target.value)}
+                onPressEnter={() => updateQuery({ search: search.trim() })}
+                prefix={<SearchOutlined />}
+                placeholder="Action, resource, or reason"
+                allowClear
+              />
+              <Button
+                size="middle"
+                type="primary"
+                onClick={() => updateQuery({ search: search.trim() })}
+              >
+                Search
+              </Button>
+            </Space.Compact>
+          </Col>
+          <Col xs={24} sm={12} lg={4}>
+            <Select
+              size="middle"
+              allowClear
+              value={query.success}
+              onChange={(value) => updateQuery({ success: value })}
+              placeholder="Result"
+              style={{ width: '100%' }}
+              options={[
+                { value: 'true', label: 'Succeeded' },
+                { value: 'false', label: 'Failed' }
+              ]}
+            />
+          </Col>
+          <Col xs={24} sm={12} lg={3}>
+            <Button size="middle" block icon={<ReloadOutlined />} onClick={load}>
+              Refresh
+            </Button>
+          </Col>
         </Row>
       </Card>
-      <Drawer width={720} title="Audit event details" open={Boolean(selected)} onClose={() => setSelected(null)}>
-        {selected && <Space direction="vertical" size={18} style={{ width: '100%' }}>
-          <Descriptions bordered size="small" column={1} items={[
-            { key: 'date', label: 'Date and time', children: new Date(selected.createdAt).toLocaleString() },
-            { key: 'admin', label: 'Administrator', children: `${selected.actor?.name || 'System'}${selected.actor?.email ? ` · ${selected.actor.email}` : ''}` },
-            { key: 'action', label: 'Action', children: String(selected.action).replaceAll('_', ' ') },
-            { key: 'resource', label: 'Resource', children: `${selected.resourceType || 'Unknown'}${selected.resourceId ? ` · ${selected.resourceId}` : ''}` },
-            { key: 'result', label: 'Result', children: <Tag color={selected.success ? 'blue' : 'orange'}>{selected.success ? 'Succeeded' : 'Failed'}</Tag> },
-            { key: 'reason', label: 'Reason / description', children: selected.reason || selected.description || 'Not provided' },
-            { key: 'device', label: 'Device', children: selected.userAgent || 'Not recorded' }
-          ]} />
-          <Alert type="info" showIcon message="Sensitive values are excluded" description="Passwords, tokens, and complete medical records are never displayed in audit details." />
-        </Space>}
+      <Drawer
+        width={720}
+        title="Audit event details"
+        open={Boolean(selected)}
+        onClose={() => setSelected(null)}
+      >
+        {selected && (
+          <Space direction="vertical" size={18} style={{ width: '100%' }}>
+            <Descriptions
+              bordered
+              size="small"
+              column={1}
+              items={[
+                {
+                  key: 'date',
+                  label: 'Date and time',
+                  children: new Date(selected.createdAt).toLocaleString()
+                },
+                {
+                  key: 'admin',
+                  label: 'Administrator',
+                  children: `${selected.actor?.name || 'System'}${selected.actor?.email ? ` · ${selected.actor.email}` : ''}`
+                },
+                {
+                  key: 'action',
+                  label: 'Action',
+                  children: String(selected.action).replaceAll('_', ' ')
+                },
+                {
+                  key: 'resource',
+                  label: 'Resource',
+                  children: `${selected.resourceType || 'Unknown'}${selected.resourceId ? ` · ${selected.resourceId}` : ''}`
+                },
+                {
+                  key: 'result',
+                  label: 'Result',
+                  children: (
+                    <Tag color={selected.success ? 'blue' : 'orange'}>
+                      {selected.success ? 'Succeeded' : 'Failed'}
+                    </Tag>
+                  )
+                },
+                {
+                  key: 'reason',
+                  label: 'Reason / description',
+                  children: selected.reason || selected.description || 'Not provided'
+                },
+                { key: 'device', label: 'Device', children: selected.userAgent || 'Not recorded' }
+              ]}
+            />
+            <Alert
+              type="info"
+              showIcon
+              message="Sensitive values are excluded"
+              description="Passwords, tokens, and complete medical records are never displayed in audit details."
+            />
+          </Space>
+        )}
       </Drawer>
       <Card>
         <Table

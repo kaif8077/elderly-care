@@ -20,9 +20,10 @@ const AdminLayout = () => {
   const [mobileOpen, setMobileOpen] = useState(false);
   const [collapsed, setCollapsed] = useState(false);
   const location = useLocation();
-  const title = titles[location.pathname]
-    || (location.pathname.startsWith('/admin/users/') ? 'User details' : null)
-    || (location.pathname.startsWith('/admin/id-cards/') ? 'ID card' : 'Administration');
+  const title =
+    titles[location.pathname] ||
+    (location.pathname.startsWith('/admin/users/') ? 'User details' : null) ||
+    (location.pathname.startsWith('/admin/id-cards/') ? 'ID card' : 'Administration');
   const sidebarWidth = collapsed ? 76 : 250;
 
   return (
@@ -60,7 +61,9 @@ const AdminLayout = () => {
           />
         </Header>
         <Content className="admin-ant-content">
-          <div className="admin-ant-page"><Outlet /></div>
+          <div className="admin-ant-page">
+            <Outlet />
+          </div>
         </Content>
       </Layout>
     </Layout>

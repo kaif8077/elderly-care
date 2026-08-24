@@ -17,9 +17,12 @@ const sendPdf = async (res, report, includeInsurance, filename) => {
 exports.userDownload = async (req, res) => {
   try {
     const report = await getReport({ reportId: req.params.reportId, userId: req.user.id });
-    if (!report || report.isArchived) return res.status(404).json({ message: 'Medical report not found' });
+    if (!report || report.isArchived)
+      return res.status(404).json({ message: 'Medical report not found' });
     const safeName = String(report.snapshotData.personal.name || 'elder')
-      .replace(/[^a-z0-9]+/gi, '-').replace(/^-|-$/g, '').slice(0, 60);
+      .replace(/[^a-z0-9]+/gi, '-')
+      .replace(/^-|-$/g, '')
+      .slice(0, 60);
     await sendPdf(
       res,
       report,
@@ -35,8 +38,11 @@ exports.userDownload = async (req, res) => {
 exports.adminDownload = async (req, res) => {
   try {
     const report = await getReport({ reportId: req.params.reportId });
-    if (!report || report.isArchived) return res.status(404).json({ message: 'Medical report not found' });
-    const pdf = await generateMedicalReportPdf(report, { includeInsurance: req.query.includeInsurance === 'true' });
+    if (!report || report.isArchived)
+      return res.status(404).json({ message: 'Medical report not found' });
+    const pdf = await generateMedicalReportPdf(report, {
+      includeInsurance: req.query.includeInsurance === 'true'
+    });
     await writeAuditLog({
       req,
       actor: req.admin,
@@ -97,10 +103,18 @@ exports.adminRegenerate = async (req, res) => {
       affectedUserId: source.userId,
       description: 'Admin generated a new report snapshot from the latest medical profile'
     });
-    res.status(201).json({ message: 'New report version generated', reportId: report._id, reportVersion: report.reportVersion });
+    res.status(201).json({
+      message: 'New report version generated',
+      reportId: report._id,
+      reportVersion: report.reportVersion
+    });
   } catch (error) {
-    if (error.code === 'PROFILE_REQUIRED') return res.status(409).json({ message: error.message, code: error.code });
-    if (error.code === 11000) return res.status(409).json({ message: 'A report is already being generated. Please retry.' });
+    if (error.code === 'PROFILE_REQUIRED')
+      return res.status(409).json({ message: error.message, code: error.code });
+    if (error.code === 11000)
+      return res
+        .status(409)
+        .json({ message: 'A report is already being generated. Please retry.' });
     res.status(500).json({ message: 'Unable to regenerate medical report' });
   }
 };

@@ -25,19 +25,24 @@ const calculateCompletion = (profile) => {
     profile.emergencyPhone || primaryEmergency?.phone,
     profile.dietPreference
   ];
-  return Math.round((fields.filter((value) => value !== null && value !== undefined && value !== '').length / fields.length) * 100);
+  return Math.round(
+    (fields.filter((value) => value !== null && value !== undefined && value !== '').length /
+      fields.length) *
+      100
+  );
 };
 
-const isProfileComplete = (profile) => Boolean(
-  profile
-  && profile.name
-  && profile.dob
-  && profile.gender
-  && profile.phone
-  && profile.address
-  && (profile.emergencyContact || profile.emergencyContacts?.[0]?.name)
-  && (profile.emergencyPhone || profile.emergencyContacts?.[0]?.phone)
-);
+const isProfileComplete = (profile) =>
+  Boolean(
+    profile &&
+    profile.name &&
+    profile.dob &&
+    profile.gender &&
+    profile.phone &&
+    profile.address &&
+    (profile.emergencyContact || profile.emergencyContacts?.[0]?.name) &&
+    (profile.emergencyPhone || profile.emergencyContacts?.[0]?.phone)
+  );
 
 const completeProfileExpression = {
   $and: [
@@ -49,13 +54,23 @@ const completeProfileExpression = {
     { $ne: ['$profile.address', null] },
     {
       $or: [
-        { $and: [{ $ne: ['$profile.emergencyContact', null] }, { $ne: ['$profile.emergencyContact', ''] }] },
+        {
+          $and: [
+            { $ne: ['$profile.emergencyContact', null] },
+            { $ne: ['$profile.emergencyContact', ''] }
+          ]
+        },
         { $gt: [{ $size: { $ifNull: ['$profile.emergencyContacts', []] } }, 0] }
       ]
     },
     {
       $or: [
-        { $and: [{ $ne: ['$profile.emergencyPhone', null] }, { $ne: ['$profile.emergencyPhone', ''] }] },
+        {
+          $and: [
+            { $ne: ['$profile.emergencyPhone', null] },
+            { $ne: ['$profile.emergencyPhone', ''] }
+          ]
+        },
         { $gt: [{ $size: { $ifNull: ['$profile.emergencyContacts', []] } }, 0] }
       ]
     }
@@ -74,7 +89,10 @@ const listUsers = async (query) => {
   const { page, limit, sortBy, sortOrder } = parseQuery(query);
   const match = { role: { $nin: ['admin', 'super_admin'] } };
 
-  if (query.accountStatus && ['active', 'inactive', 'suspended', 'archived'].includes(query.accountStatus)) {
+  if (
+    query.accountStatus &&
+    ['active', 'inactive', 'suspended', 'archived'].includes(query.accountStatus)
+  ) {
     match.accountStatus = query.accountStatus;
   } else {
     match.isDeleted = { $ne: true };
@@ -92,10 +110,21 @@ const listUsers = async (query) => {
           { $limit: 1 },
           {
             $project: {
-              name: 1, dob: 1, gender: 1, bloodGroup: 1, height: 1, weight: 1,
-              phone: 1, address: 1, emergencyContact: 1, emergencyPhone: 1,
-              emergencyContacts: 1, elderlyCareId: 1, profilePhoto: 1,
-              dietPreference: 1, updatedAt: 1
+              name: 1,
+              dob: 1,
+              gender: 1,
+              bloodGroup: 1,
+              height: 1,
+              weight: 1,
+              phone: 1,
+              address: 1,
+              emergencyContact: 1,
+              emergencyPhone: 1,
+              emergencyContacts: 1,
+              elderlyCareId: 1,
+              profilePhoto: 1,
+              dietPreference: 1,
+              updatedAt: 1
             }
           }
         ],
@@ -140,7 +169,8 @@ const listUsers = async (query) => {
     pipeline.push({ $match: { $expr: { $not: [completeProfileExpression] } } });
   }
   if (query.qrStatus === 'generated') pipeline.push({ $match: { qrCode: { $ne: null } } });
-  if (query.qrStatus === 'active') pipeline.push({ $match: { 'qrCode.status': 'active', 'qrCode.token': { $ne: null } } });
+  if (query.qrStatus === 'active')
+    pipeline.push({ $match: { 'qrCode.status': 'active', 'qrCode.token': { $ne: null } } });
   if (query.qrStatus === 'revoked') pipeline.push({ $match: { 'qrCode.status': 'revoked' } });
   if (query.qrStatus === 'missing') pipeline.push({ $match: { qrCode: null } });
 
@@ -182,7 +212,7 @@ const listUsers = async (query) => {
     profileCompletion: calculateCompletion(user.profile),
     profileStatus: isProfileComplete(user.profile) ? 'complete' : 'incomplete',
     reportStatus: 'not_available',
-    qrStatus: user.qrCode?.token ? user.qrCode.status : (user.qrCode ? 'legacy' : 'missing'),
+    qrStatus: user.qrCode?.token ? user.qrCode.status : user.qrCode ? 'legacy' : 'missing',
     accountStatus: user.accountStatus || 'active',
     createdAt: user.createdAt || null,
     updatedAt: user.profile?.updatedAt || user.updatedAt || null

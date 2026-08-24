@@ -5,23 +5,28 @@ const { sendOtpEmail } = require('../services/emailService');
 const { createOtp, normalizeIdentifier, verifyOtp } = require('../services/otpService');
 const { normalizeSessionVersion } = require('../services/userSessionService');
 
-const signUserToken = (user) => jwt.sign(
-  { id: user._id, sessionVersion: normalizeSessionVersion(user.sessionVersion) },
-  process.env.JWT_SECRET,
-  { expiresIn: '7d' }
-);
+// Signs a short-lived member token containing only authorization-safe claims.
+const signUserToken = (user) =>
+  jwt.sign(
+    { id: user._id, sessionVersion: normalizeSessionVersion(user.sessionVersion) },
+    process.env.JWT_SECRET,
+    { expiresIn: '7d' }
+  );
 
+// Maps a user document to the safe account fields returned to the frontend.
 const publicUser = (user) => ({
   _id: user._id,
   email: user.email,
   name: user.name
 });
 
+// Creates and emails an OTP for the requested registration or recovery purpose.
 const sendPurposeOtp = async (email, purpose) => {
   const otp = await createOtp({ identifier: email, purpose });
   await sendOtpEmail({ to: email, otp, purpose });
 };
 
+// Starts registration by validating the email and sending its verification OTP.
 exports.register = async (req, res) => {
   const email = normalizeIdentifier(req.body.email);
 
@@ -39,6 +44,7 @@ exports.register = async (req, res) => {
   }
 };
 
+// Verifies the registration OTP before account creation is allowed.
 exports.verifyOTP = async (req, res) => {
   try {
     const result = await verifyOtp({
@@ -65,6 +71,7 @@ exports.verifyOTP = async (req, res) => {
   }
 };
 
+// Creates the verified account, hashes its password, and returns a login token.
 exports.completeRegistration = async (req, res) => {
   const { name, password, registrationToken } = req.body;
 
@@ -78,7 +85,9 @@ exports.completeRegistration = async (req, res) => {
     }
 
     if (!name || !password || password.length < 8) {
-      return res.status(400).json({ message: 'Name and a password of at least 8 characters are required' });
+      return res
+        .status(400)
+        .json({ message: 'Name and a password of at least 8 characters are required' });
     }
 
     const user = await User.create({
@@ -95,13 +104,16 @@ exports.completeRegistration = async (req, res) => {
     });
   } catch (error) {
     if (error.name === 'JsonWebTokenError' || error.name === 'TokenExpiredError') {
-      return res.status(400).json({ message: 'Registration verification expired. Request a new OTP.' });
+      return res
+        .status(400)
+        .json({ message: 'Registration verification expired. Request a new OTP.' });
     }
     console.error('Complete registration error:', error.message);
     res.status(500).json({ message: 'Server error' });
   }
 };
 
+// Authenticates an active user with email and password.
 exports.login = async (req, res) => {
   const email = normalizeIdentifier(req.body.email);
 
@@ -126,6 +138,7 @@ exports.login = async (req, res) => {
   }
 };
 
+// Returns the current authenticated account for session restoration.
 exports.me = async (req, res) => {
   try {
     const user = await User.findById(req.user.id).select('_id email name').lean();
@@ -156,6 +169,7 @@ exports.verifyLoginOTP = async (req, res) => {
   }
 };
 
+// Starts password recovery by emailing a short-lived reset OTP.
 exports.forgotPassword = async (req, res) => {
   const email = normalizeIdentifier(req.body.email);
 
@@ -171,6 +185,7 @@ exports.forgotPassword = async (req, res) => {
   }
 };
 
+// Validates the password-reset OTP before accepting a new password.
 exports.verifyResetOTP = async (req, res) => {
   const email = normalizeIdentifier(req.body.email);
 
@@ -182,11 +197,9 @@ exports.verifyResetOTP = async (req, res) => {
     });
     if (!result.valid) return res.status(400).json({ message: result.message });
 
-    const tempToken = jwt.sign(
-      { email, purpose: 'password_reset' },
-      process.env.JWT_SECRET,
-      { expiresIn: '15m' }
-    );
+    const tempToken = jwt.sign({ email, purpose: 'password_reset' }, process.env.JWT_SECRET, {
+      expiresIn: '15m'
+    });
     res.json({ message: 'OTP verified successfully', tempToken, nextStep: 'reset-password' });
   } catch (error) {
     console.error('Reset verification error:', error.message);
@@ -194,6 +207,7 @@ exports.verifyResetOTP = async (req, res) => {
   }
 };
 
+// Replaces the password after OTP verification and revokes older sessions.
 exports.resetPassword = async (req, res) => {
   try {
     const decoded = jwt.verify(req.body.tempToken, process.env.JWT_SECRET);

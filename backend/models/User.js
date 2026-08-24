@@ -3,7 +3,8 @@ const mongoose = require('mongoose');
 const USER_ROLES = ['user', 'guardian', 'caregiver', 'doctor', 'admin', 'super_admin'];
 const ACCOUNT_STATUSES = ['active', 'inactive', 'suspended', 'archived'];
 
-const UserSchema = new mongoose.Schema({
+const UserSchema = new mongoose.Schema(
+  {
     name: { type: String, required: true },
     email: { type: String, required: true, unique: true, lowercase: true, trim: true },
     password: { type: String, required: true },
@@ -11,10 +12,10 @@ const UserSchema = new mongoose.Schema({
     role: { type: String, enum: USER_ROLES, default: 'user', index: true },
     permissions: [{ type: String }],
     accountStatus: {
-        type: String,
-        enum: ACCOUNT_STATUSES,
-        default: 'active',
-        index: true
+      type: String,
+      enum: ACCOUNT_STATUSES,
+      default: 'active',
+      index: true
     },
     isDeleted: { type: Boolean, default: false, index: true },
     deletedAt: { type: Date, default: null },
@@ -26,7 +27,9 @@ const UserSchema = new mongoose.Schema({
     passwordChangedAt: { type: Date, default: null },
     mustChangePassword: { type: Boolean, default: false },
     sessionVersion: { type: Number, default: 0 }
-}, { timestamps: true });
+  },
+  { timestamps: true }
+);
 
 module.exports = mongoose.model('User', UserSchema);
 module.exports.USER_ROLES = USER_ROLES;
