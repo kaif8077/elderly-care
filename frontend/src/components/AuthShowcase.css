@@ -13,21 +13,9 @@
   background-repeat: no-repeat;
 }
 .auth-showcase {
-  position: relative;
-  display: flex;
   min-width: 0;
   height: 100%;
-  flex-direction: column;
-  padding: clamp(30px, 6vh, 64px) clamp(54px, 7vw, 118px) clamp(26px, 4vh, 48px);
-  overflow: hidden;
   background: transparent;
-}
-.auth-showcase > * {
-  position: relative;
-  z-index: 1;
-}
-.auth-showcase-logo {
-  width: max-content;
 }
 .auth-brand-lockup {
   display: inline-flex;
@@ -49,71 +37,6 @@
 }
 .auth-brand-lockup strong span {
   color: #0066ff;
-}
-.auth-showcase-copy {
-  width: min(100%, 500px);
-  margin: clamp(42px, 10vh, 112px) 0 0;
-}
-.auth-showcase-line {
-  display: block;
-  width: 36px;
-  height: 4px;
-  margin-bottom: clamp(20px, 4vh, 34px);
-  border-radius: 99px;
-  background: #0066ff;
-}
-.auth-showcase h1.ant-typography {
-  margin: 0;
-  color: #102044;
-  font-size: clamp(44px, 4.1vw, 62px);
-  line-height: 0.98;
-  letter-spacing: -0.03em;
-}
-.auth-showcase h1 strong {
-  color: #0066ff;
-}
-.auth-showcase-copy > p.ant-typography {
-  max-width: 430px;
-  margin: clamp(18px, 3vh, 30px) 0 clamp(22px, 4vh, 38px);
-  color: #3f4f6d;
-  font-size: 15px;
-  line-height: 1.65;
-}
-.auth-benefits {
-  gap: 24px !important;
-}
-.auth-benefits > .ant-space-item > div {
-  display: flex;
-  align-items: center;
-  gap: 18px;
-}
-.auth-benefits > .ant-space-item > div > span {
-  display: grid;
-  width: 40px;
-  height: 40px;
-  flex: 0 0 40px;
-  place-items: center;
-  color: #0066ff;
-  font-size: 24px;
-}
-.auth-benefits > .ant-space-item > div > div {
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
-}
-.auth-benefits .ant-typography-strong {
-  color: #102044;
-  font-size: 14px;
-}
-.auth-benefits .ant-typography-secondary {
-  font-size: 13px;
-}
-.auth-showcase-footer {
-  display: flex;
-  align-items: center;
-  gap: 9px;
-  margin-top: auto;
-  font-size: 12px;
 }
 .care-auth-card.ant-card {
   position: relative;
@@ -232,18 +155,6 @@
   }
 }
 @media (max-height: 760px) and (min-width: 901px) {
-  .auth-showcase {
-    padding-block: 38px 30px;
-  }
-  .auth-showcase-copy {
-    margin-top: 48px;
-  }
-  .auth-showcase-copy > p.ant-typography {
-    margin-block: 18px 24px;
-  }
-  .auth-benefits {
-    gap: 16px !important;
-  }
   .care-auth-card > .ant-card-body {
     padding-block: 24px !important;
   }
